@@ -1,0 +1,14 @@
+---
+title: "Chris RMD"
+author: "Chris Liang"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+    latex_args: ["-shell-escape"]
+geometry: "top=15mm, bottom=15mm, left=15mm, right=15mm"
+format: pdf
+editor: visual
+---
+
+
