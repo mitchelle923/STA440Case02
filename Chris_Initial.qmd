@@ -11,4 +11,70 @@ format: pdf
 editor: visual
 ---
 
+```{r}
+#| echo : false
+#| label: downloading-packages
+#| message: false
+#| include: false
+
+library(tidyverse)
+library(knitr)
+```
+
+
+```{r}
+#| echo : false
+#| label: read-data
+#| message: false
+#| include: false
+
+
+earlydata <- read_csv("~/R/Case_Studies/STA440_Case_2/Cleaned Data/data_2017_2021.csv")
+laterdata <- read_csv("~/R/Case_Studies/STA440_Case_2/Cleaned Data/data_2022_2023.csv")
+
+early <- earlydata |>
+  drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
+
+later <- laterdata |>
+  drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
+```
+
+
+
+```{r}
+laterdata |>
+  filter(Apparatus == "HB") |>
+  select(LastName, FirstName, Country, Date, Competition, Round, Score) |>
+  group_by(Round) |>
+  arrange(desc(Score)) |>
+  slice_max(order_by = Score, n = 10)
+
+laterdata |>
+  filter(Apparatus == "HB") |>
+  select(LastName, FirstName, Country, Date, Competition, Round, Score) |>
+  arrange(desc(Score)) |>
+  slice_max(order_by = Score, n = 10)
+```
+
+
+
+```{r}
+apparatus_summary <- laterdata |>
+  filter(Gender == "m") |>
+  select(LastName, FirstName, Apparatus, Country, Date, Competition, Round, D_Score, E_Score, Score) |>
+  group_by(Apparatus, Country) |>
+  summarise(mean_difficulty = mean(D_Score),
+            mean_execution = mean(E_Score),
+            mean_overall = mean(Score)) |>
+  slice_max(order_by = mean_overall, n = 10)
+
+apparatus_summary
+```
+
+```{r}
+apparatus_summary |>
+  filter(Apparatus == "FX") |>
+  ggplot(aes(x = mean_overall, y = fct_reorder(Country, mean_overall))) +
+  geom_col()
+```
 
