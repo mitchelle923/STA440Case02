@@ -1,0 +1,60 @@
+---
+title: "Enzo Analysis"
+author: "Enzo Moraes Mescall"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+data_23 = read.csv("Cleaned Data/modified_2023.csv")
+```
+
+```{r}
+summary(data_23)
+```
+```{r}
+# Count missing values in each column
+missing_data <- data_23 %>% summarise_all(~sum(is.na(.)))
+  
+# View missing data summary
+missing_data
+```
+
+```{r}
+# Scatter plot of Rank vs. Score
+ggplot(data_23, aes(x = Rank, y = Score)) +
+  geom_point() +
+  labs(x = "Rank", y = "Score")
+```
+```{r}
+data_23 %>%
+  group_by(Apparatus) %>%
+  summarise(
+    Avg_D_Score = mean(D_Score, na.rm = TRUE),
+    Avg_E_Score = mean(E_Score, na.rm = TRUE),
+    Avg_Score = mean(Score, na.rm = TRUE)
+  ) %>% arrange(Avg_Score)
+```
+
+
+```{r}
+# Example: Identify top 5 athletes with the highest scores
+top_athletes <- data_23 %>%
+  arrange(desc(Score))
+
+# View the top athletes
+top_athletes
+  #%>%  filter(Country == "USA")
+```
+
+
+
