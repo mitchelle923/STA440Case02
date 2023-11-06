@@ -9,22 +9,83 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
 ```
 
-## Including Plots
+```{r}
+data_2017_2021 <- read_csv("Cleaned Data/data_2017_2021.csv")
+data_2022_2023 <- read_csv("Cleaned Data/data_2022_2023.csv")
 
-You can also embed plots, for example:
+data_2017_2021 <- data_2017_2021 %>% 
+  drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+data_2022_2023 <- data_2022_2023 %>% 
+  drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+# filter by gender, apparatus, qual vs final vs AAfinal vs AAqual vs team qual vs team final, country?
+usa_women_17_21 <- data_2017_2021 %>%
+  #filter(Gender== "m") %>%
+  filter(Country == "USA") %>%
+  group_by(Apparatus) %>%
+  slice_max(order_by = Score, n = 5) %>%
+  ungroup()
+
+print(usa_women_17_21)
+
+usa_men_22_23 <- data_2022_2023 %>%
+  filter(Gender== "m") %>%
+  filter(Country == "USA") %>%
+  group_by(Apparatus) %>%
+  slice_max(order_by = Score, n = 5) %>%
+  ungroup()
+
+print(usa_men_22_23)
+
+usa_women_22_23 <- data_2022_2023 %>%
+  filter(Gender== "w") %>%
+  filter(Country == "USA") %>%
+  group_by(Apparatus) %>%
+  slice_max(order_by = Score, n = 5) %>%
+  ungroup()
+
+print(usa_women_22_23)
+```
+```{r}
+# ggplot(data_2017_2021, aes(x = Date, y = Score, color = Country)) +
+#   geom_point() +
+#   facet_wrap(~ Apparatus, scales = "free_y") +
+#   labs(title = "Scores by Country Faceted by Apparatus")
+
+data_2017_2021 %>%
+  filter(Country == "USA") %>%
+  ggplot(aes(x = Date, y = Score, color = LastName)) +
+  geom_point() +
+  facet_wrap(~ Apparatus, scales = "free_y") +
+  labs(title = "Scores by Gymnast Faceted by Apparatus")
+
+data_2022_2023 %>%
+  filter(Country == "USA") %>%
+  filter(Gender == "w") %>%
+  ggplot(aes(x = Date, y = Score, color = LastName)) +
+  geom_point() +
+  facet_wrap(~ Apparatus, scales = "free_y") +
+  labs(title = "Scores by Gymnast Faceted by Apparatus") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# data_2022_2023 %>%
+#   filter(Country == "USA") %>%
+#   filter(Gender == "m") %>%
+#   ggplot(aes(x = Date, y = Score, color = LastName)) +
+#   geom_point() +
+#   facet_wrap(~ Apparatus, scales = "free_y") +
+#   labs(title = "Scores by Gymnast Faceted by Apparatus")
+```
+
+
+
