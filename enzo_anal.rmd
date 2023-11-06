@@ -41,8 +41,21 @@ data_23 %>%
   summarise(
     Avg_D_Score = mean(D_Score, na.rm = TRUE),
     Avg_E_Score = mean(E_Score, na.rm = TRUE),
-    Avg_Score = mean(Score, na.rm = TRUE)
-  ) %>% arrange(Avg_Score)
+    Avg_Score = mean(Score, na.rm = TRUE),
+    Max_Score = max(Score)
+  ) %>% arrange(Max_Score)
+```
+
+```{r}
+data_23 %>%
+  ggplot(aes(x = Apparatus, y = Score)) +
+  geom_boxplot() +
+  labs(title = "Boxplots of Scores by Apparatus Category",
+       x = "Apparatus Category",
+       y = "Score") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 ```
 
 
