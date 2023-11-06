@@ -40,22 +40,42 @@ later <- laterdata |>
 ```
 
 
+## LATER QUAD
 
 ```{r}
-laterdata |>
-  filter(Apparatus == "HB") |>
-  select(LastName, FirstName, Country, Date, Competition, Round, Score) |>
-  group_by(Round) |>
-  arrange(desc(Score)) |>
-  slice_max(order_by = Score, n = 10)
+AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
+'%notin%' <- function(x,y)!('%in%'(x,y))
 
-laterdata |>
-  filter(Apparatus == "HB") |>
-  select(LastName, FirstName, Country, Date, Competition, Round, Score) |>
+#for only the apparatus events
+top_20_apparatus_men <- laterdata |>
+  filter(Gender == "m",
+         Round %notin% AA_team) |>
+  select(Apparatus, LastName, FirstName, Country, Date, Competition, Round, Score) |>
+  group_by(Apparatus) |>
   arrange(desc(Score)) |>
-  slice_max(order_by = Score, n = 10)
+  slice_max(order_by = Score, n = 20)
+
+top_20_apparatus_women <- laterdata |>
+  filter(Gender == "w",
+         Round %notin% AA_team) |>
+  select(Apparatus, LastName, FirstName, Country, Date, Competition, Round, Score) |>
+  group_by(Apparatus) |>
+  arrange(desc(Score)) |>
+  slice_max(order_by = Score, n = 20)
+
+#top_20_apparatus_men
 ```
 
+
+```{r}
+top_20_apparatus_men |>
+  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_bar() + 
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  theme(legend.position = "none") +
+  facet_grid(~ Apparatus, scales = "free_x") + 
+  coord_flip()
+```
 
 
 ```{r}
@@ -73,8 +93,140 @@ apparatus_summary
 
 ```{r}
 apparatus_summary |>
+  ggplot(aes(x = mean_overall, y = fct_reorder(Country, mean_overall), fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_col() +
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  theme(legend.position = "none") +
+  facet_grid(~ Apparatus, scales = "free_y")
+```
+
+```{r}
+top_20_apparatus_men |>
   filter(Apparatus == "FX") |>
-  ggplot(aes(x = mean_overall, y = fct_reorder(Country, mean_overall))) +
-  geom_col()
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "FX Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_men |>
+  filter(Apparatus == "PH") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "PH Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_men |>
+  filter(Apparatus == "HB") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "HB Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_men |>
+  filter(Apparatus == "hb") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "hb Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_men |>
+  filter(Apparatus == "VT") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "VT Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_men |>
+  filter(Apparatus == "VT1") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "VT1 Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_men |>
+  filter(Apparatus == "VT2") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "VT2 Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_men |>
+  filter(Apparatus == "SR") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "SR Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_men |>
+  filter(Apparatus == "PB") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "PB Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+```
+
+
+Thoughts: maybe give each athlete a Unique ID (for purposes of combining first and last name)
+What to do about VT1, VT2 vs. just VT
+
+
+```{r}
+top_20_apparatus_women |>
+  filter(Apparatus == "BB") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "BB Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_women |>
+  filter(Apparatus == "VT") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "VT Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_women |>
+  filter(Apparatus == "UB") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "UB Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_women |>
+  filter(Apparatus == "VT1") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "VT1 Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+top_20_apparatus_women |>
+  filter(Apparatus == "VT2") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "VT2 Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
+
+
+top_20_apparatus_women |>
+  filter(Apparatus == "FX") |>
+  ggplot(aes(x = LastName)) +
+  geom_bar() +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "FX Apparatus Top Athletes",
+       subtitle = "# of Times an Athlete was in the Top 20 Scores")
 ```
 
