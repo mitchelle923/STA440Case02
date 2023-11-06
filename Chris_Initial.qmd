@@ -230,3 +230,23 @@ top_20_apparatus_women |>
        subtitle = "# of Times an Athlete was in the Top 20 Scores")
 ```
 
+
+## USA Specific
+
+
+```{r}
+laterUSA <- later |>
+  filter(Country == "USA")
+
+laterUSAwomen <- laterUSA |>
+  filter(Gender == "w")
+
+laterUSAmen <- laterUSA |>
+  filter(Gender == "m")
+```
+
+
+
+
+
+
