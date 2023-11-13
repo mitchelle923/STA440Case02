@@ -15,13 +15,21 @@ library(tidyverse)
 
 
 ```{r}
-data_23 = read.csv("Cleaned Data/modified_2023.csv") %>%
-  mutate(Apparatus = toupper(Apparatus))
-data_21 = read.csv("Cleaned Data/data_2017_2021.csv") 
+library(tidyverse)
+library(janitor)
+library(lme4)
+library(lmerTest)
+library(glmmTMB)
 ```
 
 ```{r}
-summary(data_23)
+data_23 %>%
+  filter(Country == "USA") %>%
+  filter(Gender == "m") %>%
+  group_by(LastName, Gender) %>%
+  summarise(MaxRank = min(Rank, na.rm = TRUE)) %>%
+  arrange(-MaxRank) %>%
+  filter(MaxRank != Inf)
 ```
 ```{r}
 # Count missing values in each column
@@ -153,17 +161,37 @@ top_5_athletes_per_apparatus %>%
 ```{r}
 data_21 %>%
   filter(Score > 8) %>%
-  ggplot(aes(x = Score)) +
-  geom_histogram() +
+  ggplot(aes(x = D_Score, fill = Apparatus)) +
+  geom_density(alpha = 0.4) +
   labs(title = "Scores in 2021 Olympics")
 ```
 
 ```{r}
 data_21 %>%
-  filter(LastName == "BILES") %>%
-  ggplot(aes(x = Score)) +
-  geom_histogram() +
-  labs(title = "Biles' Scores in 2021 Olympics")
+  filter(Apparatus == "FX") %>%
+  ggplot(aes(x = D_Score)) +
+  geom_histogram()
 ```
 
+## Trying to discover the underlying distribution
+
+First approach with 2021 data
+
+```{r}
+model_df = data_21 %>%
+  mutate(Name = paste(toupper(FirstName), LastName)) %>%
+  select(Name, Country, Round, Apparatus, Rank, D_Score, E_Score, Penalty, Score)
+
+model_df$Score <- model_df$Score/16
+```
+
+
+```{r}
+model = glmmTMB(Score ~ (1|Name), data = model_df, family = beta_family(link = "logit"))
+summary(model)
+```
+
+```{r}
+
+```
 
