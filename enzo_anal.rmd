@@ -15,18 +15,25 @@ library(tidyverse)
 
 
 ```{r}
-data_23 = read.csv("Cleaned Data/modified_2023.csv")
+library(tidyverse)
+library(janitor)
+library(lme4)
+library(lmerTest)
+library(glmmTMB)
 ```
 
 ```{r}
-summary(data_23)
+data_23 %>%
+  filter(Country == "USA") %>%
+  filter(Gender == "m") %>%
+  group_by(LastName, Gender) %>%
+  summarise(MaxRank = min(Rank, na.rm = TRUE)) %>%
+  arrange(-MaxRank) %>%
+  filter(MaxRank != Inf)
 ```
 ```{r}
 # Count missing values in each column
-missing_data <- data_23 %>% summarise_all(~sum(is.na(.)))
-  
-# View missing data summary
-missing_data
+data_23 %>% summarise_all(~sum(is.na(.)))
 ```
 
 ```{r}
@@ -41,20 +48,150 @@ data_23 %>%
   summarise(
     Avg_D_Score = mean(D_Score, na.rm = TRUE),
     Avg_E_Score = mean(E_Score, na.rm = TRUE),
-    Avg_Score = mean(Score, na.rm = TRUE)
-  ) %>% arrange(Avg_Score)
+    Avg_Score = mean(Score, na.rm = TRUE),
+    Max_Score = max(Score)
+  ) %>% arrange(Max_Score)
+```
+
+```{r}
+data_21 %>%
+  group_by(Apparatus) %>%
+  summarise(
+    Avg_D_Score = mean(D_Score, na.rm = TRUE),
+    Avg_E_Score = mean(E_Score, na.rm = TRUE),
+    Avg_Score = mean(Score, na.rm = TRUE),
+    Max_Score = max(Score, na.rm = TRUE)
+  ) %>% arrange(Max_Score)
+```
+
+```{r}
+data_23 %>%
+  ggplot(aes(x = Apparatus, y = Score)) +
+  geom_boxplot() +
+  labs(title = "Boxplots of Scores by Apparatus Category",
+       x = "Apparatus Category",
+       y = "Score") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 ```
 
 
 ```{r}
-# Example: Identify top 5 athletes with the highest scores
+# General top 5 athletes
 top_athletes <- data_23 %>%
   arrange(desc(Score))
 
 # View the top athletes
-top_athletes
-  #%>%  filter(Country == "USA")
+top_athletes %>%
+  filter(Country == "USA")
+```
+
+```{r}
+top_5_athletes_per_apparatus <- data_23 %>%
+  group_by(Apparatus) %>%
+  arrange(desc(Score)) %>%
+  slice_head(n = 5) %>%
+  ungroup()
+
+top_5_athletes_per_apparatus
+```
+
+```{r}
+# Define a custom color palette for the specified countries
+country_colors <- c(
+  ALG = "green",
+  ARM = "purple",
+  AUS = "gold",
+  CHN = "red",
+  CYP = "orange",
+  ENG = "lightblue",
+  GBR = "blue",
+  IRL = "darkgreen",
+  JPN = "black",
+  KAZ = "yellow",
+  PHI = "maroon",
+  TPE = "pink",
+  TUR = "brown",
+  USA = "navyblue"
+)
+
+# Add a special shape for US athletes
+country_shapes <- c(
+  ALG = 1,  # Shape code for other countries
+  ARM = 1,
+  AUS = 1,
+  CHN = 1,
+  CYP = 1,
+  ENG = 1,
+  GBR = 1,
+  IRL = 1,
+  JPN = 1,
+  KAZ = 1,
+  PHI = 1,
+  TPE = 1,
+  TUR = 1,
+  USA = 2  # Shape code for US athletes
+)
+
+top_5_athletes_per_apparatus$CountryColor <- country_colors[top_5_athletes_per_apparatus$Country]
+top_5_athletes_per_apparatus$CountryShape <- country_shapes[top_5_athletes_per_apparatus$Country]
+
+# Filter to include all US athletes
+us_athletes <- top_5_athletes_per_apparatus %>%
+  filter(Country == "USA")
+
+top_5_athletes_per_apparatus %>%
+  ggplot(aes(x = Apparatus, y = Score, color = Country, shape = as.factor(CountryShape))) +
+  geom_point(stat = "identity", size = 3) +
+  geom_point(data = us_athletes, size = 3) +  # Add all US athletes
+  labs(
+    title = "Top 5 Athletes by Apparatus and Country",
+    x = "Apparatus",
+    y = "Score"
+  ) +
+  scale_shape_manual(values = c("1" = 1, "2" = 16)) +  # Define shape codes 
+  scale_fill_manual(values = country_colors) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+```{r}
+data_21 %>%
+  filter(Score > 8) %>%
+  ggplot(aes(x = D_Score, fill = Apparatus)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Scores in 2021 Olympics")
+```
+
+```{r}
+data_21 %>%
+  filter(Apparatus == "FX") %>%
+  ggplot(aes(x = D_Score)) +
+  geom_histogram()
+```
+
+## Trying to discover the underlying distribution
+
+First approach with 2021 data
+
+```{r}
+model_df = data_21 %>%
+  mutate(Name = paste(toupper(FirstName), LastName)) %>%
+  select(Name, Country, Round, Apparatus, Rank, D_Score, E_Score, Penalty, Score)
+
+model_df$Score <- model_df$Score/16
 ```
 
 
+```{r}
+model = glmmTMB(Score ~ (1|Name), data = model_df, family = beta_family(link = "logit"))
+summary(model)
+```
+
+```{r}
+
+```
 
