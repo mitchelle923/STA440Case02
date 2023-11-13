@@ -91,8 +91,6 @@ data_2022_2023 %>%
 n_distinct(data_2022_2023$Country)
 
 mean(data_2022_2023$Score)
-
-highscore
 ```
 
 ```{r}
@@ -113,8 +111,3 @@ top_percent_women <- women_data %>%
   group_by(Apparatus) %>%
   filter(rank(desc(Score), ties.method = "min")/n() <= 0.20)
 ```
-```{r}
-
-
-```
-
