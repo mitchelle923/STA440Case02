@@ -19,6 +19,7 @@ editor: visual
 
 library(tidyverse)
 library(knitr)
+library(stringr)
 ```
 
 
@@ -28,9 +29,9 @@ library(knitr)
 #| message: false
 #| include: false
 
-
-earlydata <- read_csv("~/R/Case_Studies/STA440_Case_2/Cleaned Data/data_2017_2021.csv")
-laterdata <- read_csv("~/R/Case_Studies/STA440_Case_2/Cleaned Data/data_2022_2023.csv")
+#make sure this is forked to github so it's not a local file path
+earlydata <- read_csv("Cleaned Data/data_2017_2021.csv")
+laterdata <- read_csv("Cleaned Data/data_2022_2023.csv")
 
 early <- earlydata |>
   drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
@@ -39,6 +40,35 @@ later <- laterdata |>
   drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
 ```
 
+```{r}
+#indonesian gymnast's name is Abiyu RAFI not ABIYURAFI
+laterdata <- laterdata |>
+  mutate(FirstName = ifelse(LastName == "ABIYURAFI" & FirstName == ".", "Abiyu", FirstName),
+    LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName))
+
+
+laterdata <- laterdata |>
+  mutate(firstname_check = ifelse(str_length(FirstName) >= 3, 1, 0),
+         lastname_check = ifelse(str_length(LastName) >= 3, 1, 0))
+
+laterdata <- laterdata |>
+  mutate(FirstName = ifelse(firstname_check == 0, paste0(FirstName, "_"), FirstName),
+         LastName = ifelse(lastname_check == 0, paste0(LastName, "_"), LastName))
+
+#based on string methods -- creating unique athlete IDs
+laterdata <- laterdata |>
+  mutate(unique_id = paste0(str_sub(FirstName, 1, 3), str_sub(LastName, 1, 3), "_", Country))
+```
+
+```{r}
+quantiled_data <- laterdata |>
+  group_by(Gender, Competition, Round, Apparatus) |>
+  mutate(quantile = ntile(-Score, 5))
+
+# NEED TO FIX THIS 
+# quant_data <- quantiled_data |>
+#   filter(quantile == 1)
+```
 
 ## LATER QUAD
 
@@ -50,7 +80,7 @@ AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
 top_20_apparatus_men <- laterdata |>
   filter(Gender == "m",
          Round %notin% AA_team) |>
-  select(Apparatus, LastName, FirstName, Country, Date, Competition, Round, Score) |>
+  select(Apparatus, unique_id, Country, Date, Competition, Round, Score) |>
   group_by(Apparatus) |>
   arrange(desc(Score)) |>
   slice_max(order_by = Score, n = 20)
@@ -58,7 +88,7 @@ top_20_apparatus_men <- laterdata |>
 top_20_apparatus_women <- laterdata |>
   filter(Gender == "w",
          Round %notin% AA_team) |>
-  select(Apparatus, LastName, FirstName, Country, Date, Competition, Round, Score) |>
+  select(Apparatus, unique_id, Country, Date, Competition, Round, Score) |>
   group_by(Apparatus) |>
   arrange(desc(Score)) |>
   slice_max(order_by = Score, n = 20)
@@ -81,7 +111,7 @@ top_20_apparatus_men |>
 ```{r}
 apparatus_summary <- laterdata |>
   filter(Gender == "m") |>
-  select(LastName, FirstName, Apparatus, Country, Date, Competition, Round, D_Score, E_Score, Score) |>
+  select(unique_id, Apparatus, Country, Date, Competition, Round, D_Score, E_Score, Score) |>
   group_by(Apparatus, Country) |>
   summarise(mean_difficulty = mean(D_Score),
             mean_execution = mean(E_Score),
@@ -103,7 +133,7 @@ apparatus_summary |>
 ```{r}
 top_20_apparatus_men |>
   filter(Apparatus == "FX") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "FX Apparatus Top Athletes",
@@ -111,7 +141,7 @@ top_20_apparatus_men |>
 
 top_20_apparatus_men |>
   filter(Apparatus == "PH") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "PH Apparatus Top Athletes",
@@ -119,7 +149,7 @@ top_20_apparatus_men |>
 
 top_20_apparatus_men |>
   filter(Apparatus == "HB") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "HB Apparatus Top Athletes",
@@ -127,7 +157,7 @@ top_20_apparatus_men |>
 
 top_20_apparatus_men |>
   filter(Apparatus == "hb") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "hb Apparatus Top Athletes",
@@ -135,7 +165,7 @@ top_20_apparatus_men |>
 
 top_20_apparatus_men |>
   filter(Apparatus == "VT") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "VT Apparatus Top Athletes",
@@ -143,7 +173,7 @@ top_20_apparatus_men |>
 
 top_20_apparatus_men |>
   filter(Apparatus == "VT1") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "VT1 Apparatus Top Athletes",
@@ -151,7 +181,7 @@ top_20_apparatus_men |>
 
 top_20_apparatus_men |>
   filter(Apparatus == "VT2") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "VT2 Apparatus Top Athletes",
@@ -159,7 +189,7 @@ top_20_apparatus_men |>
 
 top_20_apparatus_men |>
   filter(Apparatus == "SR") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "SR Apparatus Top Athletes",
@@ -167,7 +197,7 @@ top_20_apparatus_men |>
 
 top_20_apparatus_men |>
   filter(Apparatus == "PB") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "PB Apparatus Top Athletes",
@@ -182,7 +212,7 @@ What to do about VT1, VT2 vs. just VT
 ```{r}
 top_20_apparatus_women |>
   filter(Apparatus == "BB") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "BB Apparatus Top Athletes",
@@ -190,7 +220,7 @@ top_20_apparatus_women |>
 
 top_20_apparatus_women |>
   filter(Apparatus == "VT") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "VT Apparatus Top Athletes",
@@ -198,7 +228,7 @@ top_20_apparatus_women |>
 
 top_20_apparatus_women |>
   filter(Apparatus == "UB") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "UB Apparatus Top Athletes",
@@ -206,7 +236,7 @@ top_20_apparatus_women |>
 
 top_20_apparatus_women |>
   filter(Apparatus == "VT1") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "VT1 Apparatus Top Athletes",
@@ -214,7 +244,7 @@ top_20_apparatus_women |>
 
 top_20_apparatus_women |>
   filter(Apparatus == "VT2") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "VT2 Apparatus Top Athletes",
@@ -223,7 +253,7 @@ top_20_apparatus_women |>
 
 top_20_apparatus_women |>
   filter(Apparatus == "FX") |>
-  ggplot(aes(x = LastName)) +
+  ggplot(aes(x = unique_id)) +
   geom_bar() +
   facet_wrap(~ Country, scales = "free_x") +
   labs(title = "FX Apparatus Top Athletes",
@@ -235,17 +265,15 @@ top_20_apparatus_women |>
 
 
 ```{r}
-laterUSA <- later |>
-  filter(Country == "USA")
-
-laterUSAwomen <- laterUSA |>
-  filter(Gender == "w")
-
-laterUSAmen <- laterUSA |>
-  filter(Gender == "m")
+# laterUSA <- later |>
+#   filter(Country == "USA")
+# 
+# laterUSAwomen <- laterUSA |>
+#   filter(Gender == "w")
+# 
+# laterUSAmen <- laterUSA |>
+#   filter(Gender == "m")
 ```
-
-
 
 
 
