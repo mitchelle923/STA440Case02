@@ -1,0 +1,161 @@
+---
+title: "Mitchelle's EDA"
+output: pdf_document
+date: "2023-11-01"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries}
+library(readr)
+library(dplyr)
+library(ggplot2)
+```
+
+
+#Data
+```{r data}
+data_2017_2021 <- read_csv("Cleaned Data/data_2017_2021.csv")
+data_2022_2023 <- read_csv("Cleaned Data/data_2022_2023.csv")
+
+```
+
+```{r}
+#remove gymnasts that did not have Scores??
+data_2017_2021 %>% 
+  filter(is.na(Score)) %>% 
+  dplyr::summarise(ct = n())
+
+data_2022_2023 %>% 
+  filter(is.na(Score)) %>% 
+  dplyr::summarise(ct = n())
+```
+
+```{r}
+#Competitions types
+data_2017_2021 %>% 
+  group_by(Competition) %>% 
+  dplyr::summarise(ct = n())
+
+data_2022_2023 %>% 
+  group_by(Competition) %>% 
+  dplyr::summarise(ct = n())
+```
+
+```{r}
+data_2017_2021 %>% 
+  group_by(Round) %>% 
+  dplyr::summarise(ct = n())
+
+data_2022_2023 %>% 
+  group_by(Round) %>% 
+  dplyr::summarise(ct = n())
+```
+
+```{r}
+data_2017_2021 %>% 
+  group_by(Apparatus) %>% 
+  dplyr::summarise(ct = n())
+
+data_2022_2023 %>% 
+  group_by(Apparatus) %>% 
+  dplyr::summarise(ct = n())
+```
+
+
+```{r}
+# fix first name issue (some have middle names)
+```
+
+
+```{r}
+#women 2017-2021 data 
+women2017_2021 <- data_2017_2021[data_2017_2021$Gender == "w", ]
+#there is no men data in 2017-2021 data table
+
+#women 2022-2023 data
+women2022_2023 <- data_2022_2023[data_2022_2023$Gender == "w", ]
+#men 2022-2023 data
+men2022_2023 <- data_2022_2023[data_2022_2023$Gender == "m", ]
+
+#women USA data 2017-2021
+womenUSA2017_2021 <- data_2017_2021[data_2017_2021$Gender == "w"& data_2017_2021$Country == "USA",]
+
+
+#USA men 2022-2023 data
+menUSA2022_2023 <- data_2022_2023[data_2022_2023$Gender == "m"& data_2022_2023$Country == "USA",]
+#USA women 2022-2023 data
+womenUSA2022_2023 <- data_2022_2023[data_2022_2023$Gender == "w"& data_2022_2023$Country == "USA",]
+
+```
+
+```{r}
+ ggplot(data = womenUSA2017_2021, aes(x = Apparatus, y = Score)) +
+  geom_boxplot() +
+  labs(title = "USA Scores by Apparatus", x = "Appartus", y = "Total Score") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + facet_wrap(~Round)
+
+ ggplot(data = menUSA2022_2023, aes(x = Apparatus, y = Score)) +
+  geom_boxplot() +
+  labs(title = "USA Scores by Apparatus", x = "Appartus", y = "Total Score") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + facet_wrap(~Round)
+
+ ggplot(data = womenUSA2022_2023, aes(x = Apparatus, y = Score)) +
+  geom_boxplot() +
+  labs(title = "USA Scores by Apparatus", x = "Appartus", y = "Total Score") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + facet_wrap(~Round)
+```
+
+```{r}
+ ggplot(data = women2017_2021, aes(x = Apparatus, y = Score)) +
+  geom_point() +
+  labs(title = "Scores by Apparatus for Women (2017-2021)", x = "Appartus", y = "Total Score") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ ggplot(data = women2022_2023, aes(x = Apparatus, y = Score)) +
+  geom_point() +
+  labs(title = "Scores by Apparatus for Women(2022-2023)", x = "Appartus", y = "Total Score") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ 
+  ggplot(data = men2022_2023, aes(x = Apparatus, y = Score)) +
+  geom_point() +
+  labs(title = "Scores by Apparatus for Men (2022-2023)", x = "Appartus", y = "Total Score") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ 
+```
+```{r}
+data_2017_2021 %>% 
+  group_by(Round, Rank) %>% 
+  dplyr::summarise(ct = n())
+```
+
+So far we subsetted the top 20% percentile by Gender and Apparatus
+```{r}
+#take out middle names because some names have first name and some have middle (Frederick (Nathaniel) Richard)
+data_2022_2023$FirstNameOnly <- sub("^(\\w+)\\s+\\w+$", "\\1", data_2022_2023$FirstName)
+```
+
+
+```{r}
+#subsetting 2nd data set by individual athlete
+data_2022_2023 %>% 
+  group_by(Gender,Competition,Round,Apparatus, Rank) %>% 
+  dplyr::summarise(ct = n())
+
+data_2022_2023 %>% 
+  group_by(Gender, Apparatus) %>% 
+  mutate(meanScore = mean(Score))
+```
+```{r}
+data_2022_2023 %>% 
+  group_by(Gender,Apparatus) %>% 
+  mutate()
+  summarise(meanScore =  mean(Score))
+```
+
+
+
+
