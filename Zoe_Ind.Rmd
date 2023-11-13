@@ -87,5 +87,34 @@ data_2022_2023 %>%
 #   labs(title = "Scores by Gymnast Faceted by Apparatus")
 ```
 
+```{r}
+n_distinct(data_2022_2023$Country)
 
+mean(data_2022_2023$Score)
+
+highscore
+```
+
+```{r}
+men_data <- data_2022_2023 %>%
+  filter(Gender=="m")
+
+women_data <- data_2022_2023 %>%
+  filter(Gender=="w")
+
+data_2022_2023 %>%
+  count(Gender)
+
+top_percent_men <- men_data %>%
+  group_by(Apparatus) %>%
+  filter(rank(desc(Score), ties.method = "min")/n() <= 0.20)
+
+top_percent_women <- women_data %>%
+  group_by(Apparatus) %>%
+  filter(rank(desc(Score), ties.method = "min")/n() <= 0.20)
+```
+```{r}
+
+
+```
 
