@@ -9,22 +9,138 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r libraries}
+library(tidyverse)
+library(fitdistrplus)
 ```
 
-## Including Plots
+## Reading data
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r data}
+data_23 = read.csv("Cleaned Data/modified_2023.csv") %>%
+  mutate(Apparatus = toupper(Apparatus))
+data_21 = read.csv("Cleaned Data/data_2017_2021.csv") 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+# Plotting distributions of difficulty scores add more ticks on the x axis
+data_23 %>%
+  ggplot(aes(x = D_Score, fill = Apparatus)) +
+  geom_histogram() +
+  labs(title = "Distribution of Difficulty Scores",
+       x = "Difficulty Score",
+       y = "Count") +
+  facet_wrap(~Apparatus)
+```
+
+
+```{r}
+# Plotting distributions of execution scores
+data_23 %>%
+  ggplot(aes(x = E_Score, fill = Apparatus)) +
+  geom_histogram() +
+  labs(title = "Distribution of Execution Scores",
+       x = "Execution Score",
+       y = "Count") +
+  facet_wrap(~Apparatus)
+```
+
+Its clear that the execution scores have a left tail to them while the execution scores are more unimodal. Although it doesn't seem like the difficulty scores are exactly normal, they are more normal than the execution scores. 
+
+```{r}
+calculate_p_value <- function(estimate, se, null_value = 0) {
+  z <- (estimate - null_value) / se
+  p_value <- 2 * pnorm(-abs(z))
+  return(p_value)
+}
+```
+
+```{r}
+# Running fitdist() on normal dist and calculating p-value
+normal_fit = fitdist(data_23$D_Score[data_23$Apparatus == "HB"], "norm")
+summary(normal_fit)
+calculate_p_value(normal_fit$estimate[[1]], normal_fit$estimate[[2]])
+
+# Compare this to the sample mean and standard deviation
+mean(data_23$D_Score[data_23$Apparatus == "HB"])
+sd(data_23$D_Score[data_23$Apparatus == "HB"])
+```
+
+p-values seem really low, so we can plot this distribution over the data to see how it looks
+
+```{r}
+# Plot of the gamma distribution over the plot of Apparatus == HB D_Score data
+data_23 %>%
+  filter(Apparatus == "HB") %>%
+  ggplot(aes(x = D_Score)) +
+  geom_density() +
+  stat_function(fun = dnorm, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", size = 1) +
+  labs(title = paste("HB Difficulty compared to normal distribution"),  
+       x = "Difficulty Score",
+       y = "Density")
+```
+
+Looks like a really good fit, but this has me wondering whether when calculating the posterior distribution, should we consider both the mean and the standard deviation to be known values?
+
+```{r}
+# Loop through all people who have done HB and calculate the standard deviations of their difficulty scores
+HB_sd = data_23 %>%
+  filter(Apparatus == "HB") %>%
+  group_by(FirstName, LastName, Gender, Country) %>%
+  summarise(sd = sd(D_Score))
+
+summary(HB_sd$sd)
+
+# Plot histogram of SDs
+HB_sd %>%
+  ggplot(aes(x = sd)) +
+  geom_histogram() +
+  labs(title = "Distribution of SDs of Difficulty Scores",
+       x = "SD",
+       y = "Count") + 
+  geom_vline(xintercept = 0.718, color = "red")
+```
+
+It seems like the standard deviations themselves follow a distribution, canonically the conjugate prior would be an inverse-gamma but I'm not sure how to approach that and it feels like it would be really complicated to have two prior distributions for difficulty score every apparatus for both genders. I also forgot if I should build the prior from the distribution of means/standard deviations or from the distribution of actual scores
+
+```{r}
+# Loop through all people who have done HB and calculate the mean of their difficulty scores
+HB_sd = data_23 %>%
+  filter(Apparatus == "HB") %>%
+  group_by(FirstName, LastName, Gender, Country) %>%
+  summarise(mu = mean(D_Score))
+
+mean(HB_sd$mu)
+
+# Plot histogram of SDs
+HB_sd %>%
+  ggplot(aes(x = mu)) +
+  geom_histogram() +
+  labs(title = "Distribution of Means of Difficulty Scores",
+       x = "SD",
+       y = "Count") + 
+  geom_vline(xintercept = 4.87, color = "red")
+```
+
+My solution to this is to try and fit a beta distribution
+
+```{r}
+# Running fitdist() on beta dist and calculating p-value
+beta_fit = fitdist(data_23$D_Score[data_23$Apparatus == "HB"]/10, "beta")
+summary(beta_fit)
+calculate_p_value(normal_fit$estimate[[1]], normal_fit$estimate[[2]])
+```
+
+```{r}
+# Plot of the gamma distribution over the plot of Apparatus == HB D_Score data
+data_23 %>%
+  filter(Apparatus == "HB") %>%
+  ggplot(aes(x = D_Score/10)) +
+  geom_density() +
+  stat_function(fun = dbeta, args = list(beta_fit$estimate[[1]], beta_fit$estimate[[2]]), color = "red", size = 1) +
+  labs(title = paste("HB Difficulty compared to Beta distribution"),  
+       x = "Difficulty Score",
+       y = "Density")
+```
+
+For beta priors we need to have a prior for both alpha and beta parameters. 

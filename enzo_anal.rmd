@@ -9,10 +9,6 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
-library(tidyverse)
-```
-
 
 ```{r}
 library(tidyverse)
@@ -21,6 +17,13 @@ library(lme4)
 library(lmerTest)
 library(glmmTMB)
 ```
+
+```{r}
+data_23 = read.csv("Cleaned Data/modified_2023.csv") %>%
+  mutate(Apparatus = toupper(Apparatus))
+data_21 = read.csv("Cleaned Data/data_2017_2021.csv") 
+```
+
 
 ```{r}
 data_23 %>%
@@ -191,7 +194,4 @@ model = glmmTMB(Score ~ (1|Name), data = model_df, family = beta_family(link = "
 summary(model)
 ```
 
-```{r}
-
-```
 
