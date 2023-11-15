@@ -1,0 +1,161 @@
+---
+title: "US Gymnastics Analysis"
+author: "Chris, Enzo, Mitchelle, Zoe"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+    latex_args: ["-shell-escape"]
+geometry: "top=15mm, bottom=15mm, left=15mm, right=15mm"
+format: pdf
+editor: visual
+---
+
+```{r}
+#| echo : false
+#| label: downloading-packages
+#| message: false
+#| include: false
+
+library(tidyverse)
+library(knitr)
+library(stringr)
+```
+
+
+```{r}
+#| echo : false
+#| label: read-data
+#| message: false
+#| include: false
+
+#make sure this is forked to github so it's not a local file path
+earlydata <- read_csv("Cleaned Data/data_2017_2021.csv")
+laterdata <- read_csv("Cleaned Data/data_2022_2023.csv")
+
+#will not be using early dataset because it only contains data about female athletes
+early <- earlydata |>
+  drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
+
+later <- laterdata |>
+  drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
+```
+
+## Introduction
+
+## Methodology
+
+```{r}
+#indonesian gymnast's name is Abiyu RAFI not ABIYURAFI
+laterdata <- laterdata |>
+  mutate(FirstName = ifelse(LastName == "ABIYURAFI" & FirstName == ".", "Abiyu", FirstName),
+    LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName))
+
+
+laterdata <- laterdata |>
+  mutate(firstname_check = ifelse(str_length(FirstName) >= 3, 1, 0),
+         lastname_check = ifelse(str_length(LastName) >= 3, 1, 0))
+
+laterdata <- laterdata |>
+  mutate(FirstName = ifelse(firstname_check == 0, paste0(FirstName, "_"), FirstName),
+         LastName = ifelse(lastname_check == 0, paste0(LastName, "_"), LastName))
+
+#based on string methods -- creating unique athlete IDs
+laterdata <- laterdata |>
+  mutate(unique_id = paste0(str_sub(FirstName, 1, 3), str_sub(LastName, 1, 3), "_", Country))
+
+#create a vector for AA or team
+AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
+'%notin%' <- function(x,y)!('%in%'(x,y))
+
+finals_vector <- c("AAfinal", "TeamFinal", "final")
+```
+
+
+```{r}
+#these quantiles are already grouped by gender and competition, round, apapratus, etc. so no bleeding
+quantiled_data <- laterdata |>
+  group_by(Gender, Competition, Round, Apparatus) |>
+  mutate(quantile_20s = ntile(-Score, 5),
+         quantile_10s = ntile(-Score, 10))
+
+#filter out the athletes who have NEVER made it to a final, ever
+filtered_data <- quantiled_data |>
+  group_by(unique_id) |>
+  filter(any(Round == "final" | Round == "TeamFinal" | Round == "AAfinal")) |>
+  ungroup()
+
+#summary of number of athletes competed in each competition in each round
+number_athletes <- filtered_data |>
+  group_by(Competition, Round) |>
+  summarise(athletes_participated = n_distinct(unique_id))
+
+
+# at the oceania continental championships, only 10 unique athletes competed
+# every other competition at each round has at minimum 36 athletes competing
+#at these final rounds, there are at least 40 athletes in each final, so it's fine
+#going to left join to show the number of athletes that participated per round
+
+joined_data <- filtered_data |>
+  left_join(number_athletes, by = c("Competition", "Round"))
+
+#now the athletes_participated column = how many athletes competed in it
+
+
+#this filters out the individual records for ppl who were not in top quantiles at a competition
+final_data <- joined_data |>
+  filter((athletes_participated <= 100 & quantile_20s == 1) | (athletes_participated > 100 & quantile_10s == 1) | (Competition == "Oceania Continental Championships 2023" & quantile_20s %in% c(1, 2)))
+
+#now let's check the number of unique athletes left
+# final_data |>
+#   group_by(Country) |>
+#   summarise(athletes_left = n_distinct(unique_id))
+
+#there are 679 athletes left in total once we have filtered, USA still has 91 left
+```
+
+
+## Results
+
+## Discussion
+
+
+## Appendix
+
+```{r}
+number_athletes |>
+  filter(Round %in% AA_team) |>
+  ggplot(aes(x = athletes_participated)) +
+    geom_histogram() +
+    facet_wrap(~ Round) +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "Distribution of Athletes Competed at Competition Rounds",
+         subtitle = "All Around or Team All Arounds")
+
+number_athletes |>
+  filter(Round == "AAfinal") |>
+  ggplot(aes(x = athletes_participated)) +
+    geom_histogram() +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "Distribution of Athletes Competed at AA Finals")
+
+number_athletes |>
+  filter(Round == "final") |>
+  ggplot(aes(x = athletes_participated)) +
+    geom_histogram() +
+    facet_wrap(~ Round) +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "Distribution of Athletes Competed at Final Rounds",
+         subtitle = "Individual Apparatuses")
+
+ggplot(number_athletes, aes(x = athletes_participated)) +
+  geom_histogram() +
+  labs(x = "Number of Unique Athletes Competed",
+       y = "Frequency",
+       title = "Distribution of Athletes Competed at Competitions")
+
+```
+
