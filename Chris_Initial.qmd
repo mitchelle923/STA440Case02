@@ -33,6 +33,7 @@ library(stringr)
 earlydata <- read_csv("Cleaned Data/data_2017_2021.csv")
 laterdata <- read_csv("Cleaned Data/data_2022_2023.csv")
 
+#will not be using early dataset because it only contains data about female athletes
 early <- earlydata |>
   drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
 
@@ -58,12 +59,51 @@ laterdata <- laterdata |>
 #based on string methods -- creating unique athlete IDs
 laterdata <- laterdata |>
   mutate(unique_id = paste0(str_sub(FirstName, 1, 3), str_sub(LastName, 1, 3), "_", Country))
+
+laterdata |>
+  filter(Gender == "w",
+         Country == "USA")
+
+#create a vector for AA or team
+AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
+'%notin%' <- function(x,y)!('%in%'(x,y))
 ```
 
 ```{r}
 quantiled_data <- laterdata |>
   group_by(Gender, Competition, Round, Apparatus) |>
   mutate(quantile = ntile(-Score, 5))
+
+#summary of number of athletes competed in each competition in each round
+number_athletes <- quantiled_data |>
+  group_by(Competition, Round) |>
+  summarise(unique_id_count = n_distinct(unique_id))
+
+number_athletes |>
+  filter(Round %in% AA_team) |>
+  ggplot(aes(x = unique_id_count)) +
+    geom_histogram() +
+    facet_wrap(~ Round) +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "Distribution of Athletes Competed at Competition Rounds",
+         subtitle = "All Around or Team All Arounds")
+
+number_athletes |>
+  filter(Round %notin% AA_team) |>
+  ggplot(aes(x = unique_id_count)) +
+    geom_histogram() +
+    facet_wrap(~ Round) +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "Distribution of Athletes Competed at Competition Rounds",
+         subtitle = "Individual Apparatuses")
+
+ggplot(number_athletes, aes(x = unique_id_count)) +
+  geom_histogram() +
+  labs(x = "Number of Unique Athletes Competed",
+       y = "Frequency",
+       title = "Distribution of Athletes Competed at Competitions")
 
 # NEED TO FIX THIS 
 # quant_data <- quantiled_data |>
@@ -73,8 +113,7 @@ quantiled_data <- laterdata |>
 ## LATER QUAD
 
 ```{r}
-AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
-'%notin%' <- function(x,y)!('%in%'(x,y))
+
 
 #for only the apparatus events
 top_20_apparatus_men <- laterdata |>
