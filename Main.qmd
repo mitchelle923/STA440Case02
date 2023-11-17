@@ -114,6 +114,15 @@ final_data <- joined_data |>
 ```
 
 # NEW RANKING
+
+```{r}
+menFinal <- final_data %>% 
+  filter(Gender == 'm')
+
+womenFinal <- final_data %>% 
+  filter(Gender == 'w')
+```
+
 ## Men
 ```{r}
 #rank actually shown to be correct here for the early observationsbesides a couple missing ranks
@@ -149,7 +158,7 @@ for (i in 2:nrow(orderMenFinal)){
 orderMenFinal
 ```
 
-#Women
+## Women
 ```{r}
 orderWomenFinal <- womenFinal %>% 
   arrange(Competition, Round, Apparatus, desc(Score)) %>% 
