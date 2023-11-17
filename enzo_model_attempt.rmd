@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r libraries}
 library(tidyverse)
+library(invgamma)
 library(fitdistrplus)
 ```
 
@@ -69,7 +70,7 @@ sd(data_23$D_Score[data_23$Apparatus == "HB"])
 p-values seem really low, so we can plot this distribution over the data to see how it looks
 
 ```{r}
-# Plot of the gamma distribution over the plot of Apparatus == HB D_Score data
+# Plot of the normal distribution over the plot of Apparatus == HB D_Score data
 data_23 %>%
   filter(Apparatus == "HB") %>%
   ggplot(aes(x = D_Score)) +
@@ -86,34 +87,36 @@ Looks like a really good fit, but this has me wondering whether when calculating
 # Loop through all people who have done HB and calculate the standard deviations of their difficulty scores
 HB_sd = data_23 %>%
   filter(Apparatus == "HB") %>%
-  group_by(FirstName, LastName, Gender, Country) %>%
-  summarise(sd = sd(D_Score))
+  group_by(FirstName, LastName) %>%
+  summarise(sd = var(D_Score)) %>%
+  mutate(sd = ifelse(is.na(sd), 0, sd))
 
 summary(HB_sd$sd)
 
 # Plot histogram of SDs
 HB_sd %>%
+  filter(sd > 0) %>%
   ggplot(aes(x = sd)) +
   geom_histogram() +
   labs(title = "Distribution of SDs of Difficulty Scores",
        x = "SD",
        y = "Count") + 
-  geom_vline(xintercept = 0.718, color = "red")
+  geom_vline(xintercept = 0.718**2, color = "red")
 ```
 
-It seems like the standard deviations themselves follow a distribution, canonically the conjugate prior would be an inverse-gamma but I'm not sure how to approach that and it feels like it would be really complicated to have two prior distributions for difficulty score every apparatus for both genders. I also forgot if I should build the prior from the distribution of means/standard deviations or from the distribution of actual scores
+It seems like the standard deviations themselves follow an inv-gamma distribution, canonically the conjugate prior would be an inverse-gamma but I'm not sure how to approach that and it feels like it would be really complicated to have two prior distributions for difficulty score every apparatus for both genders. I also forgot if I should build the prior from the distribution of means/standard deviations or from the distribution of actual scores
 
 ```{r}
 # Loop through all people who have done HB and calculate the mean of their difficulty scores
-HB_sd = data_23 %>%
+HB_mu = data_23 %>%
   filter(Apparatus == "HB") %>%
   group_by(FirstName, LastName, Gender, Country) %>%
   summarise(mu = mean(D_Score))
 
-mean(HB_sd$mu)
+mean(HB_mu$mu)
 
-# Plot histogram of SDs
-HB_sd %>%
+# Plot histogram of means
+HB_mu %>%
   ggplot(aes(x = mu)) +
   geom_histogram() +
   labs(title = "Distribution of Means of Difficulty Scores",
@@ -122,25 +125,50 @@ HB_sd %>%
   geom_vline(xintercept = 4.87, color = "red")
 ```
 
-My solution to this is to try and fit a beta distribution
+I think the reason the mean looks so weird is because some athletes get sampled more than others, i don't care though. I'm going to fit a normal distribution to the means and an inv gamma distribution to the SDs and use those as priors
 
 ```{r}
-# Running fitdist() on beta dist and calculating p-value
-beta_fit = fitdist(data_23$D_Score[data_23$Apparatus == "HB"]/10, "beta")
-summary(beta_fit)
-calculate_p_value(normal_fit$estimate[[1]], normal_fit$estimate[[2]])
+normal_mu_fit = fitdist(HB_mu$mu, "norm")
+invgamma_sd_fit = fitdist(HB_sd$sd[HB_sd$sd > 0], "invgamma")
+dinvgamma()
 ```
 
 ```{r}
-# Plot of the gamma distribution over the plot of Apparatus == HB D_Score data
-data_23 %>%
-  filter(Apparatus == "HB") %>%
-  ggplot(aes(x = D_Score/10)) +
+```
+
+```{r}
+# Plot of the invgamma distribution over the plot HB sd scores
+HB_sd %>%
+  filter(sd > 0) %>%
+  ggplot(aes(x = sd)) +
   geom_density() +
-  stat_function(fun = dbeta, args = list(beta_fit$estimate[[1]], beta_fit$estimate[[2]]), color = "red", size = 1) +
-  labs(title = paste("HB Difficulty compared to Beta distribution"),  
+  stat_function(fun = dinvgamma, args = list(shape = invgamma_sd_fit$estimate[[1]],scale = invgamma_sd_fit$estimate[[2]]), color = "red", size = 1) +
+  labs(title = paste("HB SD of difficulty scores compared to fitted invgamma distribution"),  
        x = "Difficulty Score",
        y = "Density")
 ```
 
-For beta priors we need to have a prior for both alpha and beta parameters. 
+Copying code from sta360 hw 4
+
+```{r}
+smc = 1000
+m_0 =  normal_mu_fit$estimate[[1]]
+sig_0 = normal_mu_fit$estimate[[2]]
+k_0 = invgamma_sd_fit$estimate[[1]] 
+v_0 = invgamma_sd_fit$estimate[[2]]
+
+analyze_athlete = function(athlete_results, smc, m_0, sig_0, k_0, v_0) {
+  n = len(athlete_results)
+  ybar = mean(athlete_results)
+  var = var(athlete_results)
+  k_n = k_0 + n
+  v_n = v_0 + n
+  m_n = (k_0*m_0 + n*ybar)/k_n
+  sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
+  sig_sample = rinvgamma(smc, v_n/2, sig_n*v_n/2)
+  theta_sample = rnorm(smc, m_n, sqrt(sig_sample/k_n))
+  
+  return(ret)
+}
+```
+
