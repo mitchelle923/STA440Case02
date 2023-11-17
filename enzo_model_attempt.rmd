@@ -157,18 +157,60 @@ sig_0 = normal_mu_fit$estimate[[2]]
 k_0 = invgamma_sd_fit$estimate[[1]] 
 v_0 = invgamma_sd_fit$estimate[[2]]
 
-analyze_athlete = function(athlete_results, smc, m_0, sig_0, k_0, v_0) {
-  n = len(athlete_results)
+analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc) {
+  n = length(athlete_results)
   ybar = mean(athlete_results)
-  var = var(athlete_results)
+  
+  if (is.na(var(athlete_results))) {
+    var = 0
+  } else {
+    var = var(athlete_results) 
+  }
+  
   k_n = k_0 + n
   v_n = v_0 + n
   m_n = (k_0*m_0 + n*ybar)/k_n
   sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
-  sig_sample = rinvgamma(smc, v_n/2, sig_n*v_n/2)
-  theta_sample = rnorm(smc, m_n, sqrt(sig_sample/k_n))
+  sig_sample = mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
+  theta_sample = mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
   
-  return(ret)
+  return(c(theta_sample, sig_sample))
 }
 ```
+
+```{r}
+simul_data = data_23 %>%
+  filter(Apparatus == "HB") %>%
+  group_by(FirstName, LastName) %>%
+  summarise(mean_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[1],
+            sd_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[2]) %>%
+  rowwise() %>%
+  mutate(simulated_D_Score = rnorm(1, mean_estimate, sd_estimate))
+
+simul_data %>%
+  ggplot(aes(x = simulated_D_Score)) +
+    geom_density(color = "red") +
+    labs(title = "simulated d scores",  
+         x = "Difficulty Score",
+         y = "Density")
+```
+
+```{r}
+data_23 %>%
+  filter(Apparatus == "HB") %>% 
+  group_by(FirstName, LastName) %>%
+  summarise(mean_d_score = mean(D_Score),
+            observations = n()) %>%
+  filter(observations > 1) %>%
+  inner_join(simul_data, by = c("FirstName", "LastName")) %>%
+  ggplot() +
+    geom_density(aes(x = mean_d_score), color = "blue") +
+    geom_density(aes(x = simulated_D_Score), color = "red") +
+    labs(title = "actual d scores vs simulated d scores",
+         subtitle = "blue = actual, red = simulated",
+         x = "Difficulty Score",
+         y = "Density")
+```
+
+
 
