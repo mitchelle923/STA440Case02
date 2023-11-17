@@ -374,11 +374,47 @@ final_men |>
 
 ```{r}
 final_women |>
-  group_by(unique_id, Apparatus) |>
+  group_by(Apparatus) |>
   summarise(mean_score = mean(Score),
-            sd_score = sd(Score),
+            var_score = var(Score),
             number_obs = n())
 ```
 
 
+
+```{r}
+# FOR BB, TRYING IT OUT
+# Assuming you have your data in a variable `y`
+# Set up the data
+mean_y <-13.23694  # Mean of your data
+var_y <- 0.4176740    # Variance of your data
+n <- 373   # Number of data points
+
+# Set up initial values
+S <- 1000                  # Number of samples to draw
+PHI <- matrix(nrow = S, ncol = 2)  # Matrix to store samples
+PHI[1, ] <- phi <- c( mean_y, 1/var_y)
+   # Initial values
+
+# Set prior parameters (mu0, tau0 squared, nu0, s20)
+#THIS IS SO FAKE IM JUST USING PRIORS FROM THE TEXTBOOK
+mu0<- 1.9 ; t20 <- 0.95^2 ; s20 <- .01 ; nu0<-1
+
+# Gibbs sampling
+set.seed(1)   # For reproducibility
+for (s in 2:S) {
+    # Update theta (mu) from its full conditional
+    mun <- (mu0 / t20 + n * mean_y * PHI[s - 1, 2]) / (1 / t20 + n * PHI[s - 1, 2])
+    t2n <- 1 / (1 / t20 + n * PHI[s - 1, 2])
+    PHI[s, 1] <- rnorm(1, mun, sqrt(t2n))
+
+    # Update 1/sigma squared from its full conditional
+    nun <- nu0 + n
+    s2n <- (nu0 * s20 + (n - 1) * var_y + n * (mean_y - PHI[s, 1])^2) / nun
+    PHI[s, 2] <- rgamma(1, nun / 2, nun * s2n / 2)
+}
+
+# PHI now contains the samples from the posterior
+
+```
 
