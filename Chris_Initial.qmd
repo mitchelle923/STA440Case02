@@ -47,6 +47,9 @@ laterdata <- laterdata |>
   mutate(FirstName = ifelse(LastName == "ABIYURAFI" & FirstName == ".", "Abiyu", FirstName),
     LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName))
 
+laterdata <- laterdata |>
+  mutate(Apparatus = if_else(Apparatus == 'hb', 'HB', Apparatus))
+
 
 laterdata <- laterdata |>
   mutate(firstname_check = ifelse(str_length(FirstName) >= 3, 1, 0),
@@ -341,20 +344,41 @@ top_20_apparatus_women |>
 ```
 
 
-## USA Specific
+## Trying out modeling
 
 
 ```{r}
-# laterUSA <- later |>
-#   filter(Country == "USA")
-# 
-# laterUSAwomen <- laterUSA |>
-#   filter(Gender == "w")
-# 
-# laterUSAmen <- laterUSA |>
-#   filter(Gender == "m")
+# splitting the data by men and women
+
+final_women <- final_data |>
+  filter(Gender == "w")
+# has 1522 observations
+# and 291 unique athletes left
+
+final_men <- final_data |>
+  filter(Gender == "m")
+# has 2518 observations
+# has 390 unique athletes left
+
+final_women |>
+  ggplot(aes(x = Score)) +
+  geom_histogram() +
+  facet_grid(~ Apparatus)
+
+final_men |>
+  ggplot(aes(x = Score)) +
+  geom_histogram() +
+  facet_grid(~ Apparatus)
+
 ```
 
+```{r}
+final_women |>
+  group_by(unique_id, Apparatus) |>
+  summarise(mean_score = mean(Score),
+            sd_score = sd(Score),
+            number_obs = n())
+```
 
 
 

@@ -22,7 +22,6 @@ library(knitr)
 library(stringr)
 ```
 
-
 ```{r}
 #| echo : false
 #| label: read-data
@@ -49,7 +48,8 @@ later <- laterdata |>
 #indonesian gymnast's name is Abiyu RAFI not ABIYURAFI
 laterdata <- laterdata |>
   mutate(FirstName = ifelse(LastName == "ABIYURAFI" & FirstName == ".", "Abiyu", FirstName),
-    LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName))
+    LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName),
+    Apparatus = if_else(Apparatus == 'hb', 'HB', Apparatus))
 
 
 laterdata <- laterdata |>
@@ -70,7 +70,6 @@ AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
 
 finals_vector <- c("AAfinal", "TeamFinal", "final")
 ```
-
 
 ```{r}
 #these quantiles are already grouped by gender and competition, round, apapratus, etc. so no bleeding
@@ -114,11 +113,9 @@ final_data <- joined_data |>
 #there are 679 athletes left in total once we have filtered, USA still has 91 left
 ```
 
-
 ## Results
 
 ## Discussion
-
 
 ## Appendix
 
@@ -158,4 +155,3 @@ ggplot(number_athletes, aes(x = athletes_participated)) +
        title = "Distribution of Athletes Competed at Competitions")
 
 ```
-
