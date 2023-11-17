@@ -130,10 +130,6 @@ I think the reason the mean looks so weird is because some athletes get sampled 
 ```{r}
 normal_mu_fit = fitdist(HB_mu$mu, "norm")
 invgamma_sd_fit = fitdist(HB_sd$sd[HB_sd$sd > 0], "invgamma")
-dinvgamma()
-```
-
-```{r}
 ```
 
 ```{r}
