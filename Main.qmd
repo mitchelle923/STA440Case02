@@ -113,6 +113,72 @@ final_data <- joined_data |>
 #there are 679 athletes left in total once we have filtered, USA still has 91 left
 ```
 
+# NEW RANKING
+## Men
+```{r}
+#rank actually shown to be correct here for the early observationsbesides a couple missing ranks
+orderMenFinal <- menFinal %>% 
+  arrange(Competition, Round, Apparatus, desc(Score)) %>% 
+  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
+orderMenFinal
+```
+### Men's Ranking System
+```{r}
+#this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
+#also important to note that rankers did not give same scores the same rank, but this will be done in new rank
+
+orderMenFinal <- orderMenFinal %>%
+  #initializes newRank column
+  mutate(newRank = NA)
+#starts with first row as 1 since data already grouped and ordered
+orderMenFinal$newRank[1] <- 1
+for (i in 2:nrow(orderMenFinal)){
+  #ranks for ties of same competition, round, and apparatus
+  if ((orderMenFinal$Competition[i] == orderMenFinal$Competition[i-1]) & (orderMenFinal$Round[i] == orderMenFinal$Round[i-1]) & (orderMenFinal$Apparatus[i] == orderMenFinal$Apparatus[i-1]) & (orderMenFinal$Score[i] == orderMenFinal$Score[i-1])) {
+    orderMenFinal$newRank[i] <- orderMenFinal$newRank[i-1]
+  } 
+  #ranks for non ties of same competition, round, and apparatus
+  else if ((orderMenFinal$Competition[i] == orderMenFinal$Competition[i-1]) & (orderMenFinal$Round[i] == orderMenFinal$Round[i-1]) & (orderMenFinal$Apparatus[i] == orderMenFinal$Apparatus[i-1])) {
+    orderMenFinal$newRank[i] <- orderMenFinal$newRank[i-1]+1
+  }
+  #ranks for new competition, round, and apparatus
+  else {
+    orderMenFinal$newRank[i] <- 1
+  }
+}
+orderMenFinal
+```
+
+#Women
+```{r}
+orderWomenFinal <- womenFinal %>% 
+  arrange(Competition, Round, Apparatus, desc(Score)) %>% 
+  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
+orderWomenFinal
+```
+
+### Women's Ranking System
+```{r}
+#this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
+#also important to note that rankers did not give same scores the same rank, but this will be done in new rank
+orderWomenFinal <- orderWomenFinal %>%
+  mutate(newRank = NA)
+orderWomenFinal$newRank[1] <- 1
+
+for (i in 2:nrow(orderWomenFinal)){
+  if ((orderWomenFinal$Competition[i] == orderWomenFinal$Competition[i-1]) & (orderWomenFinal$Round[i] == orderWomenFinal$Round[i-1]) & (orderWomenFinal$Apparatus[i] == orderWomenFinal$Apparatus[i-1]) & (orderWomenFinal$Score[i] == orderWomenFinal$Score[i-1])) {
+    orderWomenFinal$newRank[i] <- orderWomenFinal$newRank[i-1]
+  } 
+  else if ((orderWomenFinal$Competition[i] == orderWomenFinal$Competition[i-1]) & (orderWomenFinal$Round[i] == orderWomenFinal$Round[i-1]) & (orderWomenFinal$Apparatus[i] == orderWomenFinal$Apparatus[i-1])) {
+    orderWomenFinal$newRank[i] <- orderWomenFinal$newRank[i-1]+1
+  }
+  else {
+    orderWomenFinal$newRank[i] <- 1
+  }
+}
+orderWomenFinal
+```
+
 ## Results
 
 ## Discussion

@@ -55,7 +55,7 @@ data_2022_2023 %>%
   group_by(Round) %>% 
   dplyr::summarise(ct = n())
 ```
-
+#HERE
 ```{r}
 data_2022_2023 %>% 
   group_by(Competition,Round,Apparatus, Rank) %>% 
@@ -135,8 +135,8 @@ womenUSA2022_2023 <- data_2022_2023[data_2022_2023$Gender == "w"& data_2022_2023
  
 ```
 ```{r}
-data_2017_2021 %>% 
-  group_by(Round, Rank) %>% 
+data_2022_2023 %>% 
+  group_by(Competition, Round, Rank) %>% 
   dplyr::summarise(ct = n())
 ```
 
@@ -302,24 +302,66 @@ team for both individual apparatus rounds (final and qualifying) as well as
 the team qualifiers. Which futher proves our model should focus on a mixture of both
 but heavily prioritize the individual appartuses.
 
+# NEW RANKING
+## Men
 ```{r}
+#rank actually shown to be correct here for the early observations
 orderMenFinal <- menFinal %>% 
-  arrange(Competition, Round, Country,desc(Score)) %>% 
+  arrange(Competition, Round, Apparatus, desc(Score)) %>% 
+  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
+orderMenFinal
+```
+### Men's Individual Apparatus Ranking System
+```{r}
+#this ranking works for individual apparatus but not team all-around and individual all around since it takes total scoring for ranking
+#also important to note that rankers did not give same scores the same rank, but this will be done in new rank
+orderMenFinal_individual <- orderMenFinal %>%
+  mutate(newRank = NA) %>% 
+  filter(Round == 'qual' | Round == 'final')
+orderMenFinal_individual$newRank[1] <- 1
+
+for (i in 2:nrow(orderMenFinal_individual)){
+  if ((orderMenFinal_individual$Competition[i] == orderMenFinal_individual$Competition[i-1]) & (orderMenFinal_individual$Round[i] == orderMenFinal_individual$Round[i-1]) & (orderMenFinal_individual$Apparatus[i] == orderMenFinal_individual$Apparatus[i-1]) & (orderMenFinal_individual$Score[i] == orderMenFinal_individual$Score[i-1])) {
+    orderMenFinal_individual$newRank[i] <- orderMenFinal_individual$newRank[i-1]
+  } 
+  else if ((orderMenFinal_individual$Competition[i] == orderMenFinal_individual$Competition[i-1]) & (orderMenFinal_individual$Round[i] == orderMenFinal_individual$Round[i-1]) & (orderMenFinal_individual$Apparatus[i] == orderMenFinal_individual$Apparatus[i-1])) {
+    orderMenFinal_individual$newRank[i] <- orderMenFinal_individual$newRank[i-1]+1
+  }
+  else {
+    orderMenFinal_individual$newRank[i] <- 1
+  }
+}
+orderMenFinal_individual
+```
+### Men's 
+```{r}
+menFinal %>% 
+  filter(Round == 'AAfinal' | Round == 'AAqual') %>% 
+  arrange(Competition, Round, Country, Apparatus, desc(Score)) %>% 
   dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
 ```
 
-```{r}
-orderMenFinal <- orderMenFinal %>%
-  mutate(newRank = NA)
-orderMenFinal$newRank[1] <- 1
 
-for (i in 2:nrow(orderMenFinal)){
-  if ((orderMenFinal$Competition[i] == orderMenFinal$Competition[i-1]) & (orderMenFinal$Country[i] != orderMenFinal$Country[i-1])) {
-    orderMenFinal$newRank[i] <- orderMenFinal$newRank[i-1] +1
+#Women
+```{r}
+#rank actually shown to be correct here for the early observations
+orderWomenFinal <- womenFinal %>% 
+  arrange(Competition, Round, Apparatus, desc(Score)) %>% 
+  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
+orderWomenFinal
+```
+```{r}
+orderWomenFinal <- orderWomenFinal %>%
+  mutate(newRank = NA)
+orderWomenFinal$newRank[1] <- 1
+
+for (i in 2:nrow(orderWomenFinal)){
+  if ((orderWomenFinal$Competition[i] == orderWomenFinal$Competition[i-1]) & (orderWomenFinal$Round[i] == orderWomenFinal$Round[i-1]) & (orderWomenFinal$Apparatus[i] == orderWomenFinal$Apparatus[i-1])) {
+    orderWomenFinal$newRank[i] <- orderWomenFinal$newRank[i-1]+1
   } else {
-    orderMenFinal$newRank[i] <- 1
+    orderWomenFinal$newRank[i] <- 1
   }
 }
+orderWomenFinal
 ```
-
 
