@@ -47,6 +47,9 @@ laterdata <- laterdata |>
   mutate(FirstName = ifelse(LastName == "ABIYURAFI" & FirstName == ".", "Abiyu", FirstName),
     LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName))
 
+laterdata <- laterdata |>
+  mutate(Apparatus = if_else(Apparatus == 'hb', 'HB', Apparatus))
+
 
 laterdata <- laterdata |>
   mutate(firstname_check = ifelse(str_length(FirstName) >= 3, 1, 0),
@@ -67,21 +70,33 @@ laterdata |>
 #create a vector for AA or team
 AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
 '%notin%' <- function(x,y)!('%in%'(x,y))
+
+finals_vector <- c("AAfinal", "TeamFinal", "final")
 ```
 
+
+
 ```{r}
+#these quantiles are already grouped by gender and competition, round, apapratus, etc. so no bleeding
 quantiled_data <- laterdata |>
   group_by(Gender, Competition, Round, Apparatus) |>
-  mutate(quantile = ntile(-Score, 5))
+  mutate(quantile_20s = ntile(-Score, 5),
+         quantile_10s = ntile(-Score, 10))
+
+#filter out the athletes who have NEVER made it to a final, ever
+filtered_data <- quantiled_data |>
+  group_by(unique_id) |>
+  filter(any(Round == "final" | Round == "TeamFinal" | Round == "AAfinal")) |>
+  ungroup()
 
 #summary of number of athletes competed in each competition in each round
-number_athletes <- quantiled_data |>
+number_athletes <- filtered_data |>
   group_by(Competition, Round) |>
-  summarise(unique_id_count = n_distinct(unique_id))
+  summarise(athletes_participated = n_distinct(unique_id))
 
 number_athletes |>
   filter(Round %in% AA_team) |>
-  ggplot(aes(x = unique_id_count)) +
+  ggplot(aes(x = athletes_participated)) +
     geom_histogram() +
     facet_wrap(~ Round) +
     labs(x = "Number of Unique Athletes Competed",
@@ -90,24 +105,53 @@ number_athletes |>
          subtitle = "All Around or Team All Arounds")
 
 number_athletes |>
-  filter(Round %notin% AA_team) |>
-  ggplot(aes(x = unique_id_count)) +
+  filter(Round == "AAfinal") |>
+  ggplot(aes(x = athletes_participated)) +
+    geom_histogram() +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "Distribution of Athletes Competed at AA Finals")
+
+# at the oceania continental championships, only 10 unique athletes competed
+# every other competition at each round has at minimum 36 athletes competing
+
+number_athletes |>
+  filter(Round == "final") |>
+  ggplot(aes(x = athletes_participated)) +
     geom_histogram() +
     facet_wrap(~ Round) +
     labs(x = "Number of Unique Athletes Competed",
          y = "Frequency",
-         title = "Distribution of Athletes Competed at Competition Rounds",
+         title = "Distribution of Athletes Competed at Final Rounds",
          subtitle = "Individual Apparatuses")
 
-ggplot(number_athletes, aes(x = unique_id_count)) +
+
+#at these final rounds, there are at least 40 athletes in each final, so it's fine
+
+ggplot(number_athletes, aes(x = athletes_participated)) +
   geom_histogram() +
   labs(x = "Number of Unique Athletes Competed",
        y = "Frequency",
        title = "Distribution of Athletes Competed at Competitions")
 
-# NEED TO FIX THIS 
-# quant_data <- quantiled_data |>
-#   filter(quantile == 1)
+#going to left join to show the number of athletes that participated per round
+
+joined_data <- filtered_data |>
+  left_join(number_athletes, by = c("Competition", "Round"))
+
+#now the athletes_participated column = how many athletes competed in it
+
+
+#this filters out the individual records for ppl who were not in top quantiles at a competition
+final_data <- joined_data |>
+  filter((athletes_participated <= 100 & quantile_20s == 1) | (athletes_participated > 100 & quantile_10s == 1) | (Competition == "Oceania Continental Championships 2023" & quantile_20s %in% c(1, 2)))
+
+#now let's check the number of unique athletes left
+final_data |>
+  group_by(Country) |>
+  summarise(athletes_left = n_distinct(unique_id))
+
+#there are 679 athletes left in total once we have filtered, USA still has 91 left
 ```
 
 ## LATER QUAD
@@ -300,20 +344,77 @@ top_20_apparatus_women |>
 ```
 
 
-## USA Specific
+## Trying out modeling
 
 
 ```{r}
-# laterUSA <- later |>
-#   filter(Country == "USA")
-# 
-# laterUSAwomen <- laterUSA |>
-#   filter(Gender == "w")
-# 
-# laterUSAmen <- laterUSA |>
-#   filter(Gender == "m")
+# splitting the data by men and women
+
+final_women <- final_data |>
+  filter(Gender == "w")
+# has 1522 observations
+# and 291 unique athletes left
+
+final_men <- final_data |>
+  filter(Gender == "m")
+# has 2518 observations
+# has 390 unique athletes left
+
+final_women |>
+  ggplot(aes(x = Score)) +
+  geom_histogram() +
+  facet_grid(~ Apparatus)
+
+final_men |>
+  ggplot(aes(x = Score)) +
+  geom_histogram() +
+  facet_grid(~ Apparatus)
+
+```
+
+```{r}
+final_women |>
+  group_by(Apparatus) |>
+  summarise(mean_score = mean(Score),
+            var_score = var(Score),
+            number_obs = n())
 ```
 
 
 
+```{r}
+# FOR BB, TRYING IT OUT
+# Assuming you have your data in a variable `y`
+# Set up the data
+mean_y <-13.23694  # Mean of your data
+var_y <- 0.4176740    # Variance of your data
+n <- 373   # Number of data points
+
+# Set up initial values
+S <- 1000                  # Number of samples to draw
+PHI <- matrix(nrow = S, ncol = 2)  # Matrix to store samples
+PHI[1, ] <- phi <- c( mean_y, 1/var_y)
+   # Initial values
+
+# Set prior parameters (mu0, tau0 squared, nu0, s20)
+#THIS IS SO FAKE IM JUST USING PRIORS FROM THE TEXTBOOK
+mu0<- 1.9 ; t20 <- 0.95^2 ; s20 <- .01 ; nu0<-1
+
+# Gibbs sampling
+set.seed(1)   # For reproducibility
+for (s in 2:S) {
+    # Update theta (mu) from its full conditional
+    mun <- (mu0 / t20 + n * mean_y * PHI[s - 1, 2]) / (1 / t20 + n * PHI[s - 1, 2])
+    t2n <- 1 / (1 / t20 + n * PHI[s - 1, 2])
+    PHI[s, 1] <- rnorm(1, mun, sqrt(t2n))
+
+    # Update 1/sigma squared from its full conditional
+    nun <- nu0 + n
+    s2n <- (nu0 * s20 + (n - 1) * var_y + n * (mean_y - PHI[s, 1])^2) / nun
+    PHI[s, 2] <- rgamma(1, nun / 2, nun * s2n / 2)
+}
+
+# PHI now contains the samples from the posterior
+
+```
 

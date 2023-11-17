@@ -29,30 +29,16 @@ data_2022_2023 <- data_2022_2023 %>%
 
 ```{r}
 # filter by gender, apparatus, qual vs final vs AAfinal vs AAqual vs team qual vs team final, country?
-usa_women_17_21 <- data_2017_2021 %>%
-  #filter(Gender== "m") %>%
-  filter(Country == "USA") %>%
-  group_by(Apparatus) %>%
-  slice_max(order_by = Score, n = 5) %>%
-  ungroup()
-
-print(usa_women_17_21)
 
 usa_men_22_23 <- data_2022_2023 %>%
   filter(Gender== "m") %>%
-  filter(Country == "USA") %>%
-  group_by(Apparatus) %>%
-  slice_max(order_by = Score, n = 5) %>%
-  ungroup()
+  filter(Country == "USA")
 
 print(usa_men_22_23)
 
 usa_women_22_23 <- data_2022_2023 %>%
   filter(Gender== "w") %>%
-  filter(Country == "USA") %>%
-  group_by(Apparatus) %>%
-  slice_max(order_by = Score, n = 5) %>%
-  ungroup()
+  filter(Country == "USA") 
 
 print(usa_women_22_23)
 ```
