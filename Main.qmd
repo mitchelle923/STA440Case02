@@ -21,6 +21,8 @@ library(tidyverse)
 library(knitr)
 library(stringr)
 library(dplyr)
+library(invgamma)
+library(fitdistrplus)
 ```
 
 ```{r}
@@ -130,7 +132,7 @@ womenFinal <- final_data %>%
 #rank actually shown to be correct here for the early observationsbesides a couple missing ranks
 orderMenFinal <- menFinal %>% 
   arrange(Competition, Round, Apparatus, desc(Score)) %>% 
-  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, D_Score, E_Score, Penalty, Score)
+  dplyr::select(unique_id, Gender, Country,Competition, Round,Apparatus, Rank, D_Score, E_Score, Penalty, Score)
 ```
 
 ```{r mens-ordering}
@@ -163,10 +165,10 @@ for (i in 2:nrow(orderMenFinal)){
 #WOMENS RANKING SYSTEM
 orderWomenFinal <- womenFinal %>% 
   arrange(Competition, Round, Apparatus, desc(Score)) %>% 
-  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, D_Score, E_Score, Penalty, Score)
+  dplyr::select(unique_id, Gender, Country,Competition, Round,Apparatus, Rank, D_Score, E_Score, Penalty, Score)
 ```
 
-```{r womens-ordering}
+```{r womens-ordering, message = FALSE}
 #this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
 #also important to note that rankers did not give same scores the same rank, but this will be done in new rank
 orderWomenFinal <- orderWomenFinal %>%
@@ -184,9 +186,114 @@ for (i in 2:nrow(orderWomenFinal)){
     orderWomenFinal$newRank[i] <- 1
   }
 }
+
+#concatenating the 2 again
+combined_final <- orderMenFinal |>
+  full_join(orderWomenFinal)
 ```
 
+
+```{r removing-obs, message = FALSE}
+combined_apparatus <- combined_final |>
+  group_by(Apparatus, unique_id, Country, Gender) |>
+  summarise(mean_score = mean(Score),
+            var_score = var(Score),
+            number_obs = n(),
+            mean_D = mean(D_Score),
+            var_D = var(D_Score),
+            mean_E = mean(E_Score),
+            var_E = var(E_Score)) |>
+  filter(number_obs >= 3)
+```
+
+
 ## Results
+
+```{r fitting-priors}
+fit_normal_priors <- function(data, apparatus, gender) {
+  #fitting normal prior for mean scores
+  normal_mu_fit = fitdist(data$mean_score, "norm")
+  #fitting inv gamma prior for variance of scores
+  invgamma_var_fit = fitdist(data$var_score, "invgamma")
+  
+  m_0 =  normal_mu_fit$estimate[[1]]
+  sig_0 = normal_mu_fit$estimate[[2]]
+  k_0 = invgamma_var_fit$estimate[[1]] 
+  v_0 = invgamma_var_fit$estimate[[2]]
+
+  return(c(m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0))
+}
+```
+
+
+```{r simulation-function}
+#code for simulations, inspired by STA360/peter hoff textbook
+
+analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0, smc) {
+  n = length(athlete_results)
+  ybar = mean(athlete_results)
+  var = var(athlete_results)
+  
+  #NEED TO CHECK THIS BAYESIAN
+  k_n = k_0 + n
+  v_n = v_0 + n
+  m_n = (k_0*m_0 + n*ybar)/k_n
+  sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
+  sig_sample = mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
+  theta_sample = mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
+  
+  return(c(theta_sample, sig_sample))
+}
+```
+
+
+```{r creating-medals}
+# simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medals = TRUE) {
+#   simul_data = data %>%
+#     filter(Apparatus == apparatus
+#            , Gender == gender) %>%
+#     group_by(unique_id, Country) %>%
+#     summarise(mean_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[1],
+#               var_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[2],
+#               observations = n(), .groups = "keep") %>%
+#     rowwise() %>%
+#     mutate(simulated_Score = rnorm(1, mean_estimate, var_estimate)) %>% # Truncate scores > 10
+#     mutate(simulated_Score = ifelse(simulated_Score > 10, 10, simulated_Score)) %>%
+#     mutate(simulated_Score = ifelse(simulated_Score < 0, 0, simulated_Score)) 
+#   
+#   if (medals == TRUE) {
+#     # order by top 3 results and assign gold, silver, bronze
+#     simul_data = simul_data %>%
+#       ungroup() %>%
+#       arrange(desc(simulated_Score)) %>%
+#       mutate(medal = case_when(row_number() == 1 ~ "Gold",
+#                                row_number() == 2 ~ "Silver",
+#                                row_number() == 3 ~ "Bronze",
+#                                TRUE ~ "NA"))
+#     
+#   }
+#   return(simul_data)
+# }
+```
+
+
+```{r}
+# This is how it sort of would work
+prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "FX", "w"))
+print(prior_parameters)
+
+mu_0 = prior_parameters[1]
+sig_0 = prior_parameters[2]
+k_0 = prior_parameters[3]
+v_0 = prior_parameters[4]
+
+# So this represents one simulation, we could probably run this like 10000 times and average out the medal counts
+
+# test_simul <- simulate_results(combined_final, "FX", "w", mu_0, sig_0, k_0, v_0, TRUE)
+# head(test_simul)
+```
+
+
 
 ## Discussion
 
