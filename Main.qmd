@@ -160,7 +160,6 @@ for (i in 2:nrow(orderMenFinal)){
 }
 ```
 
-
 ```{r womens-ranking}
 #WOMENS RANKING SYSTEM
 orderWomenFinal <- womenFinal %>% 
@@ -192,8 +191,8 @@ combined_final <- orderMenFinal |>
   full_join(orderWomenFinal)
 ```
 
-
 ```{r removing-obs, message = FALSE}
+#summary stats for each athlete for each apparatus
 combined_apparatus <- combined_final |>
   group_by(Apparatus, unique_id, Country, Gender) |>
   summarise(mean_score = mean(Score),
@@ -206,8 +205,7 @@ combined_apparatus <- combined_final |>
   filter(number_obs >= 3)
 ```
 
-
-## Results
+## Simulations
 
 ```{r fitting-priors}
 fit_normal_priors <- function(data, apparatus, gender) {
@@ -224,7 +222,6 @@ fit_normal_priors <- function(data, apparatus, gender) {
   return(c(m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0))
 }
 ```
-
 
 ```{r simulation-function}
 #code for simulations, inspired by STA360/peter hoff textbook
@@ -246,40 +243,76 @@ analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0, smc) {
 }
 ```
 
-
 ```{r creating-medals}
-# simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medals = TRUE) {
-#   simul_data = data %>%
-#     filter(Apparatus == apparatus
-#            , Gender == gender) %>%
-#     group_by(unique_id, Country) %>%
-#     summarise(mean_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[1],
-#               var_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[2],
-#               observations = n(), .groups = "keep") %>%
-#     rowwise() %>%
-#     mutate(simulated_Score = rnorm(1, mean_estimate, var_estimate)) %>% # Truncate scores > 10
-#     mutate(simulated_Score = ifelse(simulated_Score > 10, 10, simulated_Score)) %>%
-#     mutate(simulated_Score = ifelse(simulated_Score < 0, 0, simulated_Score)) 
-#   
-#   if (medals == TRUE) {
-#     # order by top 3 results and assign gold, silver, bronze
-#     simul_data = simul_data %>%
-#       ungroup() %>%
-#       arrange(desc(simulated_Score)) %>%
-#       mutate(medal = case_when(row_number() == 1 ~ "Gold",
-#                                row_number() == 2 ~ "Silver",
-#                                row_number() == 3 ~ "Bronze",
-#                                TRUE ~ "NA"))
-#     
-#   }
-#   return(simul_data)
-# }
+# So this represents one simulation, we could probably run this like 1000 times and average out the medal counts
+simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medals = TRUE) {
+  simul_data = data %>%
+    filter(Apparatus == apparatus
+           , Gender == gender) %>%
+    group_by(unique_id, Country) %>%
+    summarise(mean_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[1],
+              var_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2],
+              observations = n(), .groups = "keep") %>%
+    rowwise() %>%
+    mutate(simulated_Score = rnorm(1, mean_estimate, var_estimate)) %>% # Truncate scores > 10
+    mutate(simulated_Score = ifelse(simulated_Score > 20, 10, simulated_Score)) %>% # Truncate scores < 0
+    mutate(simulated_Score = ifelse(simulated_Score < 0, 0, simulated_Score)) 
+  
+  if (medals == TRUE) {
+    # order by top 3 results and assign gold, silver, bronze
+    simul_data = simul_data %>%
+      ungroup() %>%
+      arrange(desc(simulated_Score)) %>%
+      mutate(medal = case_when(row_number() == 1 ~ "Gold",
+                               row_number() == 2 ~ "Silver",
+                               row_number() == 3 ~ "Bronze",
+                               TRUE ~ "NA"))
+    
+  }
+  return(simul_data)
+}
 ```
 
+```{r competition-simulation }
+# full competition simulation, gets pretty slow with 1000 simulations
+simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, v_0, smc = 100) {
+  athletes_medals = data %>%
+    dplyr::select(unique_id, Country) %>%
+    distinct() %>%
+    mutate(Golds = 0, Silvers = 0, Bronzes = 0, Total_Medals = 0)
+  
+  for (i in 1:smc) {    
+    big_simul = simulate_results(data, apparatus, gender, mu_0, sig_0, k_0, v_0, TRUE) %>%
+      filter(medal != "NA")
+    
+    big_simul = big_simul %>%
+      group_by(FirstName, LastName, Country) %>%
+      summarise(Golds = sum(medal == "Gold"),
+                Silvers = sum(medal == "Silver"),
+                Bronzes = sum(medal == "Bronze"),
+                Total_Medals = sum(medal != "NA"),
+                .groups = "keep") %>%
+      ungroup()
+    
+    athletes_medals = athletes_medals %>%
+      left_join(big_simul, by = c("FirstName", "LastName", "Country")) %>%
+      mutate(Golds = ifelse(is.na(Golds.y), Golds.x, Golds.y + Golds.x),
+             Silvers = ifelse(is.na(Silvers.y), Silvers.x, Silvers.y + Silvers.x),
+             Bronzes = ifelse(is.na(Bronzes.y), Bronzes.x, Bronzes.y + Bronzes.x),
+             Total_Medals = ifelse(is.na(Total_Medals.y), Total_Medals.x, Total_Medals.y + Total_Medals.x)) %>%
+      dplyr::select(FirstName, LastName, Country, Golds, Silvers, Bronzes, Total_Medals) %>%
+      arrange(desc(Total_Medals))
+  } 
+  return(athletes_medals)
+}
+```
+
+## Results
 
 ```{r}
+set.seed(123)
 # This is how it sort of would work
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "FX", "w"))
+prior_parameters = suppressWarnings(fit_normal_priors(combined_apparatus, "FX", "w"))
 print(prior_parameters)
 
 mu_0 = prior_parameters[1]
@@ -287,13 +320,9 @@ sig_0 = prior_parameters[2]
 k_0 = prior_parameters[3]
 v_0 = prior_parameters[4]
 
-# So this represents one simulation, we could probably run this like 10000 times and average out the medal counts
-
-# test_simul <- simulate_results(combined_final, "FX", "w", mu_0, sig_0, k_0, v_0, TRUE)
+# test_simul = simulate_full_competition(combined_final, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
 # head(test_simul)
 ```
-
-
 
 ## Discussion
 
