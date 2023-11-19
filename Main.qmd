@@ -226,7 +226,7 @@ fit_normal_priors <- function(data, apparatus, gender) {
 ```{r simulation-function}
 #code for simulations, inspired by STA360/peter hoff textbook
 
-analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0, smc) {
+analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0) {
   n = length(athlete_results)
   ybar = mean(athlete_results)
   var = var(athlete_results)
@@ -275,7 +275,7 @@ simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medal
 
 ```{r competition-simulation }
 # full competition simulation, gets pretty slow with 1000 simulations
-simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, v_0, smc = 100) {
+simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, v_0, smc) {
   athletes_medals = data %>%
     dplyr::select(unique_id, Country) %>%
     distinct() %>%
@@ -286,7 +286,7 @@ simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, 
       filter(medal != "NA")
     
     big_simul = big_simul %>%
-      group_by(FirstName, LastName, Country) %>%
+      group_by(unique_id, Country) %>%
       summarise(Golds = sum(medal == "Gold"),
                 Silvers = sum(medal == "Silver"),
                 Bronzes = sum(medal == "Bronze"),
@@ -295,12 +295,12 @@ simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, 
       ungroup()
     
     athletes_medals = athletes_medals %>%
-      left_join(big_simul, by = c("FirstName", "LastName", "Country")) %>%
+      left_join(big_simul, by = c("unique_id", "Country")) %>%
       mutate(Golds = ifelse(is.na(Golds.y), Golds.x, Golds.y + Golds.x),
              Silvers = ifelse(is.na(Silvers.y), Silvers.x, Silvers.y + Silvers.x),
              Bronzes = ifelse(is.na(Bronzes.y), Bronzes.x, Bronzes.y + Bronzes.x),
              Total_Medals = ifelse(is.na(Total_Medals.y), Total_Medals.x, Total_Medals.y + Total_Medals.x)) %>%
-      dplyr::select(FirstName, LastName, Country, Golds, Silvers, Bronzes, Total_Medals) %>%
+      dplyr::select(unique_id, Country, Golds, Silvers, Bronzes, Total_Medals) %>%
       arrange(desc(Total_Medals))
   } 
   return(athletes_medals)
