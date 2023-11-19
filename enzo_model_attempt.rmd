@@ -23,8 +23,44 @@ data_23 = read.csv("Cleaned Data/modified_2023.csv") %>%
 data_21 = read.csv("Cleaned Data/data_2017_2021.csv") 
 ```
 
+## EDA
+
 ```{r}
-# Plotting distributions of difficulty scores add more ticks on the x axis
+# Plotting distributions of total scores
+data_23 %>%
+  ggplot(aes(x = Score, fill = Apparatus)) +
+  geom_histogram() +
+  labs(title = "Distribution of Total Scores",
+       x = "Score",
+       y = "Count") +
+  facet_wrap(~Apparatus)
+```
+
+```{r}
+# Plotting distributions of total scores without penalties
+data_23 %>%
+  ggplot(aes(x = D_Score + E_Score, fill = Apparatus)) +
+  geom_histogram() +
+  labs(title = "Distribution of Scores before penalties",
+       x = "Difficulty + Execution Score",
+       y = "Count") +
+  facet_wrap(~Apparatus)
+```
+
+```{r}
+# Plotting distributions of penalties
+data_23 %>%
+  mutate(Penalty = ifelse(is.na(Penalty), 0, Penalty)) %>%
+  ggplot(aes(x = Penalty, fill = Apparatus)) +
+  geom_histogram() +
+  labs(title = "Distribution of Scores before penalties",
+       x = "Difficulty + Execution Score",
+       y = "Count") +
+  facet_wrap(~Apparatus)
+```
+
+```{r}
+# Plotting distributions of difficulty scores
 data_23 %>%
   ggplot(aes(x = D_Score, fill = Apparatus)) +
   geom_histogram() +
@@ -83,12 +119,14 @@ data_23 %>%
 
 Looks like a really good fit, but this has me wondering whether when calculating the posterior distribution, should we consider both the mean and the standard deviation to be known values?
 
+## Creating Priors
+
 ```{r}
 # Loop through all people who have done HB and calculate the standard deviations of their difficulty scores
 HB_sd = data_23 %>%
   filter(Apparatus == "HB") %>%
   group_by(FirstName, LastName) %>%
-  summarise(sd = var(D_Score)) %>%
+  summarise(sd = sd(D_Score)) %>%
   mutate(sd = ifelse(is.na(sd), 0, sd))
 
 summary(HB_sd$sd)
@@ -144,7 +182,7 @@ HB_sd %>%
        y = "Density")
 ```
 
-Copying code from sta360 hw 4
+## Creating Posteriors
 
 ```{r}
 smc = 1000
@@ -179,7 +217,8 @@ simul_data = data_23 %>%
   filter(Apparatus == "HB") %>%
   group_by(FirstName, LastName) %>%
   summarise(mean_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[1],
-            sd_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[2]) %>%
+            sd_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[2],
+            observations = n()) %>%
   rowwise() %>%
   mutate(simulated_D_Score = rnorm(1, mean_estimate, sd_estimate))
 
@@ -207,6 +246,3 @@ data_23 %>%
          x = "Difficulty Score",
          y = "Density")
 ```
-
-
-

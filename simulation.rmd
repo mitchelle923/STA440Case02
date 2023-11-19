@@ -1,0 +1,118 @@
+---
+title: "Simul_function"
+author: "Enzo Moraes Mescall"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r cars}
+library(tidyverse)
+library(invgamma)
+library(fitdistrplus)
+```
+
+```{r}
+data_23 = read.csv("Cleaned Data/modified_2023.csv") %>%
+  mutate(Apparatus = toupper(Apparatus))
+data_21 = read.csv("Cleaned Data/data_2017_2021.csv") 
+```
+
+
+```{r}
+analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc) {
+  n = length(athlete_results)
+  ybar = mean(athlete_results)
+  
+  if (is.na(var(athlete_results))) {
+    var = 0
+  } else {
+    var = var(athlete_results) 
+  }
+  
+  k_n = k_0 + n
+  v_n = v_0 + n
+  m_n = (k_0*m_0 + n*ybar)/k_n
+  sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
+  sig_sample = mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
+  theta_sample = mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
+  
+  return(c(theta_sample, sig_sample))
+}
+```
+
+
+```{r}
+fit_normal_priors = function(data, apparatus, gender) {
+  prior_info = data %>%
+    filter(Apparatus == apparatus,
+           Gender == gender) %>%
+    group_by(FirstName, LastName, Country) %>%
+    summarise(mean_score = mean(Score),
+              var_score = var(Score))  %>%
+    mutate(var_score = ifelse(is.na(var_score), 0, var_score))
+  
+  normal_mu_fit = fitdist(prior_info$mean_score, "norm")
+
+  invgamma_sd_fit = fitdist(prior_info$var_score[prior_info$var_score > 0], "invgamma")
+  
+  m_0 =  normal_mu_fit$estimate[[1]]
+  sig_0 = normal_mu_fit$estimate[[2]]
+  k_0 = invgamma_sd_fit$estimate[[1]] 
+  v_0 = invgamma_sd_fit$estimate[[2]]
+
+  return(c(m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0))
+}
+```
+
+```{r}
+# This is how it sort of would work
+prior_parameters = suppressWarnings(fit_normal_priors(data_23, "FX", "w"))
+print(prior_parameters)
+```
+
+```{r}
+analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
+  n = length(athlete_results)
+  ybar = mean(athlete_results)
+  
+  if (is.na(var(athlete_results))) {
+    var = 0
+  } else {
+    var = var(athlete_results) 
+  }
+  
+  # If somebody could verify this Bayesian 
+  k_n = k_0 + n
+  v_n = v_0 + n
+  m_n = (k_0*m_0 + n*ybar)/k_n
+  sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
+  sig_sample = mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
+  theta_sample = mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
+  
+  return(c(theta_sample, sig_sample))
+}
+```
+
+
+```{r}
+simulate_resutls = function(data, apparatus, gender) {
+  simul_data = data %>%
+    filter(Apparatus == apparatus
+           , Gender == gender) %>%
+    group_by(FirstName, LastName) %>%
+    summarise(mean_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[1],
+              var_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2],
+              observations = n()) %>%
+    rowwise() %>%
+    mutate(simulated_Score = rnorm(1, mean_estimate, sd_estimate))
+    
+}
+```
+
+
