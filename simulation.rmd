@@ -102,9 +102,11 @@ simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medal
     group_by(FirstName, LastName, Country) %>%
     summarise(mean_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[1],
               var_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2],
-              observations = n()) %>%
+              observations = n(), .groups = "keep") %>%
     rowwise() %>%
-    mutate(simulated_Score = rnorm(1, mean_estimate, var_estimate))
+    mutate(simulated_Score = rnorm(1, mean_estimate, var_estimate)) %>% # Truncate scores > 10
+    mutate(simulated_Score = ifelse(simulated_Score > 10, 10, simulated_Score)) %>%
+    mutate(simulated_Score = ifelse(simulated_Score < 0, 0, simulated_Score)) 
   
   if (medals == TRUE) {
     # order by top 3 results and assign gold, silver, bronze
@@ -132,10 +134,43 @@ k_0 = prior_parameters[3]
 v_0 = prior_parameters[4]
 
 # So this represents one simulation, we could probably run this like 10000 times and average out the medal counts
-test_simul = simul_data = simulate_results(data_23, "FX", "w", mu_0, sig_0, k_0, v_0, TRUE)
+test_simul = simulate_results(data_23, "FX", "w", mu_0, sig_0, k_0, v_0, TRUE)
 head(test_simul)
 ```
 
+```{r}
+# Running simulate_results 10000 times and then averaging out the medal counts
+athletes_medals = data_23 %>%
+  dplyr::select(FirstName, LastName, Country) %>%
+  distinct() %>%
+  mutate(Golds = 0, Silvers = 0, Bronzes = 0, Total_Medals = 0)
+
+apparatus = "FX"
+gender = "w"
+
+for (i in 1:1000) {    
+  big_simul = simulate_results(data_23, apparatus, gender, mu_0, sig_0, k_0, v_0, TRUE) %>%
+    filter(medal != "NA")
+  
+  big_simul = big_simul %>%
+    group_by(FirstName, LastName, Country) %>%
+    summarise(Golds = sum(medal == "Gold"),
+              Silvers = sum(medal == "Silver"),
+              Bronzes = sum(medal == "Bronze"),
+              Total_Medals = sum(medal != "NA"),
+              .groups = "keep") %>%
+    ungroup()
+  
+  athletes_medals = athletes_medals %>%
+    left_join(big_simul, by = c("FirstName", "LastName", "Country")) %>%
+    mutate(Golds = ifelse(is.na(Golds.y), Golds.x, Golds.y + Golds.x),
+           Silvers = ifelse(is.na(Silvers.y), Silvers.x, Silvers.y + Silvers.x),
+           Bronzes = ifelse(is.na(Bronzes.y), Bronzes.x, Bronzes.y + Bronzes.x),
+           Total_Medals = ifelse(is.na(Total_Medals.y), Total_Medals.x, Total_Medals.y + Total_Medals.x)) %>%
+    dplyr::select(FirstName, LastName, Country, Golds, Silvers, Bronzes, Total_Medals) %>%
+    arrange(desc(Total_Medals))
+}
+```
 
 
 
