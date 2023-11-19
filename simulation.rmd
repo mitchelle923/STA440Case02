@@ -131,6 +131,7 @@ sig_0 = prior_parameters[2]
 k_0 = prior_parameters[3]
 v_0 = prior_parameters[4]
 
+# So this represents one simulation, we could probably run this like 10000 times and average out the medal counts
 test_simul = simul_data = simulate_results(data_23, "FX", "w", mu_0, sig_0, k_0, v_0, TRUE)
 head(test_simul)
 ```
