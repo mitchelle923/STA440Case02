@@ -71,12 +71,6 @@ fit_normal_priors = function(data, apparatus, gender) {
 ```
 
 ```{r}
-# This is how it sort of would work
-prior_parameters = suppressWarnings(fit_normal_priors(data_23, "FX", "w"))
-print(prior_parameters)
-```
-
-```{r}
 analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
   n = length(athlete_results)
   ybar = mean(athlete_results)
@@ -101,18 +95,46 @@ analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
 
 
 ```{r}
-simulate_resutls = function(data, apparatus, gender) {
+simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medals = TRUE) {
   simul_data = data %>%
     filter(Apparatus == apparatus
            , Gender == gender) %>%
-    group_by(FirstName, LastName) %>%
+    group_by(FirstName, LastName, Country) %>%
     summarise(mean_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[1],
               var_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2],
               observations = n()) %>%
     rowwise() %>%
-    mutate(simulated_Score = rnorm(1, mean_estimate, sd_estimate))
+    mutate(simulated_Score = rnorm(1, mean_estimate, var_estimate))
+  
+  if (medals == TRUE) {
+    # order by top 3 results and assign gold, silver, bronze
+    simul_data = simul_data %>%
+      ungroup() %>%
+      arrange(desc(simulated_Score)) %>%
+      mutate(medal = case_when(row_number() == 1 ~ "Gold",
+                               row_number() == 2 ~ "Silver",
+                               row_number() == 3 ~ "Bronze",
+                               TRUE ~ "NA"))
     
+  }
+  return(simul_data)
 }
 ```
+
+```{r}
+# This is how it sort of would work
+prior_parameters = suppressWarnings(fit_normal_priors(data_23, "FX", "w"))
+print(prior_parameters)
+
+mu_0 = prior_parameters[1]
+sig_0 = prior_parameters[2]
+k_0 = prior_parameters[3]
+v_0 = prior_parameters[4]
+
+test_simul = simul_data = simulate_results(data_23, "FX", "w", mu_0, sig_0, k_0, v_0, TRUE)
+head(test_simul)
+```
+
+
 
 
