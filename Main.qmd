@@ -20,6 +20,7 @@ editor: visual
 library(tidyverse)
 library(knitr)
 library(stringr)
+library(dplyr)
 ```
 
 ```{r}
@@ -71,7 +72,7 @@ AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
 finals_vector <- c("AAfinal", "TeamFinal", "final")
 ```
 
-```{r}
+```{r quantiling, message = FALSE}
 #these quantiles are already grouped by gender and competition, round, apapratus, etc. so no bleeding
 quantiled_data <- laterdata |>
   group_by(Gender, Competition, Round, Apparatus) |>
@@ -113,9 +114,9 @@ final_data <- joined_data |>
 #there are 679 athletes left in total once we have filtered, USA still has 91 left
 ```
 
-# NEW RANKING
-
 ```{r}
+#separating datasets into mens and womens
+
 menFinal <- final_data %>% 
   filter(Gender == 'm')
 
@@ -123,16 +124,16 @@ womenFinal <- final_data %>%
   filter(Gender == 'w')
 ```
 
-## Men
-```{r}
+```{r mens-ranking}
+#MENS RANKING SYSTEM
+
 #rank actually shown to be correct here for the early observationsbesides a couple missing ranks
 orderMenFinal <- menFinal %>% 
   arrange(Competition, Round, Apparatus, desc(Score)) %>% 
-  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
-orderMenFinal
+  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, D_Score, E_Score, Penalty, Score)
 ```
-### Men's Ranking System
-```{r}
+
+```{r mens-ordering}
 #this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
 #also important to note that rankers did not give same scores the same rank, but this will be done in new rank
 
@@ -155,19 +156,17 @@ for (i in 2:nrow(orderMenFinal)){
     orderMenFinal$newRank[i] <- 1
   }
 }
-orderMenFinal
 ```
 
-## Women
-```{r}
+
+```{r womens-ranking}
+#WOMENS RANKING SYSTEM
 orderWomenFinal <- womenFinal %>% 
   arrange(Competition, Round, Apparatus, desc(Score)) %>% 
-  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
-orderWomenFinal
+  dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, D_Score, E_Score, Penalty, Score)
 ```
 
-### Women's Ranking System
-```{r}
+```{r womens-ordering}
 #this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
 #also important to note that rankers did not give same scores the same rank, but this will be done in new rank
 orderWomenFinal <- orderWomenFinal %>%
@@ -185,7 +184,6 @@ for (i in 2:nrow(orderWomenFinal)){
     orderWomenFinal$newRank[i] <- 1
   }
 }
-orderWomenFinal
 ```
 
 ## Results

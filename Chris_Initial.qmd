@@ -378,8 +378,148 @@ final_women |>
   summarise(mean_score = mean(Score),
             var_score = var(Score),
             number_obs = n())
+
+#using 3+ competitions, so that there is a variance
+women_apparatus <- final_women |>
+  group_by(Apparatus, unique_id, Country) |>
+  summarise(mean_score = mean(Score),
+            var_score = var(Score),
+            number_obs = n(),
+            mean_D = mean(D_Score),
+            var_D = var(D_Score),
+            mean_E = mean(E_Score),
+            var_E = var(E_Score)) |>
+  filter(number_obs >= 3)
+
+#this the top 10 mean scores for each athlete
+final_women_apparatus <- women_apparatus |>
+  group_by(Apparatus) |>
+  arrange(desc(mean_score)) |>
+  slice_head(n = 10)
+
+# women_apparatus |>
+#   filter(number_obs >= 2) |>
+#   group_by(Apparatus) |>
+#   arrange(desc(mean_score)) |>
+#   slice_head(n = 10)
 ```
 
+
+# ATTEMPTING MODELING
+
+```{r}
+calculate_p_value <- function(estimate, se, null_value = 0) {
+  z <- (estimate - null_value) / se
+  p_value <- 2 * pnorm(-abs(z))
+  return(p_value)
+}
+```
+
+```{r}
+# # Running fitdist() on normal dist and calculating p-value
+# normal_fit = fitdist(final_women$D_Score[final_women$Apparatus == "BB"], "norm")
+# summary(normal_fit)
+# calculate_p_value(normal_fit$estimate[[1]], normal_fit$estimate[[2]])
+# 
+# # Compare this to the sample mean and standard deviation
+# mean(final_women$D_Score[final_women$Apparatus == "HB"])
+# sd(final_women$D_Score[final_women$Apparatus == "HB"])
+```
+
+
+
+## TRYING
+
+```{r error = FALSE}
+# dscore_analysis <- function(data, apparatus) {
+#   # Filtering data for the specified apparatus
+#   filtered_data <- final_women[final_women$Apparatus == apparatus,]
+# 
+#   # Running fitdist() on normal distribution and calculating p-value
+#   normal_fit <- fitdist(filtered_data$D_Score, "norm")
+#   print(summary(normal_fit))
+#   p_value <- calculate_p_value(normal_fit$estimate[[1]], normal_fit$estimate[[2]])
+#   print(paste("P-value:", p_value))
+# 
+#   # Outputting sample mean and standard deviation
+#   mean_val <- mean(filtered_data$D_Score)
+#   sd_val <- sd(filtered_data$D_Score)
+#   print(paste("Mean:", mean_val, "Standard Deviation:", sd_val))
+# 
+#   # Returning all calculated and fitted values
+#   return(list(normal_fit = normal_fit,
+#               p_value = p_value,
+#               mean_val = mean_val,
+#               sd_val = sd_val,
+#               normal_mu_fit = normal_mu_fit,
+#               invgamma_sd_fit = invgamma_sd_fit))
+# }
+
+# Usage example:
+#dscore_analysis(final_women, "BB")
+
+```
+
+
+
+## BELOW
+```{r}
+# #calculate for the mus
+# calculate_fits <- function(data, apparatus, meanchoice, varchoice) {
+# 
+#   # Fit a normal distribution to the means
+#   normal_mu_fit <- fitdist(data$meanchoice, "norm")
+# 
+#   # Fit an inverse gamma distribution to the standard deviations (excluding zeros)
+#   invgamma_var_fit <- fitdist(data$varchoice, "invgamma")
+# 
+#   # Return the fitted distributions
+#   return(list(normal_mu_fit = normal_mu_fit, invgamma_var_fit = invgamma_var_fit))
+# }
+# 
+# # Usage example:
+# fits <- calculate_fits(women_apparatus, "BB", mean_D, var_D)
+
+
+```
+
+Copying code from sta360 hw 4
+
+```{r}
+# smc = 1000
+# m_0 =  normal_mu_fit$estimate[[1]]
+# sig_0 = normal_mu_fit$estimate[[2]]
+# k_0 = invgamma_sd_fit$estimate[[1]] 
+# v_0 = invgamma_sd_fit$estimate[[2]]
+# 
+# analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc) {
+#   n = length(athlete_results)
+#   ybar = mean(athlete_results)
+#   
+#   if (is.na(var(athlete_results))) {
+#     var = 0
+#   } else {
+#     var = var(athlete_results) 
+#   }
+#   
+#   k_n = k_0 + n
+#   v_n = v_0 + n
+#   m_n = (k_0*m_0 + n*ybar)/k_n
+#   sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
+#   sig_sample = mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
+#   theta_sample = mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
+#   
+#   return(c(theta_sample, sig_sample))
+# }
+```
+
+
+
+
+
+
+
+## IGNORE BELOW
 
 
 ```{r}
