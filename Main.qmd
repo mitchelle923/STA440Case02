@@ -226,7 +226,7 @@ fit_normal_priors <- function(data, apparatus, gender) {
 ```{r simulation-function}
 #code for simulations, inspired by STA360/peter hoff textbook
 
-analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0) {
+analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
   n = length(athlete_results)
   ybar = mean(athlete_results)
   var = var(athlete_results)
@@ -249,7 +249,7 @@ simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medal
   simul_data = data %>%
     filter(Apparatus == apparatus
            , Gender == gender) %>%
-    group_by(unique_id, Country) %>%
+    group_by(unique_id) %>%
     summarise(mean_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[1],
               var_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2],
               observations = n(), .groups = "keep") %>%
@@ -277,7 +277,7 @@ simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medal
 # full competition simulation, gets pretty slow with 1000 simulations
 simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, v_0, smc) {
   athletes_medals = data %>%
-    dplyr::select(unique_id, Country) %>%
+    dplyr::select(unique_id) %>%
     distinct() %>%
     mutate(Golds = 0, Silvers = 0, Bronzes = 0, Total_Medals = 0)
   
@@ -286,7 +286,7 @@ simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, 
       filter(medal != "NA")
     
     big_simul = big_simul %>%
-      group_by(unique_id, Country) %>%
+      group_by(unique_id) %>%
       summarise(Golds = sum(medal == "Gold"),
                 Silvers = sum(medal == "Silver"),
                 Bronzes = sum(medal == "Bronze"),
@@ -295,12 +295,12 @@ simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, 
       ungroup()
     
     athletes_medals = athletes_medals %>%
-      left_join(big_simul, by = c("unique_id", "Country")) %>%
+      left_join(big_simul, by = c("unique_id")) %>%
       mutate(Golds = ifelse(is.na(Golds.y), Golds.x, Golds.y + Golds.x),
              Silvers = ifelse(is.na(Silvers.y), Silvers.x, Silvers.y + Silvers.x),
              Bronzes = ifelse(is.na(Bronzes.y), Bronzes.x, Bronzes.y + Bronzes.x),
              Total_Medals = ifelse(is.na(Total_Medals.y), Total_Medals.x, Total_Medals.y + Total_Medals.x)) %>%
-      dplyr::select(unique_id, Country, Golds, Silvers, Bronzes, Total_Medals) %>%
+      dplyr::select(unique_id, Golds, Silvers, Bronzes, Total_Medals) %>%
       arrange(desc(Total_Medals))
   } 
   return(athletes_medals)
@@ -309,7 +309,7 @@ simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, 
 
 ## Results
 
-```{r}
+```{r warning = FALSE}
 set.seed(123)
 # This is how it sort of would work
 prior_parameters = suppressWarnings(fit_normal_priors(combined_apparatus, "FX", "w"))
@@ -320,8 +320,8 @@ sig_0 = prior_parameters[2]
 k_0 = prior_parameters[3]
 v_0 = prior_parameters[4]
 
-# test_simul = simulate_full_competition(combined_final, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
-# head(test_simul)
+test_simul = simulate_full_competition(combined_final, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
+head(test_simul, 10)
 ```
 
 ## Discussion
