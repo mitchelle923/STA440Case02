@@ -1,6 +1,6 @@
 ---
-title: "US Gymnastics Analysis"
-author: "Chris, Enzo, Mitchelle, Zoe"
+title: "Journey to Paris 2024: A Bayesian Approach to Finding the Best Men's and Women's U.S. Gymnastics Teams"
+author: "Chris Liang, Enzo Moraes Mescall, Mitchelle Mojekwu, Zoe Svec"
 output: 
   pdf_document:
     latex_engine: xelatex
@@ -73,8 +73,6 @@ We have the following objectives for this study: (UCSAS, 2023)
 4)  Identify the group of five athletes who will most likely enable the Team USA Olympic Men's and Women's Artistic Gymnastics team to maximize medals won in the Paris 2024 Summer Olympics using an analytical model.
 
 Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection. In our analysis of the best fit US male and female gymnastics teams for the Paris Olympics, we will undertake a Bayesian approach to simulate outcomes of individual athletes' scores in an apparatus. Bayesian frameworks in sports analytics to simulate athlete's results are well-documented and have seen a rise in popularity in the past decade (Santos-Fernandez, et. al., 2019). For instance, Yang and Swartz use Monte Carlo Markov Chains to simulate the outcomes of baseball games (Yang et. al., 2022). We will build upon these analyses and choose the appropriate Bayesian method to simulate outcomes of gymnast results in each apparatus, after which we will analyze the top performers in each apparatus, assign medals, and find the best combination of athletes.
-
-### EDA ...
 
 ## Methodology
 
@@ -195,6 +193,102 @@ combined <- combined |>
 #combined now has 2210 obs instead of 4040 obs -- using this to run sims
 ```
 
+
+### Exploratory Data Visualizations
+
+```{r score-distributions}
+
+#womens score distributions by apparatus
+womensdist <- combined |>
+  filter(Gender == "w") |>
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+   labs(title = "Distribution of Female Gymnasts' Overall Scores",
+       subtitle = "By Apparatus",
+       x = "Overall Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+
+#mens score distributions by apparatus
+mensdist <- combined |>
+  filter(Gender == "m") |>
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+   labs(title = "Distribution of Male Gymnasts' Overall Scores",
+       subtitle = "By Apparatus",
+       x = "Overall Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+plot_grid(womensdist, mensdist, ncol=2)
+```
+
+```{r top-10-athletes}
+top_10_f_means <- combined_apparatus |>
+  filter(Gender == "w") |>
+  group_by(Apparatus, unique_id) |>
+  arrange(Apparatus, desc(mean_score)) |>
+  group_by(Apparatus) |>
+  slice_head(n = 10) |>
+  ungroup()
+
+topwomens <- top_10_f_means |>
+  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_bar() + 
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  labs(title = "Number of Female Athletes in \n Top 10 of Each Apparatus",
+       subtitle = "By Athlete's Mean Apparatus Score and Country",
+       x = "Number of Female Athletes in Top 10 of Each Apparatus",
+       y = "Country the Athlete Represents") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7)) +
+  facet_wrap(~ Apparatus, scales = "free_x") + 
+  coord_flip()
+
+
+top_10_m_means <- combined_apparatus |>
+  filter(Gender == "m") |>
+  group_by(Apparatus, unique_id) |>
+  arrange(Apparatus, desc(mean_score)) |>
+  group_by(Apparatus) |>
+  slice_head(n = 10) |>
+  ungroup()
+
+topmens <- top_10_m_means |>
+  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_bar() + 
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  labs(title = "Number of Male Athletes in \n Top 10 of Each Apparatus",
+       subtitle = "By Athlete's Mean Apparatus Scores and Country",
+       x = "Number of Male Athletes in Top 10 of Each Apparatus",
+       y = "Country the Athlete Represents") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 5),
+        axis.title = element_text(size = 7)) +
+  facet_wrap(~ Apparatus, scales = "free_x") + 
+  coord_flip()
+
+plot_grid(topwomens, topmens, ncol=2)
+```
+
 ## Simulations
 
 ```{r fitting-priors}
@@ -309,7 +403,7 @@ sig_0 <- fxw_prior_parameters[2]
 k_0 <- fxw_prior_parameters[3]
 v_0 <- fxw_prior_parameters[4]
 
-FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 500)
+FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
 
 FX_w_simul |>
   head(10) |>
@@ -327,7 +421,7 @@ sig_0 <- bbw_prior_parameters[2]
 k_0 <- bbw_prior_parameters[3]
 v_0 <- bbw_prior_parameters[4]
 
-BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 500)
+BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 100)
 BB_w_simul |>
   head(10) |>
   kable(caption = "Women's Balance Beam Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -344,7 +438,7 @@ sig_0 <- vtw_prior_parameters[2]
 k_0 <- vtw_prior_parameters[3]
 v_0 <- vtw_prior_parameters[4]
 
-VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 500)
+VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 100)
 VT_w_simul |>
   head(10) |>
   kable(caption = "Women's Vault Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -361,11 +455,7 @@ sig_0 <- ubw_prior_parameters[2]
 k_0 <- ubw_prior_parameters[3]
 v_0 <- ubw_prior_parameters[4]
 
-UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 500)
-UB_w_simul |>
-  head(10) |>
-  kable(caption = "Women's Uneven Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 100)
 ```
 
 ### Male Athletes' Results
@@ -380,11 +470,7 @@ sig_0 <- fxm_prior_parameters[2]
 k_0 <- fxm_prior_parameters[3]
 v_0 <- fxm_prior_parameters[4]
 
-FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 500)
-FX_m_simul |>
-  head(10) |>
-  kable(caption = "Men's Floor Exercise Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 100)
 ```
 
 ```{r VT-men-sims}
@@ -397,7 +483,8 @@ sig_0 <- vtm_prior_parameters[2]
 k_0 <- vtm_prior_parameters[3]
 v_0 <- vtm_prior_parameters[4]
 
-VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 500)
+VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 100)
+
 VT_m_simul |>
   head(10) |>
   kable(caption = "Men's Vault Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -414,11 +501,7 @@ sig_0 <- phm_prior_parameters[2]
 k_0 <- phm_prior_parameters[3]
 v_0 <- phm_prior_parameters[4]
 
-PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 500)
-PH_m_simul |>
-  head(10) |>
-  kable(caption = "Men's Pommel Horse Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 100)
 ```
 
 ```{r HB-men-sims}
@@ -431,7 +514,7 @@ sig_0 <- hbm_prior_parameters[2]
 k_0 <- hbm_prior_parameters[3]
 v_0 <- hbm_prior_parameters[4]
 
-HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 500)
+HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 100)
 HB_m_simul |>
   head(10) |>
   kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -448,11 +531,7 @@ sig_0 <- srm_prior_parameters[2]
 k_0 <- srm_prior_parameters[3]
 v_0 <- srm_prior_parameters[4]
 
-SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 500)
-SR_m_simul |>
-  head(10) |>
-  kable(caption = "Men's Still Rings Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 100)
 ```
 
 ```{r PB-men-sims}
@@ -465,11 +544,7 @@ sig_0 <- pbm_prior_parameters[2]
 k_0 <- pbm_prior_parameters[3]
 v_0 <- pbm_prior_parameters[4]
 
-PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 500)
-PB_m_simul |>
-  head(10) |>
-  kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 100)
 ```
 
 ```{r include = FALSE}
@@ -583,9 +658,105 @@ Santos-Fernandez, Edgar, et al. "Bayesian Statistics Meets Sports: A Comprehensi
 
 Yang, Tae Young, and Tim Swartz. "A Two-Stage Bayesian Model for Predicting Winners in Major League Baseball." Journal of Data Science, vol. 2, no. 1, Aug. 2022, pp. 61--73. jds-online.org, https://doi.org/10.6339/JDS.2004.02(1).142.
 
-### Visualizations
+### Additional Simulation Results
 
-```{r}
+```{r additional-sims-tables}
+
+#womens additional
+UB_w_simul |>
+  head(10) |>
+  kable(caption = "Women's Uneven Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
+
+#mens additional
+FX_m_simul |>
+  head(10) |>
+  kable(caption = "Men's Floor Exercise Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
+
+PH_m_simul |>
+  head(10) |>
+  kable(caption = "Men's Pommel Horse Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
+
+SR_m_simul |>
+  head(10) |>
+  kable(caption = "Men's Still Rings Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
+
+PB_m_simul |>
+  head(10) |>
+  kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
+```
+
+
+### Extra Visualizations
+
+``` {r execution-difficulty-distributions}
+## GOING INTO APPENDIX
+combined |>
+  filter(Gender == "w") |>
+  ggplot(aes(x = E_Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+  labs(title = "Distribution of Female Gymnasts' Execution Scores",
+       subtitle = "By Apparatus",
+       x = "Execution Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+combined |>
+  filter(Gender == "w") |>
+  ggplot(aes(x = D_Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+    labs(title = "Distribution of Female Gymnasts' Difficulty Scores",
+         subtitle = "By Apparatus",
+         x = "Difficulty Score",
+         y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+combined |>
+  filter(Gender == "m") |>
+  ggplot(aes(x = E_Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+  labs(title = "Distribution of Male Gymnasts' Execution Scores",
+       subtitle = "By Apparatus",
+       x = "Execution Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+combined |>
+  filter(Gender == "m") |>
+  ggplot(aes(x = D_Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+    labs(title = "Distribution of Male Gymnasts' Difficulty Scores",
+         subtitle = "By Apparatus",
+         x = "Difficulty Score",
+         y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+```
+
+```{r unique-athletes}
 number_athletes |>
   filter(Round %in% AA_team) |>
   ggplot(aes(x = athletes_participated)) +
@@ -754,7 +925,6 @@ For the men's simulation when looking at the top 5 athletes by:
 -   *Weighted Medal Count* for each apparatus there are 4 out of 30 from the US: floor exercise (FX): 1, high bar (HB): 1, parallel bars (PB): 0, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
 
     -   USA makes up 23% of the weight of men's medals in the simulation.
-
 
 **Image 9)**
 

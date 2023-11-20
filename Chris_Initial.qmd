@@ -41,14 +41,12 @@ later <- laterdata |>
   drop_na(Score, E_Score, D_Score, Apparatus, Round, Location, Competition, Country, Gender)
 ```
 
-```{r}
+```{r data-cleaning, message = FALSE}
 #indonesian gymnast's name is Abiyu RAFI not ABIYURAFI
 laterdata <- laterdata |>
   mutate(FirstName = ifelse(LastName == "ABIYURAFI" & FirstName == ".", "Abiyu", FirstName),
-    LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName))
-
-laterdata <- laterdata |>
-  mutate(Apparatus = if_else(Apparatus == 'hb', 'HB', Apparatus))
+    LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName),
+    Apparatus = if_else(Apparatus == 'hb', 'HB', Apparatus))
 
 
 laterdata <- laterdata |>
@@ -63,20 +61,39 @@ laterdata <- laterdata |>
 laterdata <- laterdata |>
   mutate(unique_id = paste0(str_sub(FirstName, 1, 3), str_sub(LastName, 1, 3), "_", Country))
 
-laterdata |>
-  filter(Gender == "w",
-         Country == "USA")
-
 #create a vector for AA or team
 AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
 '%notin%' <- function(x,y)!('%in%'(x,y))
 
 finals_vector <- c("AAfinal", "TeamFinal", "final")
+
+#basically take the highest vault if there's a VT1 and VT2 since the vaults need to be different, and you would perform the harder/higher vault in the final
+
+mutated_data <- laterdata |>
+  filter(Apparatus %notin% c("VT1", "VT2"))
+
+vaults_set <- laterdata |>
+  filter(Apparatus %in% c("VT1", "VT2")) |>
+  group_by(unique_id, Competition, Round, Apparatus, Gender, FirstName, LastName, Date, Location, Rank, Country, firstname_check, lastname_check) |>
+  summarise(
+    Score = max(Score, na.rm = TRUE),
+    E_Score = E_Score[which.max(Score)],
+    D_Score = D_Score[which.max(Score)],
+    Penalty = Penalty[which.max(Score)],
+    .groups = 'drop'
+  ) |>
+  mutate(Apparatus = ifelse(Apparatus == "VT1", "VT", "VT"))
+
+#need to join the vaults set back with og data
+
+laterdata <- mutated_data |>
+  left_join(vaults_set)
+
+#now there are no more VT1s or VT2s --> down to 18423 obs
+
 ```
 
-
-
-```{r}
+```{r quantiling, message = FALSE}
 #these quantiles are already grouped by gender and competition, round, apapratus, etc. so no bleeding
 quantiled_data <- laterdata |>
   group_by(Gender, Competition, Round, Apparatus) |>
@@ -94,46 +111,10 @@ number_athletes <- filtered_data |>
   group_by(Competition, Round) |>
   summarise(athletes_participated = n_distinct(unique_id))
 
-number_athletes |>
-  filter(Round %in% AA_team) |>
-  ggplot(aes(x = athletes_participated)) +
-    geom_histogram() +
-    facet_wrap(~ Round) +
-    labs(x = "Number of Unique Athletes Competed",
-         y = "Frequency",
-         title = "Distribution of Athletes Competed at Competition Rounds",
-         subtitle = "All Around or Team All Arounds")
-
-number_athletes |>
-  filter(Round == "AAfinal") |>
-  ggplot(aes(x = athletes_participated)) +
-    geom_histogram() +
-    labs(x = "Number of Unique Athletes Competed",
-         y = "Frequency",
-         title = "Distribution of Athletes Competed at AA Finals")
 
 # at the oceania continental championships, only 10 unique athletes competed
 # every other competition at each round has at minimum 36 athletes competing
-
-number_athletes |>
-  filter(Round == "final") |>
-  ggplot(aes(x = athletes_participated)) +
-    geom_histogram() +
-    facet_wrap(~ Round) +
-    labs(x = "Number of Unique Athletes Competed",
-         y = "Frequency",
-         title = "Distribution of Athletes Competed at Final Rounds",
-         subtitle = "Individual Apparatuses")
-
-
 #at these final rounds, there are at least 40 athletes in each final, so it's fine
-
-ggplot(number_athletes, aes(x = athletes_participated)) +
-  geom_histogram() +
-  labs(x = "Number of Unique Athletes Competed",
-       y = "Frequency",
-       title = "Distribution of Athletes Competed at Competitions")
-
 #going to left join to show the number of athletes that participated per round
 
 joined_data <- filtered_data |>
@@ -147,49 +128,194 @@ final_data <- joined_data |>
   filter((athletes_participated <= 100 & quantile_20s == 1) | (athletes_participated > 100 & quantile_10s == 1) | (Competition == "Oceania Continental Championships 2023" & quantile_20s %in% c(1, 2)))
 
 #now let's check the number of unique athletes left
-final_data |>
-  group_by(Country) |>
-  summarise(athletes_left = n_distinct(unique_id))
-
-#there are 679 athletes left in total once we have filtered, USA still has 91 left
+# final_data |>
+#   group_by(Country) |>
+#   summarise(athletes_left = n_distinct(unique_id))
 ```
 
-## LATER QUAD
+```{r removing-obs, message = FALSE}
+#summary stats for each athlete for each apparatus
+combined_apparatus <- final_data |>
+  group_by(Apparatus, unique_id, Country, Gender) |>
+  summarise(mean_score = mean(Score),
+            var_score = var(Score),
+            number_obs = n(),
+            mean_D = mean(D_Score),
+            var_D = var(D_Score),
+            mean_E = mean(E_Score),
+            var_E = var(E_Score)) |>
+  filter(number_obs >= 3)
 
-```{r}
+combined <- final_data |>
+  left_join(combined_apparatus, by = c("Apparatus", "unique_id", "Country", "Gender"))
+
+# USE THIS DF FOR RUNNING SIMS
+combined <- combined |>
+  filter(!is.na(number_obs))
+
+#combined now has 2210 obs instead of 4040 obs -- using this to run sims
+```
+
+## EXPLORATORY DATA VIS
+
+```{r score-distributions}
+
+#womens score distributions by apparatus
+combined |>
+  filter(Gender == "w") |>
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+   labs(title = "Distribution of Female Gymnasts' Overall Scores",
+       subtitle = "By Apparatus",
+       x = "Overall Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
 
 
-#for only the apparatus events
-top_20_apparatus_men <- laterdata |>
-  filter(Gender == "m",
-         Round %notin% AA_team) |>
-  select(Apparatus, unique_id, Country, Date, Competition, Round, Score) |>
-  group_by(Apparatus) |>
-  arrange(desc(Score)) |>
-  slice_max(order_by = Score, n = 20)
-
-top_20_apparatus_women <- laterdata |>
-  filter(Gender == "w",
-         Round %notin% AA_team) |>
-  select(Apparatus, unique_id, Country, Date, Competition, Round, Score) |>
-  group_by(Apparatus) |>
-  arrange(desc(Score)) |>
-  slice_max(order_by = Score, n = 20)
-
-#top_20_apparatus_men
+#mens score distributions by apparatus
+combined |>
+  filter(Gender == "m") |>
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+   labs(title = "Distribution of Male Gymnasts' Overall Scores",
+       subtitle = "By Apparatus",
+       x = "Overall Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
 ```
 
 
+## TO PUT IN APPENDIX
+``` {r execution-difficulty-distributions}
+## GOING INTO APPENDIX
+combined |>
+  filter(Gender == "w") |>
+  ggplot(aes(x = E_Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+  labs(title = "Distribution of Female Gymnasts' Execution Scores",
+       subtitle = "By Apparatus",
+       x = "Execution Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+combined |>
+  filter(Gender == "w") |>
+  ggplot(aes(x = D_Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+    labs(title = "Distribution of Female Gymnasts' Difficulty Scores",
+         subtitle = "By Apparatus",
+         x = "Difficulty Score",
+         y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+combined |>
+  filter(Gender == "m") |>
+  ggplot(aes(x = E_Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+  labs(title = "Distribution of Male Gymnasts' Execution Scores",
+       subtitle = "By Apparatus",
+       x = "Execution Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+combined |>
+  filter(Gender == "m") |>
+  ggplot(aes(x = D_Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+    labs(title = "Distribution of Male Gymnasts' Difficulty Scores",
+         subtitle = "By Apparatus",
+         x = "Difficulty Score",
+         y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+
+```
+
+
+
 ```{r}
-top_20_apparatus_men |>
+top_10_f_means <- combined_apparatus |>
+  filter(Gender == "w") |>
+  group_by(Apparatus, unique_id) |>
+  arrange(Apparatus, desc(mean_score)) |>
+  group_by(Apparatus) |>
+  slice_head(n = 10) |>
+  ungroup()
+
+top_10_f_means |>
   ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
   geom_bar() + 
   scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
-  theme(legend.position = "none") +
-  facet_grid(~ Apparatus, scales = "free_x") + 
+  labs(title = "Number of Female Athletes in Top 10 of Each Apparatus",
+       subtitle = "By Athlete's Mean Apparatus Score and Country",
+       x = "Number of Female Athletes in Top 10 of Each Apparatus",
+       y = "Country the Athlete Represents") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7)) +
+  facet_wrap(~ Apparatus, scales = "free_x") + 
+  coord_flip()
+
+
+top_10_m_means <- combined_apparatus |>
+  filter(Gender == "m") |>
+  group_by(Apparatus, unique_id) |>
+  arrange(Apparatus, desc(mean_score)) |>
+  group_by(Apparatus) |>
+  slice_head(n = 10) |>
+  ungroup()
+
+top_10_m_means |>
+  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_bar() + 
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  labs(title = "Number of Male Athletes in Top 10 of Each Apparatus",
+       subtitle = "By Athlete's Mean Apparatus Scores and Country",
+       x = "Number of Male Athletes in Top 10 of Each Apparatus",
+       y = "Country the Athlete Represents") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7)) +
+  facet_wrap(~ Apparatus, scales = "free_x") + 
   coord_flip()
 ```
-
+## NOT GOING INTO APPENDIX
 
 ```{r}
 apparatus_summary <- laterdata |>
@@ -344,7 +470,7 @@ top_20_apparatus_women |>
 ```
 
 
-## Trying out modeling
+## Already copied in
 
 
 ```{r}
@@ -405,113 +531,6 @@ final_women_apparatus <- women_apparatus |>
 ```
 
 
-# ATTEMPTING MODELING
-
-```{r}
-calculate_p_value <- function(estimate, se, null_value = 0) {
-  z <- (estimate - null_value) / se
-  p_value <- 2 * pnorm(-abs(z))
-  return(p_value)
-}
-```
-
-```{r}
-# # Running fitdist() on normal dist and calculating p-value
-# normal_fit = fitdist(final_women$D_Score[final_women$Apparatus == "BB"], "norm")
-# summary(normal_fit)
-# calculate_p_value(normal_fit$estimate[[1]], normal_fit$estimate[[2]])
-# 
-# # Compare this to the sample mean and standard deviation
-# mean(final_women$D_Score[final_women$Apparatus == "HB"])
-# sd(final_women$D_Score[final_women$Apparatus == "HB"])
-```
-
-
-
-## TRYING
-
-```{r error = FALSE}
-# dscore_analysis <- function(data, apparatus) {
-#   # Filtering data for the specified apparatus
-#   filtered_data <- final_women[final_women$Apparatus == apparatus,]
-# 
-#   # Running fitdist() on normal distribution and calculating p-value
-#   normal_fit <- fitdist(filtered_data$D_Score, "norm")
-#   print(summary(normal_fit))
-#   p_value <- calculate_p_value(normal_fit$estimate[[1]], normal_fit$estimate[[2]])
-#   print(paste("P-value:", p_value))
-# 
-#   # Outputting sample mean and standard deviation
-#   mean_val <- mean(filtered_data$D_Score)
-#   sd_val <- sd(filtered_data$D_Score)
-#   print(paste("Mean:", mean_val, "Standard Deviation:", sd_val))
-# 
-#   # Returning all calculated and fitted values
-#   return(list(normal_fit = normal_fit,
-#               p_value = p_value,
-#               mean_val = mean_val,
-#               sd_val = sd_val,
-#               normal_mu_fit = normal_mu_fit,
-#               invgamma_sd_fit = invgamma_sd_fit))
-# }
-
-# Usage example:
-#dscore_analysis(final_women, "BB")
-
-```
-
-
-
-## BELOW
-```{r}
-# #calculate for the mus
-# calculate_fits <- function(data, apparatus, meanchoice, varchoice) {
-# 
-#   # Fit a normal distribution to the means
-#   normal_mu_fit <- fitdist(data$meanchoice, "norm")
-# 
-#   # Fit an inverse gamma distribution to the standard deviations (excluding zeros)
-#   invgamma_var_fit <- fitdist(data$varchoice, "invgamma")
-# 
-#   # Return the fitted distributions
-#   return(list(normal_mu_fit = normal_mu_fit, invgamma_var_fit = invgamma_var_fit))
-# }
-# 
-# # Usage example:
-# fits <- calculate_fits(women_apparatus, "BB", mean_D, var_D)
-
-
-```
-
-Copying code from sta360 hw 4
-
-```{r}
-# smc = 1000
-# m_0 =  normal_mu_fit$estimate[[1]]
-# sig_0 = normal_mu_fit$estimate[[2]]
-# k_0 = invgamma_sd_fit$estimate[[1]] 
-# v_0 = invgamma_sd_fit$estimate[[2]]
-# 
-# analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc) {
-#   n = length(athlete_results)
-#   ybar = mean(athlete_results)
-#   
-#   if (is.na(var(athlete_results))) {
-#     var = 0
-#   } else {
-#     var = var(athlete_results) 
-#   }
-#   
-#   k_n = k_0 + n
-#   v_n = v_0 + n
-#   m_n = (k_0*m_0 + n*ybar)/k_n
-#   sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
-#   sig_sample = mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
-#   theta_sample = mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
-#   
-#   return(c(theta_sample, sig_sample))
-# }
-```
 
 
 
@@ -519,42 +538,6 @@ Copying code from sta360 hw 4
 
 
 
-## IGNORE BELOW
+## Writeup of Methodology (data cleaning part)
 
-
-```{r}
-# FOR BB, TRYING IT OUT
-# Assuming you have your data in a variable `y`
-# Set up the data
-mean_y <-13.23694  # Mean of your data
-var_y <- 0.4176740    # Variance of your data
-n <- 373   # Number of data points
-
-# Set up initial values
-S <- 1000                  # Number of samples to draw
-PHI <- matrix(nrow = S, ncol = 2)  # Matrix to store samples
-PHI[1, ] <- phi <- c( mean_y, 1/var_y)
-   # Initial values
-
-# Set prior parameters (mu0, tau0 squared, nu0, s20)
-#THIS IS SO FAKE IM JUST USING PRIORS FROM THE TEXTBOOK
-mu0<- 1.9 ; t20 <- 0.95^2 ; s20 <- .01 ; nu0<-1
-
-# Gibbs sampling
-set.seed(1)   # For reproducibility
-for (s in 2:S) {
-    # Update theta (mu) from its full conditional
-    mun <- (mu0 / t20 + n * mean_y * PHI[s - 1, 2]) / (1 / t20 + n * PHI[s - 1, 2])
-    t2n <- 1 / (1 / t20 + n * PHI[s - 1, 2])
-    PHI[s, 1] <- rnorm(1, mun, sqrt(t2n))
-
-    # Update 1/sigma squared from its full conditional
-    nun <- nu0 + n
-    s2n <- (nu0 * s20 + (n - 1) * var_y + n * (mean_y - PHI[s, 1])^2) / nun
-    PHI[s, 2] <- rgamma(1, nun / 2, nun * s2n / 2)
-}
-
-# PHI now contains the samples from the posterior
-
-```
 
