@@ -25,7 +25,7 @@ data_21 = read.csv("Cleaned Data/data_2017_2021.csv")
 
 
 ```{r}
-analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc) {
+analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
   n = length(athlete_results)
   ybar = mean(athlete_results)
   
@@ -161,7 +161,7 @@ simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, 
 ```{r}
 set.seed(123)
 # This is how it sort of would work
-prior_parameters = suppressWarnings(fit_normal_priors(data_23, "FX", "w"))
+prior_parameters = suppressWarnings(fit_normal_priors(data_23, "HB", "m"))
 print(prior_parameters)
 
 mu_0 = prior_parameters[1]
@@ -169,7 +169,7 @@ sig_0 = prior_parameters[2]
 k_0 = prior_parameters[3]
 v_0 = prior_parameters[4]
 
-test_simul = simulate_full_competition(data_23, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
+test_simul = simulate_full_competition(data_23, "HB", "m", mu_0, sig_0, k_0, v_0, 100)
 head(test_simul)
 ```
 

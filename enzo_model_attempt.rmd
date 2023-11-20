@@ -3,7 +3,7 @@ title: "Attempting a Model"
 author: "Enzo Moraes Mescall"
 date: "`r Sys.Date()`"
 output: pdf_document
----
+--- 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -14,6 +14,50 @@ library(tidyverse)
 library(invgamma)
 library(fitdistrplus)
 ```
+
+## Methodology Writeup
+
+In this study, we present a Bayesian statistical approach to select the top male and female American gymnast candidates for participation in the 2024 Olympics. Our method involves the creation of prior distributions based on historical performance data, conditioning these distributions on individual competition results, and simulating medal outcomes by predicting scores for each gymnast in each apparatus event. The approach offers a robust framework for incorporating both prior beliefs and observed data to make informed predictions about athletes' performances in simulated events. Utilizing Bayes' law as follows, where $i$ represents the $i$th athlete, $\dot x_i$ represents the observed data for athlete $i$, and $\theta$ represents the parameters of the distribution we will be using to model:
+
+$$
+p(\theta_i | x) = \frac{p(x | \theta) p(\theta)}{p(x)} \\
+$$
+
+### Prior Distribution Creation:
+
+We began by creating prior distributions for each apparatus' total score. Splitting all competitions in the dataset by apparatus and gender resulted multiple separate datasets, see Exploratory Data Visualizations Sector. Observing the combined score distributions, they appeared be unimodal and be slight-ly right sweked. Various distributions were considered, like the beta distribution which is conveniently upper and lower bounded, but the normal distribution was chosen for its simplicity, ease of use, and effective fit.
+
+** include graphs of fitting normal and beta distributions **
+
+The decision was made then to assume that the parameters leads to the question of how to model the prior distribution of the total score. We chose to model the prior distribution of the total score as a normal-inverse gamma distribution. This is because the total score is the sum of the difficulty score and the execution score, and both of these scores are normally distributed. The difficulty score is the sum of the difficulty values of each skill performed, and the execution score is the sum of the execution values of each skill performed. The difficulty values and execution values of each skill performed are normally distributed. The total score is the sum of normally distributed random variables, and the sum of normally distributed random variables is also normally distributed.
+
+From here, we worked backwards and used the normal distribution to model the prior distribution of the total score. The normal distribution is a continuous probability distribution that is symmetric about the mean. It is used to model the distribution of a random variable that is normally distributed. The normal distribution is a conjugate prior for the mean of a normal distribution. This means that if the prior distribution of the mean is a normal distribution, and the likelihood function is a normal distribution, then the posterior distribution is also a normal distribution. This is useful because it allows us to update our prior distribution of the mean with the likelihood function of the data to get the posterior distribution of the mean.
+
+When constructing the priors we run into the issue of different athletes having different numbers of competitions.
+
+To account for this, we used the inverse gamma distribution to model the variance of the normal distribution. The inverse gamma distribution is a continuous probability distribution that is the inverse of the gamma distribution. It is used to model the variance of a normal distribution. The inverse gamma distribution is a conjugate prior for the variance of a normal distribution. This means that if the prior distribution of the variance is an inverse gamma distribution, and the likelihood function is a normal distribution, then the posterior distribution is also an inverse gamma distribution. This is useful because it allows us to update our prior distribution of the variance with the likelihood function of the data to get the posterior distribution of the variance.
+
+** Include plot of distribution of score means and variances for a chosen apparatus **
+
+Conditioning on Individual Results:
+
+Following the establishment of the prior distributions, we updated these distributions based on individual competition results. Bayesian methods, specifically Bayes' theorem, were employed for this purpose. Conditioning on observed data involved updating the mean and variance parameters of the distributions, resulting in posterior distributions that reflected our refined beliefs about each athlete's true ability given their recent performance.
+
+Assuming independence between events, we used the posterior distributions to simulate individual apparatus events. Conditioning on the observed competition results allowed us to incorporate new information into the model, providing a more accurate representation of the gymnasts' abilities.
+
+Simulation of Gymnastics Events:
+
+To simulate gymnastics events, we performed 500 iterations for each apparatus event and for each gymnast. Drawing samples from the normal distributions derived from the posterior distributions allowed us to capture the uncertainty in the athletes' abilities. This Monte Carlo simulation generated a distribution of possible scores for each gymnast, reflecting the inherent variability in performance.
+
+The simulated events provided a basis for predicting medal outcomes. The gymnast with the highest simulated score for a given apparatus event was awarded the gold medal, the second-highest the silver, and the third-highest the bronze. This process was repeated across all apparatus events for both male and female gymnasts.
+
+Assumptions:
+
+Inherent in our methodology are several assumptions. Firstly, we assume that gymnastic scores are normally distributed, justifying the use of the normal distribution for both prior and posterior distributions. Additionally, we assume independence between events, allowing us to treat each apparatus event as a separate and identically distributed random variable.
+
+Furthermore, we assume that historical performance data adequately represents the gymnasts' true abilities. While this assumption simplifies the modeling process, it may not fully capture the complexities of individual development and improvements over time.
+
+In conclusion, our methodology integrates Bayesian statistics, conditioning on individual results, and simulation techniques to select the top male and female American gymnasts for the upcoming Olympics. The approach offers a robust framework for incorporating both prior beliefs and observed data to make informed predictions about athletes' performances in simulated events.
 
 ## Reading data
 
@@ -136,10 +180,10 @@ HB_sd %>%
   filter(sd > 0) %>%
   ggplot(aes(x = sd)) +
   geom_histogram() +
-  labs(title = "Distribution of SDs of Difficulty Scores",
-       x = "SD",
+  labs(title = "Distribution of Sigmas of Difficulty Scores",
+       x = "Variance",
        y = "Count") + 
-  geom_vline(xintercept = 0.718**2, color = "red")
+  geom_vline(xintercept = mean(HB_sd$sd), color = "red")
 ```
 
 It seems like the standard deviations themselves follow an inv-gamma distribution, canonically the conjugate prior would be an inverse-gamma but I'm not sure how to approach that and it feels like it would be really complicated to have two prior distributions for difficulty score every apparatus for both genders. I also forgot if I should build the prior from the distribution of means/standard deviations or from the distribution of actual scores
@@ -151,16 +195,14 @@ HB_mu = data_23 %>%
   group_by(FirstName, LastName, Gender, Country) %>%
   summarise(mu = mean(D_Score))
 
-mean(HB_mu$mu)
-
 # Plot histogram of means
 HB_mu %>%
   ggplot(aes(x = mu)) +
   geom_histogram() +
   labs(title = "Distribution of Means of Difficulty Scores",
-       x = "SD",
+       x = "Mean",
        y = "Count") + 
-  geom_vline(xintercept = 4.87, color = "red")
+  geom_vline(xintercept = mean(HB_mu$mu), color = "red")
 ```
 
 I think the reason the mean looks so weird is because some athletes get sampled more than others, i don't care though. I'm going to fit a normal distribution to the means and an inv gamma distribution to the SDs and use those as priors
