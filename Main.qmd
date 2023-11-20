@@ -536,15 +536,23 @@ tot_m_simul
 
 ### Objective 1: Choice of Medal Success Metric (Total Number of Gold Medals)
 
-From the visualizations of the women's simulation of the three considered success metrics (gold medal count, total medal count, and weighted medal count) for each apparatus by USA and non-USA teams, there looks to be at least one USA athlete that places higher than of all non-USA athletes in each medal metric for each apparatus except uneven bars (Appendix: Image 5). The women's USA team makes up 58% of the total women's gold medals in the simulation which is a higher proportion than the 49% of the total medal count and 52% of the weighted medals (Appendix: Image 7). From the visualizations of the men's simulation of the three considered success metrics, for each apparatus by USA and non-USA teams, there are non-USA athletes for each apparatus that exceed the USA in each medal success metric (Appendix: Image 6). The men's USA team makes up 25% of the total medal count in the simulation which is a higher proportion than the 23% of the total gold medal count and 24% of the weighted medals. (Appendix: Image 8) When viewing the top 5 most successful female athletes (top 5 most decorated by that medal metric) in each apparatus for each medal success metric, the USA makes a good portion of these athletes. There tend to be 2-4 USA athletes in the top 5 depending on the success metric and apparatus (Appendix: Image 7). When viewing the top 5 most successful male athletes in each apparatus for each medal success metric, there tends to be 0-3 (mostly 0) male athletes present (Appendix: Image 8).
+From the dotplot visualizations of the women's simulation of the three considered success metrics (gold medal count, total medal count, and weighted medal count) for each apparatus by USA and non-USA teams, there looks to be at least one USA athlete that places higher than of all non-USA athletes in each medal metric for each apparatus except uneven bars (Appendix: Image 5). The women's USA team makes up 58% of the total women's gold medals in the simulation which is a higher proportion than the 49% of the total medal count and 52% of the weighted medals (Appendix: Image 7). From the dotplot visualizations of the men's simulation of the three considered success metrics, for each apparatus by USA and non-USA teams, there are non-USA athletes for each apparatus that exceed the USA in each medal success metric (Appendix: Image 6). The men's USA team makes up 25% of the total medal count in the simulation which is a higher proportion than the 23% of the total gold medal count and 24% of the weighted medals. (Appendix: Image 8) When viewing the top 5 most successful female athletes (top 5 most decorated by that medal metric) in each apparatus for each medal success metric, the USA makes a good portion of these athletes. There tend to be 2-4 USA athletes in the top 5 depending on the success metric and apparatus (Appendix: Image 7). When viewing the top 5 most successful male athletes in each apparatus for each medal success metric, there tends to be 0-3 (mostly 0) US male athletes present (Appendix: Image 8).
 
 Considering that female USA athletes tend to represent a much higher proportion of medal successes (no matter the success metric) than male USA athletes, it is best to prioritize the success metric that the female team performs the best in. Therefore, the success metric that we aim to maximize to best ensure the USA team's success is the total number of gold medals.
 
-### Objective 2: Value of Medals for Each Event Type
+### Objective 2: Value of Medals for Each Event Type (Team AA > Individual AA > Individual Apparatus)
 
+From the table of the top 10 most decorated gold medal female athletes by apparatus, the USA, China, Brazil, and Great Britain make multiple appearances. The USA has athletes in the top 10 most decorated gold medalist for each apparatus as well as the top 5, but other countries do not (Appendix: Image 9). This allows us to assume that the USA has great potential in winning the team all-around since it is the only country with many of the most successful athletes in each apparatus in terms of number of gold medals. In this case valuing the team all-around medal more than the individual all-around and individual apparatus will hopefully increase medal success in terms of gold medal count. Also when viewing the top 10 most decorated gold medal female athletes by apparatus, the USA's Simone Biles, appears in balance beam as first, in floor exercise as first, in uneven bars tied at eighth highest, and vault as first. Valuing individual all-around higher also may help team USA increase in our metric of success. Also, since these events are harder to achieve than individual apparatuses because of the multiple sections within the event that need to also meet a standard, it will be harder for other countries to also benefit from this increased value.
+
+From the table of the top 10 most decorated gold medal male athletes by apparatus, the USA, Japan, China, and Great Britain make multiple appearances. The only countries that have an athlete in each apparatus for the top 10, are the USA and Great Britain (Appendix: Image 11). Since Great Britain has 1-2 (mostly 1) highly decorated gold medalist in the top 10 rankings for each apparatus and the US tends to have more, it could be slightly beneficial to the men's team to value the team all-around success more than the other events. The US men's team also does not have a well rounded athlete that places in the top 10 most decorated gold male athletes for each apparatus so we can assume valuing individual all-around successes over the other events would not help the US men's team but it also would not hurt it since other countries also do not have a highly decorated well rounded competitor.
+
+In the dot plots of the top 5 decorated gold medal female athlete's unique ids by number of gold medals for each apparatus, US athletes make multiple appearances (Appendix: Image 10). In the dot plots of the top 5 decorated gold medal male athlete's unique ids by number of gold medals for each apparatus, the US athletes are only present in vault and parallel bars (Appendix: Image 12). Valuing individual apparatus events as a regular event of weight 1 would best suite both the male and female team's success against their competitors. Weighing the team-all around as 3 points is viable because not only do both the men and women's USA have the potential to win based on this simulation, but there is less of a reliance and pressure on one singular person. Weighing the individual all-around as 2 will hopefully benefit the women's team with Simone Biles as the potential representative for this event. These weights will hopefully best accommodate the male and female athletes and give them the best chance at success against other countries in terms of the total number of gold medals.
 
 ### Objective 3: All-Around vs Event Specialist vs Mixture
 
+In our metric of success we chose the total count of gold medals and we decided to weigh team all-around events greater than individual all-around events and individual all-around great than the individual apparatuses. For the women's team we believe it is best to select a team of five female athletes that are a combination of all-around and event specialist gymnasts. Since the US women's team has a strong shot at winning the individual all-around with multi-apparatus highly gold medal decorated athlete Simone Biles and team all-around with other multiple highly decorated gold medalists who specialize in their own apparatus, focusing on both would be an optimal strategy (Appendix: Image 10). For the men's team we believe it is best to select a team of five male atheletes are also a combination of both all-around gymnasts and specialists. In the simulatiom, since 4 of the top 10 most gold medal decorated male gymnasts in parallel bars are from the US and 7 of the top 10 in vault are from the US, there is a good chance that a male athlete from the US may be successful in those apparatuses (Appendix: Image 11). Since the US does not seem to have very many strong gold medal specialists in the other apparatuses, the men's team should fill the remaining positions with all-around gymnasts.
+
+### Objective 4: Identifying 5 Athletes ...
 
 ## Discussion
 
@@ -601,8 +609,8 @@ ggplot(number_athletes, aes(x = athletes_participated)) +
 
 ```
 
-
 **Image 5)**
+
 ```{r}
 #WOMEN'S MEDAL METRICS VISUALS
 #Prioritizing Gold Medals
@@ -616,6 +624,7 @@ ggplot(data = tot_w_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_p
 ```
 
 **Image 6)**
+
 ```{r}
 #MEN'S MEDAL METRICS VISUALS
 #Prioritizing Gold Medals
@@ -629,7 +638,7 @@ ggplot(data = tot_m_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_p
 
 ```
 
-**Image 7)** 
+**Image 7)**
 ```{r}
 #WOMEN
 #Top 5 athletes by apparatus for gold count
@@ -719,6 +728,41 @@ USA makes up 25% of the total men's medals in the simulation.
 
 USA makes up 24% of the weight of men's medals in the simulation.
 
+**Image 9)**
+```{r}
+tot_w_simul %>% 
+  dplyr::select(unique_id, Golds, Country, Apparatus, USA) %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Golds, n = 10) %>% 
+  kable()
+```
+
+**Image 10)**
+```{r echo=FALSE}
+#selects top 5 decorated gold medal athletes by apparatus
+top10_women <- tot_w_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Golds, n = 5)
+ggplot(data = top10_women,aes(x = unique_id, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 100) + labs(title = "10) Women's Unique ID by Number of Gold Medals", subtitle = "by Apparatus", x = "Unique ID ", y = "Number of Gold Medals")
+```
+**Image 11)**
+```{r}
+tot_m_simul %>% 
+  dplyr::select(unique_id, Golds, Country, Apparatus, USA) %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Golds, n = 10) %>% 
+  kable()
+```
+
+**Image 12)**
+```{r}
+#selects top 5 decorated gold medal athletes by apparatus
+top10_men <- tot_m_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Golds, n = 5)
+ggplot(data = top10_men,aes(x = unique_id, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 100) + labs(title = "12) Men's Unique ID by Number of Gold Medals", subtitle = "by Apparatus", x = "Unique ID ", y = "Number of Gold Medals")
+```
+***Note:*** The excessive overlap in unique ids displays that there is not much overlap in the top 5 most gold medal decorated athletes on the men's team and therefore the lack of well-rounded gymnasts.
 
 ### Diagnostics
 
