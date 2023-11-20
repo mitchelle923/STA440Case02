@@ -25,6 +25,9 @@ library(invgamma)
 library(fitdistrplus)
 library(kableExtra)
 library(cowplot)
+library(coda)
+library(bayesplot)
+library(rstan)  
 ```
 
 ```{r setup-chunk}
@@ -569,6 +572,72 @@ ggplot(number_athletes, aes(x = athletes_participated)) +
        y = "Frequency",
        title = "4) Distribution of Athletes Competed at Competitions")
 
+```
+
+### Diagnostics
+
+```{r}
+#MCMC diagnostic check
+get_mcmc_samples <- function(simulation_results) {
+  mcmc_data <- as.mcmc(simulation_results$Total_Medals)
+  return(mcmc_data)
+}
+
+mcmc_results <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
+mcmc_samples <- get_mcmc_samples(mcmc_results)
+
+traceplot(mcmc_samples, main = "Trace Plot of Total Medals")
+
+# Effective sample size
+effectiveSize(mcmc_samples)
+#A common rule of thumb is that an effective sample size should be at least 1% or 5% of the total number of samples, depending on the context.
+
+# Autocorrelation plot
+autocorr.plot(mcmc_samples)
+
+mcmc_samples <- get_mcmc_samples(mcmc_results)
+
+# Histogram of MCMC samples
+hist(mcmc_samples, main = "Histogram of Total Medals", xlab = "Total Medals")
+
+```
+
+```{r}
+# Diagnositcs for Women
+
+# Summary stats for total w medals
+mcmcTrace <- mcmc(tot_w_simul$Total_Medals)
+summary(mcmcTrace)
+
+# Acceptance rate for total w medals
+acceptanceRate <- 1 - rejectionRate(mcmcTrace)
+acceptanceRate
+
+# Effective size for total w medals
+effectiveSize(mcmcTrace)
+
+# Mixing total w medals
+plot(mcmcTrace)
+
+autocorr.plot(mcmcTrace)
+
+# Diagnostics For Men
+
+# Summary stats for total w medals
+mcmcTrace1 <- mcmc(tot_m_simul$Total_Medals)
+summary(mcmcTrace1)
+
+# Acceptance rate for total w medals
+acceptanceRate <- 1 - rejectionRate(mcmcTrace1)
+acceptanceRate
+
+# Effective size for total w medals
+effectiveSize(mcmcTrace1)
+
+# Mixing total w medals
+plot(mcmcTrace1)
+
+autocorr.plot(mcmcTrace1)
 ```
 
 ### Referenced in Results
