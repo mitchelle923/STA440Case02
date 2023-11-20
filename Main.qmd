@@ -10,6 +10,7 @@ geometry: "top=15mm, bottom=15mm, left=15mm, right=15mm"
 format: pdf
 editor: visual
 ---
+
 ```{r setup-chunk, include = FALSE}
 knitr::opts_chunk$set(message = FALSE, echo = FALSE) 
 ```
@@ -33,7 +34,6 @@ library(bayesplot)
 library(rstan)  
 ```
 
-
 ```{r}
 #| echo : false
 #| label: read-data
@@ -53,6 +53,34 @@ later <- laterdata |>
 ```
 
 ## Introduction
+
+### Context and Background
+
+The Olympic Games are a highly anticipated world-renowned multi-sporting event that takes place every four years. Particularly the Summer Olympic Games tend to have a wider variety of 32 sports and more viewers than that of the Winter Olympics (Olympics, 2021). Athletes from all over the world can participate granted they meet the criteria established by their nation's Olympic committees and the international sports federations. With female qualifying gymnasts from the United States placing with medals in the team all-around, individual all-around, and each individual apparatus in the 2020 Tokyo Olympics game, there has been a surge in media attention on the United States gymnastics teams. (Olympics, 2020)
+
+As the Paris 2024 Summer Olympic Games is approaching, the United States Olympic Men's and Women's Artistic Gymnastics aims to put together a team that best represents the country on the world's sporting stage by optimizing medal success amongst the team all-around, individual all-around, and individual apparatus events. This study aims to use the most recent Olympic Games and other world competitions' qualifying and final round results data to best assemble a team that is likely to produce optimal success in terms of medals within the Olympic qualifiers and final criteria. (UCSAS, 2023)
+
+These are our main objectives for this study: (UCSAS, 2023)
+
+1)  Decide on whether to maximize total medal count, gold medal count, or a weighted medal count (e.g., 3 for gold, 2 for silver, 1 for bronze).
+
+2)  Decide on whether to value the medals of an event over others. For example, consider a team all-around medal to be more valuable than the individual all-around medals and/or consider the individual all-around medals to be more valuable than the individual apparatus medals.
+
+3)  Decide on whether Team USA should maximize its total medal count by selecting a team of five gymnasts who are all-around gymnasts, event specialists (gymnasts who focus on 1 or more apparatus but not all apparatus), or a combination of those. This should consider under what circumstances can Team USA maximize its total medal count by selecting a gymnast who only competes on 1 apparatus (e.g., Stephen Nederoscik, 2021 pommel horse World Champion).
+
+4)  Identify the group of five athletes who will most likely enable the Team USA Olympic Men's and Women's Artistic Gymnastics team to maximize medals won in the Paris 2024 Summer Olympics using an analytical model.
+
+Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection.
+
+### The Data
+
+The UConn Sports Analytics Symposium provisioned a clean data set of the accumulation of results of teams worldwide that participated in the major domestic and international gymnastic qualifying and final competition events leading up to the 2024 Summer Olympic Games. These competitions took place in the 2022 and 2023 gymnastics seasons. The UConn Sports Analytics Symposium also provides a clean data set of the results of all the women's artistic gymnastics teams that participated in the 2020 Tokyo Summer Olympics qualifying and final events. Both datasets are at the individual athlete, competition, apparatus, and round level. The data of the recorded results for each competition for both men and women gymnasts were collected and manually input from the official corresponding competitions' website results after the judging of each competition.
+
+The columns for both datasets include LastName, Firstname, Gender, Country, Data, Competition, Round ("TeamQual": team all-around qualifiers, "TeamFinal": team all-around finals, "AAqual": individual all-around qualifiers, "AAfinal": individual all-around finals, "qual": individual apparatus qualifiers, "final": individual apparatus finals), Location, Apparatus ("BB": balance beam, "FX": floor exercise, "HB": high bar, "PB": parallel bars, "PH": pommel horse, "SR": still rings, "UB": uneven bars, "VT": vault, "VT1" and "VT2": 2 different vaults required in individual apparatus qualifications and finals), Rank, D_Score (difficulty score), E_Score (execution score), Penalty (score deduction for breaking event criteria), and Score (D_Score + E_Score - Penalty).
+
+We decided to not proceed in using the data set of results from the 2020 Tokyo Summer Olympics since the data consisted only of female athletes and one competition (the Olympic Games). Also in the context of Olympic gymnastics, athletes of age 16 and older are eligible to compete but gymnastics is a sport in which most athletes retire in their early to mid-twenties. Specifically in the summer 2020 Tokyo Olympics only three female athletes aged 27 or older qualified to compete (Camenker, 2021). Furthermore, the average age for female gymnasts in the 2020 Olympics was approximately 22 years of age, meaning we assume that many of the competitors in the older data set will not be competing in the 2024 Paris Summer Olympics (Meyers, 2021).
+
+### EDA ...
 
 ## Methodology
 
@@ -435,9 +463,7 @@ PB_m_simul |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
-### Objective 1: Choice of Medal Metric
-
-```{r}
+```{r include = FALSE}
 #LARGE WOMEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
 
 #Creates country variable
@@ -465,11 +491,11 @@ UB_w_simul$Apparatus <- "UB"
 #HAVE TO EVENTUALLY ADD VT1 and VT2!!
 tot_w_simul <- bind_rows(FX_w_simul,BB_w_simul, VT_w_simul, UB_w_simul)
 tot_w_simul <- tot_w_simul %>% 
-  mutate(USA = as.factor(ifelse(Country == "USA", TRUE, FALSE)))
+  mutate(USA = as.factor(ifelse(Country == "USA", "USA", "nonUSA")))
 tot_w_simul
 ```
 
-```{r}
+```{r include = FALSE}
 #LARGE MEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
 
 #Creates country variable
@@ -504,38 +530,39 @@ PB_m_simul$Apparatus <- "PB"
 #HAVE TO EVENTUALLY ADD VT1 and VT2!!
 tot_m_simul <- bind_rows(FX_m_simul, VT_m_simul,PH_m_simul, HB_m_simul,SR_m_simul, PB_m_simul)
 tot_m_simul <- tot_m_simul %>% 
-  mutate(USA = as.factor(ifelse(Country == "USA", TRUE, FALSE)))
+  mutate(USA = as.factor(ifelse(Country == "USA", "USA", "nonUSA")))
 tot_m_simul
 ```
 
-```{r}
-#WOMEN'S MEDAL METRICS VISUALS
-#Prioritizing Gold Medals
-ggplot(data = tot_w_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Women's Simulated Gold Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+### Objective 1: Choice of Medal Success Metric (Total Number of Gold Medals)
 
-#Prioritizing Total Medals
-ggplot(data = tot_w_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Women's Simulated Total Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+From the visualizations of the women's simulation of the three considered success metrics (gold medal count, total medal count, and weighted medal count) for each apparatus by USA and non-USA teams, there looks to be at least one USA athlete that places higher than of all non-USA athletes in each medal metric for each apparatus except uneven bars (Appendix: Image 5). The women's USA team makes up 58% of the total women's gold medals in the simulation which is a higher proportion than the 49% of the total medal count and 52% of the weighted medals (Appendix: Image 7). From the visualizations of the men's simulation of the three considered success metrics, for each apparatus by USA and non-USA teams, there are non-USA athletes for each apparatus that exceed the USA in each medal success metric (Appendix: Image 6). The men's USA team makes up 25% of the total medal count in the simulation which is a higher proportion than the 23% of the total gold medal count and 24% of the weighted medals. (Appendix: Image 8) When viewing the top 5 most successful female athletes (top 5 most decorated by that medal metric) in each apparatus for each medal success metric, the USA makes a good portion of these athletes. There tend to be 2-4 USA athletes in the top 5 depending on the success metric and apparatus (Appendix: Image 7). When viewing the top 5 most successful male athletes in each apparatus for each medal success metric, there tends to be 0-3 (mostly 0) male athletes present (Appendix: Image 8).
 
-#Prioritizing Weighted Medals
-ggplot(data = tot_w_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Women's Simulated Weighted Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
-```
+Considering that female USA athletes tend to represent a much higher proportion of medal successes (no matter the success metric) than male USA athletes, it is best to prioritize the success metric that the female team performs the best in. Therefore, the success metric that we aim to maximize to best ensure the USA team's success is the total number of gold medals.
 
-```{r}
-#MEN'S MEDAL METRICS VISUALS
-#Prioritizing Gold Medals
-ggplot(data = tot_m_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Men's Simulated Gold Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+### Objective 2: Value of Medals for Each Event Type
 
-#Prioritizing Total Medals
-ggplot(data = tot_m_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Men's Simulated Total Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
 
-#Prioritizing Weighted Medals
-ggplot(data = tot_m_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Men's Simulated Weighted Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+### Objective 3: All-Around vs Event Specialist vs Mixture
 
-```
 
 ## Discussion
 
 ## Appendix
+
+### Work Cited
+
+-   "Paris 2024 Olympic Games: How Do Athletes Qualify?" Olympics, 8 Aug. 2021, olympics.com/en/news/paris-2024-olympic-games-how-do-athletes-qualify. Accessed 20 Nov. 2023.
+
+-   "Tokyo 2020 Artistic Gymnastics - Olympic Results by Discipline." Olympics, olympics.com/en/olympic-games/tokyo-2020/results/artistic-gymnastics. Accessed 20 Nov. 2023.
+
+-   "UCSAS 2024 USOPC DATA CHALLENGE." UConn Sports Analytics Symposium (UCSAS), statds.org/events/ucsas2024/challenge.html. Accessed 20 Nov. 2023.
+
+-   Camenker, Jacob. "How Old Is Simone Biles? Why Elite Olympic Gymnasts Typically Retire at a Young Age." Sporting News, 18 Sept. 2021, www.sportingnews.com/us/athletics/news/simone-biles-retire-age-olympics/1laom4i4u4wh1thcgta4nun2x. Accessed 20 Nov. 2023.
+
+-   Meyers, Dvora. "Time for the End of the Teen Gymnast." FiveThirtyEight, 27 July 2021, fivethirtyeight.com/features/gymnasts-age-olympics/. Accessed 20 Nov. 2023.
+
+### Visualizations
 
 ```{r}
 number_athletes |>
@@ -573,6 +600,125 @@ ggplot(number_athletes, aes(x = athletes_participated)) +
        title = "4) Distribution of Athletes Competed at Competitions")
 
 ```
+
+
+**Image 5)**
+```{r}
+#WOMEN'S MEDAL METRICS VISUALS
+#Prioritizing Gold Medals
+ggplot(data = tot_w_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Female Athlete's Number of Gold Medals", subtitle = "by Country and by Apparatus", y = "Number of Gold Medals") +coord_flip()
+
+#Prioritizing Total Medals
+ggplot(data = tot_w_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Female Athlete's Number of Total Medals", subtitle = "by Country and by Apparatus", y = "Number of Total Medals") +coord_flip()
+
+#Prioritizing Weighted Medals
+ggplot(data = tot_w_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Female Athlete's Medal Weight", subtitle = "by Country and by Apparatus", y = "Medal Weight") +coord_flip()
+```
+
+**Image 6)**
+```{r}
+#MEN'S MEDAL METRICS VISUALS
+#Prioritizing Gold Medals
+ggplot(data = tot_m_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Male Athlete's Number of Gold Medals", subtitle = "by Country and by Apparatus", y = "Number of Gold Medals") +coord_flip()
+
+#Prioritizing Total Medals
+ggplot(data = tot_m_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Male Athlete's Number of Total Medals", subtitle = "by Country and by Apparatus", y = "Number of Total Medals") +coord_flip()
+
+#Prioritizing Weighted Medals
+ggplot(data = tot_m_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Male Athlete's Medal Weight", subtitle = "by Country and by Apparatus", y = "Medal Weight") +coord_flip()
+
+```
+
+**Image 7)** 
+```{r}
+#WOMEN
+#Top 5 athletes by apparatus for gold count
+tot_w_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Golds, n = 5) %>% 
+  kable()
+
+#Top 5 athletes by apparatus for total medal count
+tot_w_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Total_Medals, n = 5) %>% 
+  kable()
+
+#Top 5 athletes by apparatus for weighted medal count
+tot_w_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Medal_Weight, n = 5) %>% 
+  kable()
+
+
+#total proportion for each medal metric
+tot_w_simul %>% 
+  group_by(USA) %>% 
+  summarise(sumGolds = sum(Golds),
+            sumTot = sum(Total_Medals),
+            sumWeighted = sum(Medal_Weight)) %>% 
+  kable()
+
+```
+
+For the women's simulation when looking at the top 5 athletes by:
+
+*Gold Medal Count* for each apparatus there are 11 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 3, uneven bars (UB): 2, and vault (VT): 4
+
+USA makes up 58% of the total women's gold medals in the simulation.
+
+*Total Medal Count* for each apparatus there are 10 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 2, uneven bars (UB): 2, vault (VT): 4
+
+USA makes up 49% of the total women's medals in the simulation.
+
+*Weighted Medal Count* for each apparatus there are 9 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 2, uneven bars (UB): 2, vault (VT): 3
+
+USA makes up 52% of the weight of women's medals in the simulation.
+
+**Image 8)**
+```{r}
+#MEN
+#Top 5 athletes by apparatus for gold count
+tot_m_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Golds, n = 5) %>% 
+  kable()
+
+#Top 5 athletes by apparatus for total medal count
+tot_m_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Total_Medals, n = 5) %>% 
+  kable()
+
+#Top 5 athletes by apparatus for weighted medal count
+tot_m_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Medal_Weight, n = 5) %>% 
+  kable()
+
+#total proportion for each medal metric
+tot_m_simul %>% 
+  group_by(USA) %>% 
+  summarise(sumGolds = sum(Golds),
+            sumTot = sum(Total_Medals),
+            sumWeighted = sum(Medal_Weight)) %>% 
+  kable()
+```
+
+For the men's simulation when looking at the top 5 athletes by:
+
+*Gold Medal Count* for each apparatus there are 5 out of 30 from the US: floor exercise (FX): 0, high bar (HB): 0,parallel bars (PB): 3 pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
+
+USA makes up 23% of the total men's gold medals in the simulation.
+
+*Total Medal Count* for each apparatus there are 3 out of 30 from the US: floor exercise (FX): 1, high bar (HB): 0, parallel bars (PB): 0, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
+
+USA makes up 25% of the total men's medals in the simulation.
+
+*Weighted Medal Count* for each apparatus there are 5 out of 30 from the US: floor exercise (FX): 1, high bar (HB): 0, parallel bars (PB): 1, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 3
+
+USA makes up 24% of the weight of men's medals in the simulation.
+
 
 ### Diagnostics
 
@@ -639,96 +785,3 @@ plot(mcmcTrace1)
 
 autocorr.plot(mcmcTrace1)
 ```
-
-### Referenced in Results
-
-```{r}
-#WOMEN
-#Top 5 athletes by apparatus for gold count
-tot_w_simul %>% 
-  group_by(Apparatus) %>% 
-  slice_max(order_by = Golds, n = 5)
-
-#Top 5 athletes by apparatus for total medal count
-tot_w_simul %>% 
-  group_by(Apparatus) %>% 
-  slice_max(order_by = Total_Medals, n = 5)
-
-#Top 5 athletes by apparatus for weighted medal count
-tot_w_simul %>% 
-  group_by(Apparatus) %>% 
-  slice_max(order_by = Medal_Weight, n = 5)
-
-
-#total proportion for each medal metric
-tot_w_simul %>% 
-  group_by(USA) %>% 
-  summarise(sumGolds = sum(Golds))
-
-tot_w_simul %>% 
-  group_by(USA) %>% 
-  summarise(sumTot = sum(Total_Medals))
-
-tot_w_simul %>% 
-  group_by(USA) %>% 
-  summarise(sumWeighted = sum(Medal_Weight))
-```
-
-**Image 5)** For the women's simulation when looking at the top 5 athletes by:
-
-*Gold Medal Count* for each apparatus there are 11 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 3, uneven bars (UB): 2, and vault (VT): 4
-
-USA makes up 58% of the total women's gold medals in the simulation.
-
-*Total Medal Count* for each apparatus there are 10 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 2, uneven bars (UB): 2, vault (VT): 4
-
-USA makes up 49% of the total women's medals in the simulation.
-
-*Weighted Medal Count* for each apparatus there are 9 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 2, uneven bars (UB): 2, vault (VT): 3
-
-USA makes up 52% of the weight of women's medals in the simulation.
-
-```{r}
-#MEN
-#Top 5 athletes by apparatus for gold count
-tot_m_simul %>% 
-  group_by(Apparatus) %>% 
-  slice_max(order_by = Golds, n = 5)
-
-#Top 5 athletes by apparatus for total medal count
-tot_m_simul %>% 
-  group_by(Apparatus) %>% 
-  slice_max(order_by = Total_Medals, n = 5)
-
-#Top 5 athletes by apparatus for weighted medal count
-tot_m_simul %>% 
-  group_by(Apparatus) %>% 
-  slice_max(order_by = Medal_Weight, n = 5)
-
-#total proportion for each medal metric
-tot_m_simul %>% 
-  group_by(USA) %>% 
-  summarise(sumGolds = sum(Golds))
-
-tot_m_simul %>% 
-  group_by(USA) %>% 
-  summarise(sumTot = sum(Total_Medals))
-
-tot_m_simul %>% 
-  group_by(USA) %>% 
-  summarise(sumWeighted = sum(Medal_Weight))
-```
-
-**Image 6)** For the men's simulation when looking at the top 5 athletes by:
-
-*Gold Medal Count* for each apparatus there are 5 out of 30 from the US: floor exercise (FX): 0, high bar (HB): 0,parallel bars (PB): 3 pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
-
-USA makes up 23% of the total men's gold medals in the simulation.
-
-*Total Medal Count* for each apparatus there are 3 out of 30 from the US: floor exercise (FX): 1, high bar (HB): 0, parallel bars (PB): 0, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
-
-USA makes up 25% of the total men's medals in the simulation.
-
-*Weighted Medal Count* for each apparatus there are 5 out of 30 from the US: floor exercise (FX): 1, high bar (HB): 0, parallel bars (PB): 1, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 3
-
-USA makes up 24% of the weight of men's medals in the simulation.
