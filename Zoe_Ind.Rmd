@@ -97,3 +97,6 @@ top_percent_women <- women_data %>%
   group_by(Apparatus) %>%
   filter(rank(desc(Score), ties.method = "min")/n() <= 0.20)
 ```
+
+
+
