@@ -556,31 +556,33 @@ PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v
 
 ```{r include = FALSE}
 #LARGE WOMEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
-
+FX_w_copy <- FX_w_simul
 #Creates country variable
-FX_w_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", FX_w_simul$unique_id))
+FX_w_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", FX_w_copy$unique_id))
 #adds medal weight variable
-FX_w_simul$Medal_Weight <- (FX_w_simul$Golds*3) + (FX_w_simul$Silvers*2) + (FX_w_simul$Bronzes*1)
+FX_w_copy$Medal_Weight <- (FX_w_copy$Golds*3) + (FX_w_copy$Silvers*2) + (FX_w_copy$Bronzes*1)
 #adds apparatus to facet by later on in visuals
-FX_w_simul$Apparatus <- "FX"
+FX_w_copy$Apparatus <- "FX"
 
+BB_w_copy <- BB_w_simul
+BB_w_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", BB_w_copy$unique_id))
+BB_w_copy$Medal_Weight <- (BB_w_copy$Golds*3) + (BB_w_copy$Silvers*2) + (BB_w_copy$Bronzes*1)
+BB_w_copy$Apparatus <- "BB"
 
-BB_w_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", BB_w_simul$unique_id))
-BB_w_simul$Medal_Weight <- (BB_w_simul$Golds*3) + (BB_w_simul$Silvers*2) + (BB_w_simul$Bronzes*1)
-BB_w_simul$Apparatus <- "BB"
+VT_w_copy <- VT_w_simul
+VT_w_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", VT_w_copy$unique_id))
+VT_w_copy$Medal_Weight <- (VT_w_copy$Golds*3) + (VT_w_copy$Silvers*2) + (VT_w_copy$Bronzes*1)
+VT_w_copy$Apparatus <- "VT"
 
-VT_w_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", VT_w_simul$unique_id))
-VT_w_simul$Medal_Weight <- (VT_w_simul$Golds*3) + (VT_w_simul$Silvers*2) + (VT_w_simul$Bronzes*1)
-VT_w_simul$Apparatus <- "VT"
-
-UB_w_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", UB_w_simul$unique_id))
-UB_w_simul$Medal_Weight <- (UB_w_simul$Golds*3) + (UB_w_simul$Silvers*2) + (UB_w_simul$Bronzes*1)
-UB_w_simul$Apparatus <- "UB"
+UB_w_copy <- UB_w_simul
+UB_w_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", UB_w_copy$unique_id))
+UB_w_copy$Medal_Weight <- (UB_w_copy$Golds*3) + (UB_w_copy$Silvers*2) + (UB_w_copy$Bronzes*1)
+UB_w_copy$Apparatus <- "UB"
 
 #Joins all women's medal results table for facet wrapping
 
 #HAVE TO EVENTUALLY ADD VT1 and VT2!!
-tot_w_simul <- bind_rows(FX_w_simul,BB_w_simul, VT_w_simul, UB_w_simul)
+tot_w_simul <- bind_rows(FX_w_copy,BB_w_copy, VT_w_copy, UB_w_copy)
 tot_w_simul <- tot_w_simul %>% 
   mutate(USA = as.factor(ifelse(Country == "USA", "USA", "nonUSA")))
 tot_w_simul
@@ -589,37 +591,43 @@ tot_w_simul
 ```{r include = FALSE}
 #LARGE MEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
 
+FX_m_copy <- FX_m_simul
 #Creates country variable
-FX_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", FX_m_simul$unique_id))
+FX_m_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", FX_m_copy$unique_id))
 #adds medal weight variable
-FX_m_simul$Medal_Weight <- (FX_m_simul$Golds*3) + (FX_m_simul$Silvers*2) + (FX_m_simul$Bronzes*1)
+FX_m_copy$Medal_Weight <- (FX_m_copy$Golds*3) + (FX_m_copy$Silvers*2) + (FX_m_copy$Bronzes*1)
 #adds apparatus to facet by later on in visuals
-FX_m_simul$Apparatus <- "FX"
+FX_m_copy$Apparatus <- "FX"
 
-VT_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", VT_m_simul$unique_id))
-VT_m_simul$Medal_Weight <- (VT_m_simul$Golds*3) + (VT_m_simul$Silvers*2) + (VT_m_simul$Bronzes*1)
-VT_m_simul$Apparatus <- "VT"
+VT_m_copy <- VT_m_simul
+VT_m_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", VT_m_copy$unique_id))
+VT_m_copy$Medal_Weight <- (VT_m_copy$Golds*3) + (VT_m_copy$Silvers*2) + (VT_m_copy$Bronzes*1)
+VT_m_copy$Apparatus <- "VT"
 
-PH_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", PH_m_simul$unique_id))
-PH_m_simul$Medal_Weight <- (PH_m_simul$Golds*3) + (PH_m_simul$Silvers*2) + (PH_m_simul$Bronzes*1)
-PH_m_simul$Apparatus <- "PH"
+PH_m_copy <- PH_m_simul
+PH_m_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", PH_m_copy$unique_id))
+PH_m_copy$Medal_Weight <- (PH_m_copy$Golds*3) + (PH_m_copy$Silvers*2) + (PH_m_copy$Bronzes*1)
+PH_m_copy$Apparatus <- "PH"
 
-HB_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", HB_m_simul$unique_id))
-HB_m_simul$Medal_Weight <- (HB_m_simul$Golds*3) + (HB_m_simul$Silvers*2) + (HB_m_simul$Bronzes*1)
-HB_m_simul$Apparatus <- "HB"
+HB_m_copy <- HB_m_simul
+HB_m_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", HB_m_copy$unique_id))
+HB_m_copy$Medal_Weight <- (HB_m_copy$Golds*3) + (HB_m_copy$Silvers*2) + (HB_m_copy$Bronzes*1)
+HB_m_copy$Apparatus <- "HB"
 
-SR_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", SR_m_simul$unique_id))
-SR_m_simul$Medal_Weight <- (SR_m_simul$Golds*3) + (SR_m_simul$Silvers*2) + (SR_m_simul$Bronzes*1)
-SR_m_simul$Apparatus <- "SR"
+SR_m_copy <- SR_m_simul
+SR_m_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", SR_m_copy$unique_id))
+SR_m_copy$Medal_Weight <- (SR_m_copy$Golds*3) + (SR_m_copy$Silvers*2) + (SR_m_copy$Bronzes*1)
+SR_m_copy$Apparatus <- "SR"
 
-PB_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", PB_m_simul$unique_id))
-PB_m_simul$Medal_Weight <- (PB_m_simul$Golds*3) + (PB_m_simul$Silvers*2) + (PB_m_simul$Bronzes*1)
-PB_m_simul$Apparatus <- "PB"
+PB_m_copy <- PB_m_simul
+PB_m_copy$Country <- factor(sub(".+_([A-Z]+)", "\\1", PB_m_copy$unique_id))
+PB_m_copy$Medal_Weight <- (PB_m_copy$Golds*3) + (PB_m_copy$Silvers*2) + (PB_m_copy$Bronzes*1)
+PB_m_copy$Apparatus <- "PB"
 
 #Joins all men's medal results table for facet wrapping
 
 #HAVE TO EVENTUALLY ADD VT1 and VT2!!
-tot_m_simul <- bind_rows(FX_m_simul, VT_m_simul,PH_m_simul, HB_m_simul,SR_m_simul, PB_m_simul)
+tot_m_simul <- bind_rows(FX_m_copy, VT_m_copy,PH_m_copy, HB_m_copy,SR_m_copy, PB_m_copy)
 tot_m_simul <- tot_m_simul %>% 
   mutate(USA = as.factor(ifelse(Country == "USA", "USA", "nonUSA")))
 tot_m_simul
