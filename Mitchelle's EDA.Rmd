@@ -2,8 +2,10 @@
 title: "Mitchelle's EDA"
 output: pdf_document
 date: "2023-11-01"
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -22,8 +24,8 @@ library(kableExtra)
 library(cowplot)
 ```
 
-
 #Data
+
 ```{r data}
 data_2017_2021 <- read_csv("Cleaned Data/data_2017_2021.csv")
 data_2022_2023 <- read_csv("Cleaned Data/data_2022_2023.csv") %>% 
@@ -62,13 +64,14 @@ data_2022_2023 %>%
   group_by(Round) %>% 
   dplyr::summarise(ct = n())
 ```
+
 #HERE
+
 ```{r}
 data_2022_2023 %>% 
   group_by(Competition,Round,Apparatus, Rank) %>% 
   dplyr::summarise(ct = n())
 ```
-
 
 ```{r}
 data_2017_2021 %>% 
@@ -80,11 +83,9 @@ data_2022_2023 %>%
   dplyr::summarise(ct = n())
 ```
 
-
 ```{r}
 # fix first name issue (some have middle names)
 ```
-
 
 ```{r}
 #women 2017-2021 data 
@@ -141,6 +142,7 @@ womenUSA2022_2023 <- data_2022_2023[data_2022_2023$Gender == "w"& data_2022_2023
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
  
 ```
+
 ```{r}
 data_2022_2023 %>% 
   group_by(Competition, Round, Rank) %>% 
@@ -148,11 +150,11 @@ data_2022_2023 %>%
 ```
 
 So far we subsetted the top 20% percentile by Gender and Apparatus
+
 ```{r}
 #take out middle names because some names have first name and some have middle (Frederick (Nathaniel) Richard)
 data_2022_2023$FirstNameOnly <- sub("^(\\w+)\\s+\\w+$", "\\1", data_2022_2023$FirstName)
 ```
-
 
 ```{r}
 #subsetting 2nd data set by individual athlete
@@ -164,6 +166,7 @@ data_2022_2023 %>%
   group_by(Gender, Apparatus) %>% 
   mutate(meanScore = mean(Score))
 ```
+
 ```{r}
 data_2022_2023 %>% 
   group_by(Gender,Apparatus) %>% 
@@ -171,13 +174,13 @@ data_2022_2023 %>%
   summarise(meanScore =  mean(Score))
 ```
 
-
 ```{r}
 data_2022_2023 %>% 
   filter(Country == 'USA') %>% 
   group_by(LastName,FirstName) %>% 
   dplyr::summarise(sum = n())
 ```
+
 # Final Submission Work
 
 ```{r}
@@ -267,19 +270,22 @@ ggplot(data = menOG, aes(x = Score, group = USA, fill = USA)) + geom_density(adj
 
 ggplot(data = womenOG, aes(x = Score, group = USA, fill = USA)) + geom_density(adjust = 1.5) + facet_wrap(~Round) + labs(title = "Women's Score Density by Event Type", subtitle = "USA vs Non-USA")
 ```
+
 ## Original Data
-The USA men's teams tend to have a greater concentration in higher scores than
-non USA competitors in individual qualifiers as well team qualifiers and finals.
-This shows that for the men's team our model should prioritize the team all 
-around events.
 
-The USA women's teams tend to have a greater concentration in higher scores than
-non USA competitors in all rounds, but especially more so in team all around.
-Individual apparatuses are also a great focus since that would maximize the actual
-medal count and team USA tends to have higher scores than non USA competitors.
+The USA men's teams tend to have a greater concentration in higher
+scores than non USA competitors in individual qualifiers as well team
+qualifiers and finals. This shows that for the men's team our model
+should prioritize the team all around events.
 
+The USA women's teams tend to have a greater concentration in higher
+scores than non USA competitors in all rounds, but especially more so in
+team all around. Individual apparatuses are also a great focus since
+that would maximize the actual medal count and team USA tends to have
+higher scores than non USA competitors.
 
 ## Finalized Data
+
 ```{r}
 menFinal <- final_data %>% 
   filter(Gender == 'm')
@@ -301,16 +307,21 @@ ggplot(data = menFinal, aes(x = Score, group = USA, fill = USA)) + geom_density(
 
 ggplot(data = womenFinal, aes(x = Score, group = USA, fill = USA)) + geom_density(adjust = 1.5) + facet_wrap(~Round) + labs(title = "Women's Score Density by Event Type (Finalized Data)", subtitle = "USA vs Non-USA")
 ```
-For the men's densities we can see that the USA athletes have more concentration on
-higher scores than non USA teams for the individual qualifying and team qualifying round.
 
-For the women's denities there is more concentration on higher scores for the USA
-team for both individual apparatus rounds (final and qualifying) as well as
-the team qualifiers. Which futher proves our model should focus on a mixture of both
-but heavily prioritize the individual appartuses.
+For the men's densities we can see that the USA athletes have more
+concentration on higher scores than non USA teams for the individual
+qualifying and team qualifying round.
+
+For the women's denities there is more concentration on higher scores
+for the USA team for both individual apparatus rounds (final and
+qualifying) as well as the team qualifiers. Which futher proves our
+model should focus on a mixture of both but heavily prioritize the
+individual appartuses.
 
 # NEW RANKING
+
 ## Men
+
 ```{r}
 #rank actually shown to be correct here for the early observations
 orderMenFinal <- menFinal %>% 
@@ -318,7 +329,9 @@ orderMenFinal <- menFinal %>%
   dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
 orderMenFinal
 ```
+
 ### Men's Ranking System
+
 ```{r}
 #this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
 #also important to note that rankers did not give same scores the same rank, but this will be done in new rank
@@ -340,15 +353,17 @@ for (i in 2:nrow(orderMenFinal)){
 orderMenFinal
 ```
 
-
 #Women
+
 ```{r}
 orderWomenFinal <- womenFinal %>% 
   arrange(Competition, Round, Apparatus, desc(Score)) %>% 
   dplyr::select(unique_id, Country,Competition, Round,Apparatus, Rank, Score)
 orderWomenFinal
 ```
+
 ### Women's Ranking System
+
 ```{r}
 #this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
 #also important to note that rankers did not give same scores the same rank, but this will be done in new rank
@@ -369,6 +384,7 @@ for (i in 2:nrow(orderWomenFinal)){
 }
 orderWomenFinal
 ```
+
 ## Simulations
 
 ```{r removing-obs, message = FALSE}
@@ -497,12 +513,13 @@ simulate_full_competition <- function(data, apparatus, gender, mu_0, sig_0, k_0,
 ## Female Athletes' Results
 
 ### Women's Apparatuses:
-- FX: floor exercise
-- PH: pommel hours
-- SR: still rings
-- VT: vault
-- PB: parallel bars
-- HB: high bar
+
+-   FX: floor exercise
+-   PH: pommel hours
+-   SR: still rings
+-   VT: vault
+-   PB: parallel bars
+-   HB: high bar
 
 ```{r FX-womens-sims}
 set.seed(123)
@@ -560,7 +577,6 @@ BB_w_simul$Medal_Weight <- (BB_w_simul$Golds*3) + (BB_w_simul$Silvers*2) + (BB_w
 BB_w_simul$Apparatus <- "BB"
 BB_w_simul
 ```
-
 
 ```{r VT-womens-sims}
 set.seed(123)
@@ -628,15 +644,14 @@ tot_w_simul <- tot_w_simul %>%
 tot_w_simul
 ```
 
-
-
 ## Male Athletes' Results
 
 ### Men's Apparatuses:
-- VT: vault
-- UB: uneven bars
-- BB: balance beam
-- FX: floor exercise
+
+-   VT: vault
+-   UB: uneven bars
+-   BB: balance beam
+-   FX: floor exercise
 
 ```{r FX-men-sims}
 set.seed(123)
@@ -819,6 +834,7 @@ tot_m_simul
 # Objective 1) EDA
 
 ## Women
+
 ```{r}
 #Prioritizing Gold Medals
 ggplot(data = tot_w_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Women's Simulated Gold Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
@@ -830,6 +846,7 @@ ggplot(data = tot_w_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_p
 ggplot(data = tot_w_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Women's Simulated Weighted Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
 
 ```
+
 ```{r}
 #Top 5 athletes by apparatus for gold count
 tot_w_simul %>% 
@@ -863,31 +880,26 @@ tot_w_simul %>%
 
 For the women's simulation when looking at the top 5 athletes by:
 
-*Gold Medal Count* for each apparatus there are 11 out of 20 from the US:
-- balance beam (BB): 2
-- floor exercise (FX): 3
-- uneven bars (UB): 2
-- vault (VT): 4
+*Gold Medal Count* for each apparatus there are 11 out of 20 from the
+US: - balance beam (BB): 2 - floor exercise (FX): 3 - uneven bars (UB):
+2 - vault (VT): 4
 
 USA makes up 58% of the total women's gold medals in the simulation.
 
-*Total Medal Count* for each apparatus there are 10 out of 21 from the US:
-- balance beam (BB): 2  
-- floor exercise (FX): 2
-- uneven bars (UB): 2
-- vault (VT): 4
+*Total Medal Count* for each apparatus there are 10 out of 20 from the
+US: - balance beam (BB): 2\
+- floor exercise (FX): 2 - uneven bars (UB): 2 - vault (VT): 4
 
 USA makes up 49% of the total women's medals in the simulation.
 
-*Weighted Medal Count* for each apparatus there are 9 out of 21 from the US:
-- balance beam (BB): 2  
-- floor exercise (FX): 2
-- uneven bars (UB): 2
-- vault (VT): 3
+*Weighted Medal Count* for each apparatus there are 9 out of 20 from the
+US: - balance beam (BB): 2\
+- floor exercise (FX): 2 - uneven bars (UB): 2 - vault (VT): 3
 
 USA makes up 52% of the weight of women's medals in the simulation.
 
 ## Men
+
 ```{r}
 #Prioritizing Gold Medals
 ggplot(data = tot_m_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Men's Simulated Gold Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
@@ -899,6 +911,7 @@ ggplot(data = tot_m_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_p
 ggplot(data = tot_m_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Men's Simulated Weighted Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
 
 ```
+
 ```{r}
 #Top 5 athletes by apparatus for gold count
 tot_m_simul %>% 
@@ -931,32 +944,21 @@ tot_m_simul %>%
 
 For the men's simulation when looking at the top 5 athletes by:
 
-*Gold Medal Count* for each apparatus there are 5 out of 34 from the US (including ties):
-- floor exercise (FX): 0
-- high bar (HB): 0
-- parallel bars (PB): 3
-- pommel horse (PH): 0
-- still rings (SR): 0
-- vault (VT): 2
+*Gold Medal Count* for each apparatus there are 5 out of 30 from the US
+(including ties): - floor exercise (FX): 0 - high bar (HB): 0 - parallel
+bars (PB): 3 - pommel horse (PH): 0 - still rings (SR): 0 - vault (VT):
+2
 
 USA makes up 23% of the total men's gold medals in the simulation.
 
-*Total Medal Count* for each apparatus there are 3 out of 34 from the US:
-- floor exercise (FX): 1
-- high bar (HB): 0
-- parallel bars (PB): 0
-- pommel horse (PH): 0
-- still rings (SR): 0
-- vault (VT): 2
+*Total Medal Count* for each apparatus there are 3 out of 30 from the
+US: - floor exercise (FX): 1 - high bar (HB): 0 - parallel bars (PB):
+0 - pommel horse (PH): 0 - still rings (SR): 0 - vault (VT): 2
 
 USA makes up 25% of the total men's medals in the simulation.
 
-*Weighted Medal Count* for each apparatus there are 5 out of 32 from the US:
-- floor exercise (FX): 1
-- high bar (HB): 0
-- parallel bars (PB): 1
-- pommel horse (PH): 0
-- still rings (SR): 0
-- vault (VT): 3
+*Weighted Medal Count* for each apparatus there are 5 out of 30 from the
+US: - floor exercise (FX): 1 - high bar (HB): 0 - parallel bars (PB):
+1 - pommel horse (PH): 0 - still rings (SR): 0 - vault (VT): 3
 
 USA makes up 24% of the weight of men's medals in the simulation.

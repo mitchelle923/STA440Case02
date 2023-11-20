@@ -31,7 +31,6 @@ library(cowplot)
 knitr::opts_chunk$set(message = FALSE, echo = FALSE) 
 ```
 
-
 ```{r}
 #| echo : false
 #| label: read-data
@@ -121,82 +120,6 @@ final_data <- joined_data |>
 #   summarise(athletes_left = n_distinct(unique_id))
 
 #there are 679 athletes left in total once we have filtered, USA still has 91 left
-```
-
-```{r}
-#separating datasets into mens and womens
-
-menFinal <- final_data %>% 
-  filter(Gender == 'm')
-
-womenFinal <- final_data %>% 
-  filter(Gender == 'w')
-```
-
-```{r mens-ranking}
-#MENS RANKING SYSTEM
-
-#rank actually shown to be correct here for the early observationsbesides a couple missing ranks
-orderMenFinal <- menFinal %>% 
-  arrange(Competition, Round, Apparatus, desc(Score)) %>% 
-  dplyr::select(unique_id, Gender, Country,Competition, Round,Apparatus, Rank, D_Score, E_Score, Score)
-```
-
-```{r mens-ordering}
-#this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
-#also important to note that rankers did not give same scores the same rank, but this will be done in new rank
-
-orderMenFinal <- orderMenFinal %>%
-  #initializes newRank column
-  mutate(newRank = NA)
-#starts with first row as 1 since data already grouped and ordered
-orderMenFinal$newRank[1] <- 1
-for (i in 2:nrow(orderMenFinal)){
-  #ranks for ties of same competition, round, and apparatus
-  if ((orderMenFinal$Competition[i] == orderMenFinal$Competition[i-1]) & (orderMenFinal$Round[i] == orderMenFinal$Round[i-1]) & (orderMenFinal$Apparatus[i] == orderMenFinal$Apparatus[i-1]) & (orderMenFinal$Score[i] == orderMenFinal$Score[i-1])) {
-    orderMenFinal$newRank[i] <- orderMenFinal$newRank[i-1]
-  } 
-  #ranks for non ties of same competition, round, and apparatus
-  else if ((orderMenFinal$Competition[i] == orderMenFinal$Competition[i-1]) & (orderMenFinal$Round[i] == orderMenFinal$Round[i-1]) & (orderMenFinal$Apparatus[i] == orderMenFinal$Apparatus[i-1])) {
-    orderMenFinal$newRank[i] <- orderMenFinal$newRank[i-1]+1
-  }
-  #ranks for new competition, round, and apparatus
-  else {
-    orderMenFinal$newRank[i] <- 1
-  }
-}
-```
-
-```{r womens-ranking}
-#WOMENS RANKING SYSTEM
-orderWomenFinal <- womenFinal %>% 
-  arrange(Competition, Round, Apparatus, desc(Score)) %>% 
-  dplyr::select(unique_id, Gender, Country,Competition, Round,Apparatus, Rank, D_Score, E_Score, Score)
-```
-
-```{r womens-ordering, message = FALSE}
-#this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes
-#also important to note that rankers did not give same scores the same rank, but this will be done in new rank
-orderWomenFinal <- orderWomenFinal %>%
-  mutate(newRank = NA)
-orderWomenFinal$newRank[1] <- 1
-
-for (i in 2:nrow(orderWomenFinal)){
-  if ((orderWomenFinal$Competition[i] == orderWomenFinal$Competition[i-1]) & (orderWomenFinal$Round[i] == orderWomenFinal$Round[i-1]) & (orderWomenFinal$Apparatus[i] == orderWomenFinal$Apparatus[i-1]) & (orderWomenFinal$Score[i] == orderWomenFinal$Score[i-1])) {
-    orderWomenFinal$newRank[i] <- orderWomenFinal$newRank[i-1]
-  } 
-  else if ((orderWomenFinal$Competition[i] == orderWomenFinal$Competition[i-1]) & (orderWomenFinal$Round[i] == orderWomenFinal$Round[i-1]) & (orderWomenFinal$Apparatus[i] == orderWomenFinal$Apparatus[i-1])) {
-    orderWomenFinal$newRank[i] <- orderWomenFinal$newRank[i-1]+1
-  }
-  else {
-    orderWomenFinal$newRank[i] <- 1
-  }
-}
-
-#concatenating the 2 again
-#do not use this one for running sims
-combined_final <- orderMenFinal |>
-  full_join(orderWomenFinal)
 ```
 
 ```{r removing-obs, message = FALSE}
@@ -392,15 +315,14 @@ sig_0 <- prior_parameters[2]
 k_0 <- prior_parameters[3]
 v_0 <- prior_parameters[4]
 
-VT_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 100)
-VT_w_simul |>
+UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 100)
+UB_w_simul |>
   head(10) |>
   kable(caption = "Women's Uneven Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
 ## Male Athletes' Results
-
 
 ```{r FX-men-sims}
 set.seed(123)
@@ -456,7 +378,6 @@ PH_m_simul |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
-
 ```{r HB-men-sims}
 set.seed(123)
 
@@ -474,7 +395,6 @@ HB_m_simul |>
   kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
-
 
 ```{r SR-men-sims}
 set.seed(123)
@@ -494,7 +414,6 @@ SR_m_simul |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
-
 ```{r PB-men-sims}
 set.seed(123)
 
@@ -513,6 +432,104 @@ PB_m_simul |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
+### Objective 1: Choice of Medal Metric
+
+```{r}
+#LARGE WOMEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
+
+#Creates country variable
+FX_w_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", FX_w_simul$unique_id))
+#adds medal weight variable
+FX_w_simul$Medal_Weight <- (FX_w_simul$Golds*3) + (FX_w_simul$Silvers*2) + (FX_w_simul$Bronzes*1)
+#adds apparatus to facet by later on in visuals
+FX_w_simul$Apparatus <- "FX"
+
+
+BB_w_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", BB_w_simul$unique_id))
+BB_w_simul$Medal_Weight <- (BB_w_simul$Golds*3) + (BB_w_simul$Silvers*2) + (BB_w_simul$Bronzes*1)
+BB_w_simul$Apparatus <- "BB"
+
+VT_w_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", VT_w_simul$unique_id))
+VT_w_simul$Medal_Weight <- (VT_w_simul$Golds*3) + (VT_w_simul$Silvers*2) + (VT_w_simul$Bronzes*1)
+VT_w_simul$Apparatus <- "VT"
+
+UB_w_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", UB_w_simul$unique_id))
+UB_w_simul$Medal_Weight <- (UB_w_simul$Golds*3) + (UB_w_simul$Silvers*2) + (UB_w_simul$Bronzes*1)
+UB_w_simul$Apparatus <- "UB"
+
+#Joins all women's medal results table for facet wrapping
+
+#HAVE TO EVENTUALLY ADD VT1 and VT2!!
+tot_w_simul <- bind_rows(FX_w_simul,BB_w_simul, VT_w_simul, UB_w_simul)
+tot_w_simul <- tot_w_simul %>% 
+  mutate(USA = as.factor(ifelse(Country == "USA", TRUE, FALSE)))
+tot_w_simul
+```
+
+```{r}
+#LARGE MEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
+
+#Creates country variable
+FX_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", FX_m_simul$unique_id))
+#adds medal weight variable
+FX_m_simul$Medal_Weight <- (FX_m_simul$Golds*3) + (FX_m_simul$Silvers*2) + (FX_m_simul$Bronzes*1)
+#adds apparatus to facet by later on in visuals
+FX_m_simul$Apparatus <- "FX"
+
+VT_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", VT_m_simul$unique_id))
+VT_m_simul$Medal_Weight <- (VT_m_simul$Golds*3) + (VT_m_simul$Silvers*2) + (VT_m_simul$Bronzes*1)
+VT_m_simul$Apparatus <- "VT"
+
+PH_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", PH_m_simul$unique_id))
+PH_m_simul$Medal_Weight <- (PH_m_simul$Golds*3) + (PH_m_simul$Silvers*2) + (PH_m_simul$Bronzes*1)
+PH_m_simul$Apparatus <- "PH"
+
+HB_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", HB_m_simul$unique_id))
+HB_m_simul$Medal_Weight <- (HB_m_simul$Golds*3) + (HB_m_simul$Silvers*2) + (HB_m_simul$Bronzes*1)
+HB_m_simul$Apparatus <- "HB"
+
+SR_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", SR_m_simul$unique_id))
+SR_m_simul$Medal_Weight <- (SR_m_simul$Golds*3) + (SR_m_simul$Silvers*2) + (SR_m_simul$Bronzes*1)
+SR_m_simul$Apparatus <- "SR"
+
+PB_m_simul$Country <- factor(sub(".+_([A-Z]+)", "\\1", PB_m_simul$unique_id))
+PB_m_simul$Medal_Weight <- (PB_m_simul$Golds*3) + (PB_m_simul$Silvers*2) + (PB_m_simul$Bronzes*1)
+PB_m_simul$Apparatus <- "PB"
+
+#Joins all men's medal results table for facet wrapping
+
+#HAVE TO EVENTUALLY ADD VT1 and VT2!!
+tot_m_simul <- bind_rows(FX_m_simul, VT_m_simul,PH_m_simul, HB_m_simul,SR_m_simul, PB_m_simul)
+tot_m_simul <- tot_m_simul %>% 
+  mutate(USA = as.factor(ifelse(Country == "USA", TRUE, FALSE)))
+tot_m_simul
+```
+
+```{r}
+#WOMEN'S MEDAL METRICS VISUALS
+#Prioritizing Gold Medals
+ggplot(data = tot_w_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Women's Simulated Gold Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+
+#Prioritizing Total Medals
+ggplot(data = tot_w_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Women's Simulated Total Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+
+#Prioritizing Weighted Medals
+ggplot(data = tot_w_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Women's Simulated Weighted Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+```
+
+```{r}
+#MEN'S MEDAL METRICS VISUALS
+#Prioritizing Gold Medals
+ggplot(data = tot_m_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Men's Simulated Gold Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+
+#Prioritizing Total Medals
+ggplot(data = tot_m_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Men's Simulated Total Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+
+#Prioritizing Weighted Medals
+ggplot(data = tot_m_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Men's Simulated Weighted Medals by Country (USA vs non-USA)", subtitle = "by Apparatus") +coord_flip()
+
+```
+
 ## Discussion
 
 ## Appendix
@@ -525,7 +542,7 @@ number_athletes |>
     facet_wrap(~ Round) +
     labs(x = "Number of Unique Athletes Competed",
          y = "Frequency",
-         title = "Distribution of Athletes Competed at Competition Rounds",
+         title = "1) Distribution of Athletes Competed at Competition Rounds",
          subtitle = "All Around or Team All Arounds")
 
 number_athletes |>
@@ -534,7 +551,7 @@ number_athletes |>
     geom_histogram() +
     labs(x = "Number of Unique Athletes Competed",
          y = "Frequency",
-         title = "Distribution of Athletes Competed at AA Finals")
+         title = "2) Distribution of Athletes Competed at AA Finals")
 
 number_athletes |>
   filter(Round == "final") |>
@@ -543,13 +560,106 @@ number_athletes |>
     facet_wrap(~ Round) +
     labs(x = "Number of Unique Athletes Competed",
          y = "Frequency",
-         title = "Distribution of Athletes Competed at Final Rounds",
+         title = "3) Distribution of Athletes Competed at Final Rounds",
          subtitle = "Individual Apparatuses")
 
 ggplot(number_athletes, aes(x = athletes_participated)) +
   geom_histogram() +
   labs(x = "Number of Unique Athletes Competed",
        y = "Frequency",
-       title = "Distribution of Athletes Competed at Competitions")
+       title = "4) Distribution of Athletes Competed at Competitions")
 
 ```
+
+### Referenced in Results
+
+```{r}
+#WOMEN
+#Top 5 athletes by apparatus for gold count
+tot_w_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Golds, n = 5)
+
+#Top 5 athletes by apparatus for total medal count
+tot_w_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Total_Medals, n = 5)
+
+#Top 5 athletes by apparatus for weighted medal count
+tot_w_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Medal_Weight, n = 5)
+
+
+#total proportion for each medal metric
+tot_w_simul %>% 
+  group_by(USA) %>% 
+  summarise(sumGolds = sum(Golds))
+
+tot_w_simul %>% 
+  group_by(USA) %>% 
+  summarise(sumTot = sum(Total_Medals))
+
+tot_w_simul %>% 
+  group_by(USA) %>% 
+  summarise(sumWeighted = sum(Medal_Weight))
+```
+
+**Image 5)** For the women's simulation when looking at the top 5 athletes by:
+
+*Gold Medal Count* for each apparatus there are 11 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 3, uneven bars (UB): 2, and vault (VT): 4
+
+USA makes up 58% of the total women's gold medals in the simulation.
+
+*Total Medal Count* for each apparatus there are 10 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 2, uneven bars (UB): 2, vault (VT): 4
+
+USA makes up 49% of the total women's medals in the simulation.
+
+*Weighted Medal Count* for each apparatus there are 9 out of 20 from the US: balance beam (BB): 2, floor exercise (FX): 2, uneven bars (UB): 2, vault (VT): 3
+
+USA makes up 52% of the weight of women's medals in the simulation.
+
+```{r}
+#MEN
+#Top 5 athletes by apparatus for gold count
+tot_m_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Golds, n = 5)
+
+#Top 5 athletes by apparatus for total medal count
+tot_m_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Total_Medals, n = 5)
+
+#Top 5 athletes by apparatus for weighted medal count
+tot_m_simul %>% 
+  group_by(Apparatus) %>% 
+  slice_max(order_by = Medal_Weight, n = 5)
+
+#total proportion for each medal metric
+tot_m_simul %>% 
+  group_by(USA) %>% 
+  summarise(sumGolds = sum(Golds))
+
+tot_m_simul %>% 
+  group_by(USA) %>% 
+  summarise(sumTot = sum(Total_Medals))
+
+tot_m_simul %>% 
+  group_by(USA) %>% 
+  summarise(sumWeighted = sum(Medal_Weight))
+```
+
+**Image 6)** For the men's simulation when looking at the top 5 athletes by:
+
+*Gold Medal Count* for each apparatus there are 5 out of 30 from the US: floor exercise (FX): 0, high bar (HB): 0,parallel bars (PB): 3 pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
+
+USA makes up 23% of the total men's gold medals in the simulation.
+
+*Total Medal Count* for each apparatus there are 3 out of 30 from the US: floor exercise (FX): 1, high bar (HB): 0, parallel bars (PB): 0, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
+
+USA makes up 25% of the total men's medals in the simulation.
+
+*Weighted Medal Count* for each apparatus there are 5 out of 30 from the US: floor exercise (FX): 1, high bar (HB): 0, parallel bars (PB): 1, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 3
+
+USA makes up 24% of the weight of men's medals in the simulation.
