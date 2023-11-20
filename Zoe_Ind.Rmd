@@ -97,3 +97,61 @@ top_percent_women <- women_data %>%
   group_by(Apparatus) %>%
   filter(rank(desc(Score), ties.method = "min")/n() <= 0.20)
 ```
+
+```{r}
+install.packages("rstan")
+library(rstan)
+```
+```{r}
+model_string_stan <- "
+  data {
+    int<lower=0> N;          // Number of historical observations
+    vector[N] historical_scores;  // Historical scores
+  }
+  parameters {
+    real mu;                  // Mean of the distribution
+    real<lower=0> sigma;       // Standard deviation of the distribution
+  }
+  model {
+    // Priors
+    mu ~ normal(mean(historical_scores), sd(historical_scores));
+    sigma ~ cauchy(0, 5);
+
+    // Likelihood
+    historical_scores ~ normal(mu, sigma);
+  }
+  generated quantities {
+  real future_score[N];  // Simulated scores for the future
+  for (i in 1:N) {
+    future_score[i] = normal_rng(mu, sigma);
+  }
+}
+"
+
+```
+
+```{r}
+data_stan <- list(
+  N = length(top_percent_women$Score),
+  historical_scores = top_percent_women$Score
+)
+
+# Compile the Stan model
+stan_model <- stan_model(model_code = model_string_stan)
+
+# Fit the model
+stan_samples <- sampling(stan_model, data = data_stan, iter = 1000, chains = 3)
+
+# Extract posterior samples
+posterior_samples_stan <- extract(stan_samples)
+
+# Analyze and interpret the results as needed
+summary(posterior_samples_stan)
+
+# Extract simulated future scores
+simulated_future_scores <- posterior_samples_stan$future_score
+
+simulated_results <- data.frame(Simulated_Score = simulated_future_scores)
+
+```
+
