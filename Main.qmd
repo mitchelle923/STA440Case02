@@ -74,12 +74,108 @@ We have the following objectives for this study: (UCSAS, 2023)
 
 Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection. In our analysis of the best fit US male and female gymnastics teams for the Paris Olympics, we will undertake a Bayesian approach to simulate outcomes of individual athletes' scores in an apparatus. Bayesian frameworks in sports analytics to simulate athlete's results are well-documented and have seen a rise in popularity in the past decade (Santos-Fernandez, et. al., 2019). For instance, Yang and Swartz use Monte Carlo Markov Chains to simulate the outcomes of baseball games (Yang et. al., 2022). We will build upon these analyses and choose the appropriate Bayesian method to simulate outcomes of gymnast results in each apparatus, after which we will analyze the top performers in each apparatus, assign medals, and find the best combination of athletes.
 
+### Exploratory Data Visualizations
+
+We created some exploratory data visualizations to examine the distributions of athlete scores and examine the performance of US athletes relative to other countries. We find that from the density plots of male and female athletes' overall scores (difficulty score + execution score - penalty = overall score) per apparatus that the scores are approximately normally distributed for the apparatuses for both genders. There are some slight deviations from normality, namely women's vault scores and uneven bars scores are slightly skewed left and men's still rings scores have a slight dip in the peak. Nonetheless, the approximate normality of the distribution of athlete's scores by apparatus informs our bayesian approach, as we may use normal priors for our data. Furthermore, we plotted the number of athletes per country in the top 10 of each apparatus internationally, top 10 meaning the athletes with top 10 highest mean scores for each apparatus. For example, we see that for women's vault, 6 of the top 10 athletes in the world are US gymnasts. These plots help inform us of if we should be thinking about specialists or generalists in the US team combinations. We see that the top 10 for each apparatus have a high concentration of US female gymnasts, so we may want specialists in our team makeup, whereas that case does not transfer to the US male gymnasts, as there are few US male gymnasts in the top 10 for the floor exercise, high bar, pommel horse, and still rings apparatuses. In the men's case, we may not want to send specialists to take up a spot on team of five, and we shall explore this conjecture in our simulations.
+
+```{r score-distributions}
+
+#womens score distributions by apparatus
+womensdist <- combined |>
+  filter(Gender == "w") |>
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+   labs(title = "Distribution of Female Gymnasts' Overall Scores",
+       subtitle = "By Apparatus",
+       x = "Overall Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+
+#mens score distributions by apparatus
+mensdist <- combined |>
+  filter(Gender == "m") |>
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+   labs(title = "Distribution of Male Gymnasts' Overall Scores",
+       subtitle = "By Apparatus",
+       x = "Overall Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+plot_grid(womensdist, mensdist, ncol=2)
+```
+
+```{r top-10-athletes}
+top_10_f_means <- combined_apparatus |>
+  filter(Gender == "w") |>
+  group_by(Apparatus, unique_id) |>
+  arrange(Apparatus, desc(mean_score)) |>
+  group_by(Apparatus) |>
+  slice_head(n = 10) |>
+  ungroup()
+
+topwomens <- top_10_f_means |>
+  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_bar() + 
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  labs(title = "Number of Female Athletes in \n Top 10 of Each Apparatus",
+       subtitle = "By Athlete's Mean Apparatus Score and Country",
+       x = "Country the Athlete Represents",
+       y = "Number of Female Athletes in \n Top 10 of Each Apparatus") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7)) +
+  facet_wrap(~ Apparatus, scales = "free_x") + 
+  coord_flip()
+
+
+top_10_m_means <- combined_apparatus |>
+  filter(Gender == "m") |>
+  group_by(Apparatus, unique_id) |>
+  arrange(Apparatus, desc(mean_score)) |>
+  group_by(Apparatus) |>
+  slice_head(n = 10) |>
+  ungroup()
+
+topmens <- top_10_m_means |>
+  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_bar() + 
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  labs(title = "Number of Male Athletes in \n Top 10 of Each Apparatus",
+       subtitle = "By Athlete's Mean Apparatus Scores and Country",
+       x = "Country the Athlete Represents",
+       y = "Number of Male Athletes in \n Top 10 of Each Apparatus") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 5),
+        axis.title = element_text(size = 7)) +
+  facet_wrap(~ Apparatus, scales = "free_x") + 
+  coord_flip()
+
+plot_grid(topwomens, topmens, ncol=2)
+```
+
 ## Methodology
 
-Prior to conducting any visualizations or simulations, we cleaned our data set on the 2022-2023 gymnastics competition results. There were several cases of missing or inconsistent athlete first and last names, so we created unique athlete IDs using string methods by using the first three letters of an athlete's first name, the first three letters of an athlete's last name, and the country code. We made sure to add in missing names and account for names with less than three characters. Furthermore, the apparatus code for high bar was inconsistent across the Commonwealth Games and all other competitions, so we made sure to consolidate high bar into one apparatus code. Because individual apparatus qualifying vaults needed athletes to compete two different vaults (VT1, VT2) as opposed to one vault in the finals or team or all-around events, we decided to take the higher of the two vault scores for an athlete for a competition, if there were two vaults completed, and consolidated that score as one vault apparatus code. We decided to keep the higher score given the vaults were different, and athletes likely compete with the vault that gives them the higher score during event finals. 
+Prior to conducting simulations, we cleaned our data set on the 2022-2023 gymnastics competition results. There were several cases of missing or inconsistent athlete first and last names, so we created unique athlete IDs using string methods by using the first three letters of an athlete's first name, the first three letters of an athlete's last name, and the country code. We made sure to add in missing names and account for names with less than three characters. Furthermore, the apparatus code for high bar was inconsistent across the Commonwealth Games and all other competitions, so we made sure to consolidate high bar into one apparatus code. Because individual apparatus qualifying vaults needed athletes to compete two different vaults (VT1, VT2) as opposed to one vault in the finals or team or all-around events, we decided to take the higher of the two vault scores for an athlete for a competition, if there were two vaults completed, and consolidated that score as one vault apparatus code. We decided to keep the higher score given the vaults were different, and athletes likely compete with the vault that gives them the higher score during event finals.
 
-We then proceeded to cut down on the number of observations in our dataset for two purposes: 1) so that our simulations later could run more quickly, and 2) we felt that it was unnecessary to simulate scores for athletes that had little to no chance of medaling given their previous records, given the scarcity of athletes that will attend the Olympic finals. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterwards, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. Additionally, filtering for athletes' scores when an athleted has competed in that apparatus more than twice allows us to find a variance and mean for that athlete's performance on an apparatus. We are left with 2210 observations in our filtered data set to conduct visualizations and simulations, with 157 unique male athletes and 88 unique female athletes.
-
+We then proceeded to cut down on the number of observations in our dataset for two purposes: 1) so that our simulations later could run more quickly, and 2) we felt that it was unnecessary to simulate scores for athletes that had little to no chance of medaling given their previous records, given the scarcity of athletes that will attend the Olympic finals. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterwards, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. Additionally, filtering for athletes' scores when an athleted has competed in that apparatus more than twice allows us to find a variance and mean for that athlete's performance on an apparatus. We are left with 2210 observations in our filtered data set to conduct simulations, with 157 unique male athletes and 88 unique female athletes.
 
 ```{r data-cleaning, message = FALSE}
 #indonesian gymnast's name is Abiyu RAFI not ABIYURAFI
@@ -199,102 +295,9 @@ combined <- combined |>
 ```
 
 
-### Exploratory Data Visualizations
-
-```{r score-distributions}
-
-#womens score distributions by apparatus
-womensdist <- combined |>
-  filter(Gender == "w") |>
-  ggplot(aes(x = Score)) +
-  geom_density() +
-  facet_wrap(~ Apparatus) +
-   labs(title = "Distribution of Female Gymnasts' Overall Scores",
-       subtitle = "By Apparatus",
-       x = "Overall Score",
-       y = "Density") +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 7),
-        axis.title = element_text(size = 7))
-
-
-#mens score distributions by apparatus
-mensdist <- combined |>
-  filter(Gender == "m") |>
-  ggplot(aes(x = Score)) +
-  geom_density() +
-  facet_wrap(~ Apparatus) +
-   labs(title = "Distribution of Male Gymnasts' Overall Scores",
-       subtitle = "By Apparatus",
-       x = "Overall Score",
-       y = "Density") +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 7),
-        axis.title = element_text(size = 7))
-
-plot_grid(womensdist, mensdist, ncol=2)
-```
-
-```{r top-10-athletes}
-top_10_f_means <- combined_apparatus |>
-  filter(Gender == "w") |>
-  group_by(Apparatus, unique_id) |>
-  arrange(Apparatus, desc(mean_score)) |>
-  group_by(Apparatus) |>
-  slice_head(n = 10) |>
-  ungroup()
-
-topwomens <- top_10_f_means |>
-  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
-  geom_bar() + 
-  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
-  labs(title = "Number of Female Athletes in \n Top 10 of Each Apparatus",
-       subtitle = "By Athlete's Mean Apparatus Score and Country",
-       x = "Number of Female Athletes in Top 10 of Each Apparatus",
-       y = "Country the Athlete Represents") +
-  theme_minimal() +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 7),
-        axis.title = element_text(size = 7)) +
-  facet_wrap(~ Apparatus, scales = "free_x") + 
-  coord_flip()
-
-
-top_10_m_means <- combined_apparatus |>
-  filter(Gender == "m") |>
-  group_by(Apparatus, unique_id) |>
-  arrange(Apparatus, desc(mean_score)) |>
-  group_by(Apparatus) |>
-  slice_head(n = 10) |>
-  ungroup()
-
-topmens <- top_10_m_means |>
-  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
-  geom_bar() + 
-  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
-  labs(title = "Number of Male Athletes in \n Top 10 of Each Apparatus",
-       subtitle = "By Athlete's Mean Apparatus Scores and Country",
-       x = "Number of Male Athletes in Top 10 of Each Apparatus",
-       y = "Country the Athlete Represents") +
-  theme_minimal() +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 5),
-        axis.title = element_text(size = 7)) +
-  facet_wrap(~ Apparatus, scales = "free_x") + 
-  coord_flip()
-
-plot_grid(topwomens, topmens, ncol=2)
-```
-
 ### Simulations
+
+INSERT METHODOLOGY ON SIMULATIONS/BAYESIAN STUFF HERE
 
 ```{r fitting-priors}
 fit_normal_priors <- function(data, apparatus, gender) {
@@ -398,7 +401,13 @@ simulate_full_competition <- function(data, apparatus, gender, mu_0, sig_0, k_0,
 
 ## Results
 
+We ran simulations for each apparatus for each gender (women's 4 apparatuses and men's 6 apparatuses) 500 times.
+
+(NEED TO ADD MORE)
+
 ### Female Athletes' Results
+
+For women's apparatuses, we outputted the tables of simulation outcomes for floor exercise, balance beam, and vault because of the high presence of medals for US gymnasts. The table of simulation outcomes for uneven bars is in the appendix.
 
 ```{r FX-womens-sims}
 set.seed(123)
@@ -467,6 +476,8 @@ UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v
 
 ### Male Athletes' Results
 
+For men's apparatuses, we outputted the tables of simulation outcomes for vault and parallel bars because of the high presence of medals for US gymnasts relative to the other apparatuses. The tables of simulation outcomes for floor exercise, still rings, pommel horse, and high bar are in the appendix.
+
 ```{r FX-men-sims}
 set.seed(123)
 
@@ -522,10 +533,6 @@ k_0 <- hbm_prior_parameters[3]
 v_0 <- hbm_prior_parameters[4]
 
 HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 100)
-HB_m_simul |>
-  head(10) |>
-  kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
 ```{r SR-men-sims}
@@ -552,6 +559,11 @@ k_0 <- pbm_prior_parameters[3]
 v_0 <- pbm_prior_parameters[4]
 
 PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 100)
+
+PB_m_simul |>
+  head(10) |>
+  kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
 ```{r include = FALSE}
@@ -676,7 +688,6 @@ Yang, Tae Young, and Tim Swartz. "A Two-Stage Bayesian Model for Predicting Winn
 ### Additional Simulation Results
 
 ```{r additional-sims-tables}
-
 #womens additional
 UB_w_simul |>
   head(10) |>
@@ -689,6 +700,11 @@ FX_m_simul |>
   kable(caption = "Men's Floor Exercise Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
+HB_m_simul |>
+  head(10) |>
+  kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
+
 PH_m_simul |>
   head(10) |>
   kable(caption = "Men's Pommel Horse Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -698,17 +714,11 @@ SR_m_simul |>
   head(10) |>
   kable(caption = "Men's Still Rings Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
-
-PB_m_simul |>
-  head(10) |>
-  kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
-
 
 ### Extra Visualizations
 
-``` {r execution-difficulty-distributions}
+```{r execution-difficulty-distributions}
 ## GOING INTO APPENDIX
 combined |>
   filter(Gender == "w") |>
