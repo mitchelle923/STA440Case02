@@ -10,12 +10,15 @@ geometry: "top=15mm, bottom=15mm, left=15mm, right=15mm"
 format: pdf
 editor: visual
 ---
+```{r setup-chunk, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, echo = FALSE) 
+```
 
 ```{r}
-#| echo : false
+#| echo: false
+#| include: false
 #| label: downloading-packages
 #| message: false
-#| include: false
 
 library(tidyverse)
 library(knitr)
@@ -30,9 +33,6 @@ library(bayesplot)
 library(rstan)  
 ```
 
-```{r setup-chunk}
-knitr::opts_chunk$set(message = FALSE, echo = FALSE) 
-```
 
 ```{r}
 #| echo : false
@@ -127,7 +127,7 @@ final_data <- joined_data |>
 
 ```{r removing-obs, message = FALSE}
 #summary stats for each athlete for each apparatus
-combined_apparatus <- combined_final |>
+combined_apparatus <- final_data |>
   group_by(Apparatus, unique_id, Country, Gender) |>
   summarise(mean_score = mean(Score),
             var_score = var(Score),
@@ -138,7 +138,7 @@ combined_apparatus <- combined_final |>
             var_E = var(E_Score)) |>
   filter(number_obs >= 3)
 
-combined <- combined_final |>
+combined <- final_data |>
   left_join(combined_apparatus, by = c("Apparatus", "unique_id", "Country", "Gender"))
 
 # USE THIS DF FOR RUNNING SIMS
@@ -586,7 +586,7 @@ get_mcmc_samples <- function(simulation_results) {
 mcmc_results <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
 mcmc_samples <- get_mcmc_samples(mcmc_results)
 
-traceplot(mcmc_samples, main = "Trace Plot of Total Medals")
+coda::traceplot(mcmc_samples, main = "Trace Plot of Total Medals")
 
 # Effective sample size
 effectiveSize(mcmc_samples)
