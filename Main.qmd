@@ -54,13 +54,15 @@ later <- laterdata |>
 
 ## Introduction
 
-### Context and Background
+The Olympic Games are a highly anticipated world-renowned multi-sporting event that takes place every four years. Particularly the Summer Olympic Games tend to have a wider variety of 32 sports and more viewers than that of the Winter Olympics (Olympics, 2021). Athletes from all over the world can participate granted they meet the criteria established by their nation's Olympic committees and the international sports federations. With female qualifying gymnasts from the United States placing with medals in the team all-around, individual all-around, and each individual apparatus in the 2020 Tokyo Olympics game, there has been a surge in media attention on the United States gymnastics teams (Olympics, 2020).
 
-The Olympic Games are a highly anticipated world-renowned multi-sporting event that takes place every four years. Particularly the Summer Olympic Games tend to have a wider variety of 32 sports and more viewers than that of the Winter Olympics (Olympics, 2021). Athletes from all over the world can participate granted they meet the criteria established by their nation's Olympic committees and the international sports federations. With female qualifying gymnasts from the United States placing with medals in the team all-around, individual all-around, and each individual apparatus in the 2020 Tokyo Olympics game, there has been a surge in media attention on the United States gymnastics teams. (Olympics, 2020)
+As the Paris 2024 Summer Olympic Games is approaching, the United States Olympic Men's and Women's Artistic Gymnastics aims to put together a team that best represents the country on the world's sporting stage by optimizing medal success amongst the team all-around, individual all-around, and individual apparatus events. This study aims to use the most recent Olympic Games and other world competitions' qualifying and final round results data to best assemble a team that is likely to produce optimal success in terms of medals within the Olympic qualifiers and final criteria (UCSAS, 2023).
 
-As the Paris 2024 Summer Olympic Games is approaching, the United States Olympic Men's and Women's Artistic Gymnastics aims to put together a team that best represents the country on the world's sporting stage by optimizing medal success amongst the team all-around, individual all-around, and individual apparatus events. This study aims to use the most recent Olympic Games and other world competitions' qualifying and final round results data to best assemble a team that is likely to produce optimal success in terms of medals within the Olympic qualifiers and final criteria. (UCSAS, 2023)
+The UConn Sports Analytics Symposium provisioned two clean data sets of the accumulation of results of teams worldwide that participated in the major domestic and international gymnastic qualifying and final competition events leading up to the 2024 Summer Olympic Games. The first data set includes includes the results of the 2020 (taking place in 2021) Tokyo Summer Olympics qualifying and final rounds, and the second data set includes competitions in the 2022 and 2023 seasons. Observations for both datasets are at the athlete- and apparatus-level score for an event in a round at a gymnastics competition--for example, Simone Biles's final uneven bars score at the 2023 US Gymnastics Championships. It is worth noting, however, that the data from the Tokyo Olympics only include results for women's gymnastics, while the data from 2022-2023 include results for both men's and women's gymnastics. The data are collected from the results on each corresponding competition's official website, which are results from the officially judged scores of each competition. Variables in the data sets include first and last names of each athlete, gender, country, date of competition, name of competition, the round of the competition (e.g. qualifier or final of an individual apparatus, individual all-around, or team event), the location of the competition, apparatus ("BB": balance beam, "FX": floor exercise, "HB": high bar, "PB": parallel bars, "PH": pommel horse, "SR": still rings, "UB": uneven bars, "VT": vault, "VT1" and "VT2": 2 different vaults required in individual apparatus qualifications and finals), the execution score, difficulty score, penalty, and final score for that athlete on that apparatus, and the rank of that athlete in that apparatus and round.
 
-These are our main objectives for this study: (UCSAS, 2023)
+We decided to not proceed in using the data set of results from the Tokyo Summer Olympics since the data consisted only of female athletes and one competition (the Olympic Games). Additionally, in the context of Olympic gymnastics, athletes of age 16 and older are eligible to compete but gymnastics is a sport in which most athletes retire in their early to mid-twenties. Specifically in the summer 2020 Tokyo Olympics only three female athletes aged 27 or older qualified to compete (Camenker, 2021). Furthermore, the average age for female gymnasts in the 2020 Olympics was approximately 22 years of age, meaning we assume that many of the competitors in the older data set will not be competing in the 2024 Paris Summer Olympics (Meyers, 2021).
+
+We have the following objectives for this study: (UCSAS, 2023)
 
 1)  Decide on whether to maximize total medal count, gold medal count, or a weighted medal count (e.g., 3 for gold, 2 for silver, 1 for bronze).
 
@@ -70,15 +72,8 @@ These are our main objectives for this study: (UCSAS, 2023)
 
 4)  Identify the group of five athletes who will most likely enable the Team USA Olympic Men's and Women's Artistic Gymnastics team to maximize medals won in the Paris 2024 Summer Olympics using an analytical model.
 
-Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection.
+Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection. In our analysis of the best fit US male and female gymnastics teams for the Paris Olympics, we will undertake a Bayesian approach to simulate outcomes of individual athletes' scores in an apparatus. Bayesian frameworks in sports analytics to simulate athlete's results are well-documented and have seen a rise in popularity in the past decade (Santos-Fernandez, et. al., 2019). For instance, Yang and Swartz use Monte Carlo Markov Chains to simulate outcomes of baseball games (Yang et. al., 2022). We will build upon these analyses and choose the appropriate Bayesian method to simulate outcomes of gymnast results in each apparatus, after which we will analyze the top performers in each apparatus, assign medals, and find the best combination of athletes.
 
-### The Data
-
-The UConn Sports Analytics Symposium provisioned a clean data set of the accumulation of results of teams worldwide that participated in the major domestic and international gymnastic qualifying and final competition events leading up to the 2024 Summer Olympic Games. These competitions took place in the 2022 and 2023 gymnastics seasons. The UConn Sports Analytics Symposium also provides a clean data set of the results of all the women's artistic gymnastics teams that participated in the 2020 Tokyo Summer Olympics qualifying and final events. Both datasets are at the individual athlete, competition, apparatus, and round level. The data of the recorded results for each competition for both men and women gymnasts were collected and manually input from the official corresponding competitions' website results after the judging of each competition.
-
-The columns for both datasets include LastName, Firstname, Gender, Country, Data, Competition, Round ("TeamQual": team all-around qualifiers, "TeamFinal": team all-around finals, "AAqual": individual all-around qualifiers, "AAfinal": individual all-around finals, "qual": individual apparatus qualifiers, "final": individual apparatus finals), Location, Apparatus ("BB": balance beam, "FX": floor exercise, "HB": high bar, "PB": parallel bars, "PH": pommel horse, "SR": still rings, "UB": uneven bars, "VT": vault, "VT1" and "VT2": 2 different vaults required in individual apparatus qualifications and finals), Rank, D_Score (difficulty score), E_Score (execution score), Penalty (score deduction for breaking event criteria), and Score (D_Score + E_Score - Penalty).
-
-We decided to not proceed in using the data set of results from the 2020 Tokyo Summer Olympics since the data consisted only of female athletes and one competition (the Olympic Games). Also in the context of Olympic gymnastics, athletes of age 16 and older are eligible to compete but gymnastics is a sport in which most athletes retire in their early to mid-twenties. Specifically in the summer 2020 Tokyo Olympics only three female athletes aged 27 or older qualified to compete (Camenker, 2021). Furthermore, the average age for female gymnasts in the 2020 Olympics was approximately 22 years of age, meaning we assume that many of the competitors in the older data set will not be competing in the 2024 Paris Summer Olympics (Meyers, 2021).
 
 ## Methodology
 
@@ -580,15 +575,21 @@ In our metric of success we chose the total count of gold medals and we decided 
 
 ### Work Cited
 
--   "Paris 2024 Olympic Games: How Do Athletes Qualify?" Olympics, 8 Aug. 2021, olympics.com/en/news/paris-2024-olympic-games-how-do-athletes-qualify. Accessed 20 Nov. 2023.
+Camenker, Jacob. "How Old Is Simone Biles? Why Elite Olympic Gymnasts Typically Retire at a Young Age." Sporting News, 18 Sept. 2021, www.sportingnews.com/us/athletics/news/simone-biles-retire-age-olympics/1laom4i4u4wh1thcgta4nun2x. Accessed 20 Nov. 2023.
 
--   "Tokyo 2020 Artistic Gymnastics - Olympic Results by Discipline." Olympics, olympics.com/en/olympic-games/tokyo-2020/results/artistic-gymnastics. Accessed 20 Nov. 2023.
+Meyers, Dvora. "Time for the End of the Teen Gymnast." FiveThirtyEight, 27 July 2021, fivethirtyeight.com/features/gymnasts-age-olympics/. Accessed 20 Nov. 2023.
 
--   "UCSAS 2024 USOPC DATA CHALLENGE." UConn Sports Analytics Symposium (UCSAS), statds.org/events/ucsas2024/challenge.html. Accessed 20 Nov. 2023.
+"Paris 2024 Olympic Games: How Do Athletes Qualify?" Olympics, 8 Aug. 2021, olympics.com/en/news/paris-2024-olympic-games-how-do-athletes-qualify. Accessed 20 Nov. 2023.
 
--   Camenker, Jacob. "How Old Is Simone Biles? Why Elite Olympic Gymnasts Typically Retire at a Young Age." Sporting News, 18 Sept. 2021, www.sportingnews.com/us/athletics/news/simone-biles-retire-age-olympics/1laom4i4u4wh1thcgta4nun2x. Accessed 20 Nov. 2023.
+Santos-Fernandez, Edgar, et al. “Bayesian Statistics Meets Sports: A Comprehensive Review.” Journal of Quantitative Analysis in Sports, vol. 15, no. 4, Dec. 2019, pp. 289–312. www.degruyter.com, https://doi.org/10.1515/jqas-2018-0106.
 
--   Meyers, Dvora. "Time for the End of the Teen Gymnast." FiveThirtyEight, 27 July 2021, fivethirtyeight.com/features/gymnasts-age-olympics/. Accessed 20 Nov. 2023.
+"Tokyo 2020 Artistic Gymnastics - Olympic Results by Discipline." Olympics, olympics.com/en/olympic-games/tokyo-2020/results/artistic-gymnastics. Accessed 20 Nov. 2023.
+
+"UCSAS 2024 USOPC DATA CHALLENGE." UConn Sports Analytics Symposium (UCSAS), statds.org/events/ucsas2024/challenge.html. Accessed 20 Nov. 2023.
+
+Yang, Tae Young, and Tim Swartz. “A Two-Stage Bayesian Model for Predicting Winners in Major League Baseball.” Journal of Data Science, vol. 2, no. 1, Aug. 2022, pp. 61–73. jds-online.org, https://doi.org/10.6339/JDS.2004.02(1).142.
+
+
 
 ### Visualizations
 
