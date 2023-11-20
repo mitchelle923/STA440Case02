@@ -294,7 +294,6 @@ combined <- combined |>
 #combined now has 2210 obs instead of 4040 obs -- using this to run sims
 ```
 
-
 ### Simulations
 
 INSERT METHODOLOGY ON SIMULATIONS/BAYESIAN STUFF HERE
@@ -657,7 +656,7 @@ From the table of the top 10 most decorated gold medal female athletes by appara
 
 From the table of the top 10 most decorated gold medal male athletes by apparatus, the USA, Japan, and China make multiple appearances. The only country that has an athlete in each apparatus for the top 10, is the USA (Appendix: Image 11). It could be slightly beneficial to the men's team to value the team's all-around success more than the other events. The US men's team also does not have a well-rounded athlete that places in the top 10 most decorated gold male athletes for each apparatus so we can assume valuing individual all-around successes over the other events would not help the US men's team but it also would not hurt it since other countries also do not have a highly decorated well-rounded competitor.
 
-In the dot plots of the top 5 decorated gold medal female athletes' unique IDs by number of gold medals for each apparatus, US athletes make multiple appearances (Appendix: Image 10). In the dot plots of the top 5 decorated gold medal male athlete's unique IDs by number of gold medals for each apparatus, US athletes are present in multiple apparatuses but not many athletes are well decorated within each apparatus. But in vault there are two US athletes in the top 5 (Appendix: Image 12). Valuing individual apparatus events as regular events of weight 1 would best suit both the male and female teams' success against their competitors. Weighing the team all-around as 3 points is viable because not only do both the men's and women's USA have the potential to win based on this simulation, but there is less reliance and pressure on one singular person. Weighing the individual all-around as 2 will hopefully benefit the women's team with Simone Biles as the potential representative for this event. These weights will in hope best accommodate the male and female athletes and give them the best chance at success against other countries in terms of the total number of gold medals.
+In the dot plots of the top 5 decorated gold medal female athletes' countries by number of gold medals for each apparatus, US athletes make multiple appearances (Appendix: Image 10). In the dot plots of the top 5 decorated gold medal male athlete's countries by number of gold medals for each apparatus, US athletes are present in multiple apparatuses but not many athletes are well decorated within each apparatus. But in vault there are two US athletes in the top 5 (Appendix: Image 12). Valuing individual apparatus events as regular events of weight 1 would best suit both the male and female teams' success against their competitors. Weighing the team all-around as 3 points is viable because not only do both the men's and women's USA have the potential to win based on this simulation, but there is less reliance and pressure on one singular person. Weighing the individual all-around as 2 will hopefully benefit the women's team with Simone Biles as the potential representative for this event. These weights will in hope best accommodate the male and female athletes and give them the best chance at success against other countries in terms of the total number of gold medals.
 
 ### Objective 3: All-Around vs Event Specialist vs Mixture
 
@@ -671,19 +670,19 @@ In our metric of success, we chose the total count of gold medals and we decided
 
 ### Work Cited
 
-Camenker, Jacob. "How Old Is Simone Biles? Why Elite Olympic Gymnasts Typically Retire at a Young Age." Sporting News, 18 Sept. 2021, www.sportingnews.com/us/athletics/news/simone-biles-retire-age-olympics/1laom4i4u4wh1thcgta4nun2x. Accessed 20 Nov. 2023.
+-   Camenker, Jacob. "How Old Is Simone Biles? Why Elite Olympic Gymnasts Typically Retire at a Young Age." Sporting News, 18 Sept. 2021, www.sportingnews.com/us/athletics/news/simone-biles-retire-age-olympics/1laom4i4u4wh1thcgta4nun2x. Accessed 20 Nov. 2023.
 
-Meyers, Dvora. "Time for the End of the Teen Gymnast." FiveThirtyEight, 27 July 2021, fivethirtyeight.com/features/gymnasts-age-olympics/. Accessed 20 Nov. 2023.
+-   Meyers, Dvora. "Time for the End of the Teen Gymnast." FiveThirtyEight, 27 July 2021, fivethirtyeight.com/features/gymnasts-age-olympics/. Accessed 20 Nov. 2023.
 
-"Paris 2024 Olympic Games: How Do Athletes Qualify?" Olympics, 8 Aug. 2021, olympics.com/en/news/paris-2024-olympic-games-how-do-athletes-qualify. Accessed 20 Nov. 2023.
+-   "Paris 2024 Olympic Games: How Do Athletes Qualify?" Olympics, 8 Aug. 2021, olympics.com/en/news/paris-2024-olympic-games-how-do-athletes-qualify. Accessed 20 Nov. 2023.
 
-Santos-Fernandez, Edgar, et al. "Bayesian Statistics Meets Sports: A Comprehensive Review." Journal of Quantitative Analysis in Sports, vol. 15, no. 4, Dec. 2019, pp. 289--312. www.degruyter.com, https://doi.org/10.1515/jqas-2018-0106.
+-   Santos-Fernandez, Edgar, et al. "Bayesian Statistics Meets Sports: A Comprehensive Review." Journal of Quantitative Analysis in Sports, vol. 15, no. 4, Dec. 2019, pp. 289--312. www.degruyter.com, https://doi.org/10.1515/jqas-2018-0106.
 
-"Tokyo 2020 Artistic Gymnastics - Olympic Results by Discipline." Olympics, olympics.com/en/olympic-games/tokyo-2020/results/artistic-gymnastics. Accessed 20 Nov. 2023.
+-   "Tokyo 2020 Artistic Gymnastics - Olympic Results by Discipline." Olympics, olympics.com/en/olympic-games/tokyo-2020/results/artistic-gymnastics. Accessed 20 Nov. 2023.
 
-"UCSAS 2024 USOPC DATA CHALLENGE." UConn Sports Analytics Symposium (UCSAS), statds.org/events/ucsas2024/challenge.html. Accessed 20 Nov. 2023.
+-   "UCSAS 2024 USOPC DATA CHALLENGE." UConn Sports Analytics Symposium (UCSAS), statds.org/events/ucsas2024/challenge.html. Accessed 20 Nov. 2023.
 
-Yang, Tae Young, and Tim Swartz. "A Two-Stage Bayesian Model for Predicting Winners in Major League Baseball." Journal of Data Science, vol. 2, no. 1, Aug. 2022, pp. 61--73. jds-online.org, https://doi.org/10.6339/JDS.2004.02(1).142.
+-   Yang, Tae Young, and Tim Swartz. "A Two-Stage Bayesian Model for Predicting Winners in Major League Baseball." Journal of Data Science, vol. 2, no. 1, Aug. 2022, pp. 61--73. jds-online.org, https://doi.org/10.6339/JDS.2004.02(1).142.
 
 ### Additional Simulation Results
 
@@ -823,13 +822,13 @@ ggplot(number_athletes, aes(x = athletes_participated)) +
 ```{r}
 #WOMEN'S MEDAL METRICS VISUALS
 #Prioritizing Gold Medals
-ggplot(data = tot_w_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Female Athlete's Number of Gold Medals", subtitle = "by Country and by Apparatus", y = "Number of Gold Medals") +coord_flip()
+ggplot(data = tot_w_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Female Gymnasts' Country by Number of Gold Medals", subtitle = "by Apparatus", y = "Number of Gold Medals") +coord_flip()
 
 #Prioritizing Total Medals
-ggplot(data = tot_w_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Female Athlete's Number of Total Medals", subtitle = "by Country and by Apparatus", y = "Number of Total Medals") +coord_flip()
+ggplot(data = tot_w_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Female Gymnasts' Country by Number of Total Medals", subtitle = "by Apparatus", y = "Number of Total Medals") +coord_flip()
 
 #Prioritizing Weighted Medals
-ggplot(data = tot_w_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Female Athlete's Medal Weight", subtitle = "by Country and by Apparatus", y = "Medal Weight") +coord_flip()
+ggplot(data = tot_w_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Female Gymnasts' Country by Medal Weight", subtitle = "by Apparatus", y = "Medal Weight") +coord_flip()
 ```
 
 **Image 6)**
@@ -837,13 +836,13 @@ ggplot(data = tot_w_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_p
 ```{r}
 #MEN'S MEDAL METRICS VISUALS
 #Prioritizing Gold Medals
-ggplot(data = tot_m_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Male Athlete's Number of Gold Medals", subtitle = "by Country and by Apparatus", y = "Number of Gold Medals") +coord_flip()
+ggplot(data = tot_m_simul, aes(x = USA, y = Golds, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Male Gymnasts' Country by Number of Gold Medals", subtitle = "by Apparatus", y = "Number of Gold Medals") +coord_flip()
 
 #Prioritizing Total Medals
-ggplot(data = tot_m_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Male Athlete's Number of Total Medals", subtitle = "by Country and by Apparatus", y = "Number of Total Medals") +coord_flip()
+ggplot(data = tot_m_simul, aes(x = USA, y = Total_Medals, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Male Gymnasts' Country by Number of Total Medals", subtitle = "by Apparatus", y = "Number of Total Medals") +coord_flip()
 
 #Prioritizing Weighted Medals
-ggplot(data = tot_m_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Individual Male Athlete's Medal Weight", subtitle = "by Country and by Apparatus", y = "Medal Weight") +coord_flip()
+ggplot(data = tot_m_simul, aes(x = USA, y = Medal_Weight, color = USA)) + geom_point() + facet_wrap(~Apparatus) + labs(title = "Male Gymnasts' Country by Medal Weight", subtitle = "by Apparatus", y = "Medal Weight") +coord_flip()
 
 ```
 
@@ -967,7 +966,7 @@ tot_w_simul %>%
 top10_women <- tot_w_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Golds, n = 5)
-ggplot(data = top10_women,aes(x = unique_id, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 200) + labs(title = "10) Women's Unique ID by Number of Gold Medals", subtitle = "by Apparatus", x = "Unique ID ", y = "Number of Gold Medals")
+ggplot(data = top10_women,aes(x = Country, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 200) + labs(title = "10) Women: Country of Top 5 Athletes by Number of Gold Medals", subtitle = "by Apparatus", x = "Country ", y = "Number of Gold Medals")
 ```
 
 **Image 11)**
@@ -986,10 +985,10 @@ tot_m_simul %>%
 top10_men <- tot_m_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Golds, n = 5)
-ggplot(data = top10_men,aes(x = unique_id, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 100) + labs(title = "12) Men's Unique ID by Number of Gold Medals", subtitle = "by Apparatus", x = "Unique ID ", y = "Number of Gold Medals")
+ggplot(data = top10_men,aes(x = Country, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 100) + labs(title = "12) Men: Country of Top 5 Athletes by Number of Gold Medals", subtitle = "by Apparatus", x = "Country", y = "Number of Gold Medals")
 ```
 
-***Note:*** The excessive unique ids display that there is not much overlap in the top 5 most gold medal decorated athletes on the men's team and therefore the lack of well-rounded gymnasts.
+***Note:*** The excessive number of countries display that there is not much overlap in the top 5 most gold medal decorated athletes on the men's team and therefore the lack of well-rounded gymnasts.
 
 ### Diagnostics
 
