@@ -80,11 +80,12 @@ The columns for both datasets include LastName, Firstname, Gender, Country, Data
 
 We decided to not proceed in using the data set of results from the 2020 Tokyo Summer Olympics since the data consisted only of female athletes and one competition (the Olympic Games). Also in the context of Olympic gymnastics, athletes of age 16 and older are eligible to compete but gymnastics is a sport in which most athletes retire in their early to mid-twenties. Specifically in the summer 2020 Tokyo Olympics only three female athletes aged 27 or older qualified to compete (Camenker, 2021). Furthermore, the average age for female gymnasts in the 2020 Olympics was approximately 22 years of age, meaning we assume that many of the competitors in the older data set will not be competing in the 2024 Paris Summer Olympics (Meyers, 2021).
 
-### EDA ...
-
 ## Methodology
 
-```{r}
+
+### EDA ...
+
+```{r data-cleaning, message = FALSE}
 #indonesian gymnast's name is Abiyu RAFI not ABIYURAFI
 laterdata <- laterdata |>
   mutate(FirstName = ifelse(LastName == "ABIYURAFI" & FirstName == ".", "Abiyu", FirstName),
@@ -109,6 +110,31 @@ AA_team <- c("AAfinal", "TeamFinal", "TeamQual", "AAqual")
 '%notin%' <- function(x,y)!('%in%'(x,y))
 
 finals_vector <- c("AAfinal", "TeamFinal", "final")
+
+#basically take the highest vault if there's a VT1 and VT2 since the vaults need to be different, and you would perform the harder/higher vault in the final
+
+mutated_data <- laterdata |>
+  filter(Apparatus %notin% c("VT1", "VT2"))
+
+vaults_set <- laterdata |>
+  filter(Apparatus %in% c("VT1", "VT2")) |>
+  group_by(unique_id, Competition, Round, Apparatus, Gender, FirstName, LastName, Date, Location, Rank, Country, firstname_check, lastname_check) |>
+  summarise(
+    Score = max(Score, na.rm = TRUE),
+    E_Score = E_Score[which.max(Score)],
+    D_Score = D_Score[which.max(Score)],
+    Penalty = Penalty[which.max(Score)],
+    .groups = 'drop'
+  ) |>
+  mutate(Apparatus = ifelse(Apparatus == "VT1", "VT", "VT"))
+
+#need to join the vaults set back with og data
+
+laterdata <- mutated_data |>
+  left_join(vaults_set)
+
+#now there are no more VT1s or VT2s --> down to 18423 obs
+
 ```
 
 ```{r quantiling, message = FALSE}
@@ -173,7 +199,7 @@ combined <- final_data |>
 combined <- combined |>
   filter(!is.na(number_obs))
 
-#combined now has 2689 obs instead of 4040 obs -- using this to run sims
+#combined now has 2210 obs instead of 4040 obs -- using this to run sims
 ```
 
 ## Simulations
@@ -278,18 +304,17 @@ simulate_full_competition <- function(data, apparatus, gender, mu_0, sig_0, k_0,
 }
 ```
 
-## Female Athletes' Results
+### Female Athletes' Results
 
 ```{r FX-womens-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "FX", "w"))
-print(prior_parameters)
+fxw_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "FX", "w"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- fxw_prior_parameters[1]
+sig_0 <- fxw_prior_parameters[2]
+k_0 <- fxw_prior_parameters[3]
+v_0 <- fxw_prior_parameters[4]
 
 FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 500)
 
@@ -302,15 +327,14 @@ FX_w_simul |>
 ```{r BB-womens-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "BB", "w"))
-print(prior_parameters)
+bbw_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "BB", "w"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- bbw_prior_parameters[1]
+sig_0 <- bbw_prior_parameters[2]
+k_0 <- bbw_prior_parameters[3]
+v_0 <- bbw_prior_parameters[4]
 
-BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 100)
+BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 500)
 BB_w_simul |>
   head(10) |>
   kable(caption = "Women's Balance Beam Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -320,15 +344,14 @@ BB_w_simul |>
 ```{r VT-womens-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "VT", "w"))
-print(prior_parameters)
+vtw_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "VT", "w"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- vtw_prior_parameters[1]
+sig_0 <- vtw_prior_parameters[2]
+k_0 <- vtw_prior_parameters[3]
+v_0 <- vtw_prior_parameters[4]
 
-VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 100)
+VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 500)
 VT_w_simul |>
   head(10) |>
   kable(caption = "Women's Vault Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -338,35 +361,33 @@ VT_w_simul |>
 ```{r UB-women-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "UB", "w"))
-print(prior_parameters)
+ubw_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "UB", "w"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- ubw_prior_parameters[1]
+sig_0 <- ubw_prior_parameters[2]
+k_0 <- ubw_prior_parameters[3]
+v_0 <- ubw_prior_parameters[4]
 
-UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 100)
+UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 500)
 UB_w_simul |>
   head(10) |>
   kable(caption = "Women's Uneven Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
-## Male Athletes' Results
+### Male Athletes' Results
 
 ```{r FX-men-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "FX", "m"))
-print(prior_parameters)
+fxm_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "FX", "m"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- fxm_prior_parameters[1]
+sig_0 <- fxm_prior_parameters[2]
+k_0 <- fxm_prior_parameters[3]
+v_0 <- fxm_prior_parameters[4]
 
-FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 100)
+FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 500)
 FX_m_simul |>
   head(10) |>
   kable(caption = "Men's Floor Exercise Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -376,15 +397,14 @@ FX_m_simul |>
 ```{r VT-men-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "VT", "m"))
-print(prior_parameters)
+vtm_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "VT", "m"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- vtm_prior_parameters[1]
+sig_0 <- vtm_prior_parameters[2]
+k_0 <- vtm_prior_parameters[3]
+v_0 <- vtm_prior_parameters[4]
 
-VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 100)
+VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 500)
 VT_m_simul |>
   head(10) |>
   kable(caption = "Men's Vault Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -394,15 +414,14 @@ VT_m_simul |>
 ```{r PH-men-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "PH", "m"))
-print(prior_parameters)
+phm_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "PH", "m"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- phm_prior_parameters[1]
+sig_0 <- phm_prior_parameters[2]
+k_0 <- phm_prior_parameters[3]
+v_0 <- phm_prior_parameters[4]
 
-PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 100)
+PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 500)
 PH_m_simul |>
   head(10) |>
   kable(caption = "Men's Pommel Horse Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -412,15 +431,14 @@ PH_m_simul |>
 ```{r HB-men-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "HB", "m"))
-print(prior_parameters)
+hbm_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "HB", "m"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- hbm_prior_parameters[1]
+sig_0 <- hbm_prior_parameters[2]
+k_0 <- hbm_prior_parameters[3]
+v_0 <- hbm_prior_parameters[4]
 
-HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 100)
+HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 500)
 HB_m_simul |>
   head(10) |>
   kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -430,15 +448,14 @@ HB_m_simul |>
 ```{r SR-men-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "SR", "m"))
-print(prior_parameters)
+srm_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "SR", "m"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- srm_prior_parameters[1]
+sig_0 <- srm_prior_parameters[2]
+k_0 <- srm_prior_parameters[3]
+v_0 <- srm_prior_parameters[4]
 
-SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 100)
+SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 500)
 SR_m_simul |>
   head(10) |>
   kable(caption = "Men's Still Rings Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
@@ -448,20 +465,23 @@ SR_m_simul |>
 ```{r PB-men-sims}
 set.seed(123)
 
-prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "PB", "m"))
-print(prior_parameters)
+pbm_prior_parameters <- suppressWarnings(fit_normal_priors(combined_apparatus, "PB", "m"))
 
-mu_0 <- prior_parameters[1]
-sig_0 <- prior_parameters[2]
-k_0 <- prior_parameters[3]
-v_0 <- prior_parameters[4]
+mu_0 <- pbm_prior_parameters[1]
+sig_0 <- pbm_prior_parameters[2]
+k_0 <- pbm_prior_parameters[3]
+v_0 <- pbm_prior_parameters[4]
 
-PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 100)
+PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 500)
 PB_m_simul |>
   head(10) |>
   kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
+
+
+
+
 
 ```{r include = FALSE}
 #LARGE WOMEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
