@@ -295,9 +295,9 @@ plot_grid(topwomens, topmens, ncol=2)
 
 ## Methodology
 
-Prior to conducting simulations, we cleaned our data set on the 2022-2023 gymnastics competition results. There were several cases of missing or inconsistent athlete first and last names, so we created unique athlete IDs using string methods by using the first three letters of an athlete's first name, the first three letters of an athlete's last name, and the country code. We made sure to add in missing names and account for names with less than three characters. Furthermore, the apparatus code for high bar was inconsistent across the Commonwealth Games and all other competitions, so we made sure to consolidate high bar into one apparatus code. Because individual apparatus qualifying vaults needed athletes to compete two different vaults (VT1, VT2) as opposed to one vault in the finals or team or all-around events, we decided to take the higher of the two vault scores for an athlete for a competition, if there were two vaults completed, and consolidated that score as one vault apparatus code. We decided to keep the higher score given the vaults were different, and athletes likely compete with the vault that gives them the higher score during event finals.
+Prior to conducting simulations, we cleaned our data set on the 2022-2023 gymnastics competition results. There were several cases of missing or inconsistent athlete first and last names, so we created unique athlete IDs using string methods by using the first three letters of an athlete's first name, the first three letters of an athlete's last name, and the country code. We made sure to add in missing names and account for names with less than three characters. Furthermore, the apparatus code for high bar was inconsistent across the Commonwealth Games and all other competitions, so we made sure to consolidate high bar into one apparatus code. Because individual apparatus qualifying vaults needed athletes to compete in two different vaults (VT1, VT2) as opposed to one vault in the finals or team or all-around events, we decided to take the higher of the two vault scores for an athlete for a competition, if there were two vaults completed, and consolidated that score as one vault apparatus code. We decided to keep the higher score given the vaults were different, and athletes likely compete with the vault that gives them the higher score during event finals.
 
-We then proceeded to cut down on the number of observations in our data set for two purposes: 1) so that our simulations later could run more quickly, and 2) we felt that it was unnecessary to simulate scores for athletes that had little to no chance of medaling given their previous records, given the scarcity of athletes that will attend the Olympic finals. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterwards, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. Additionally, filtering for athletes' scores when an athleted has competed in that apparatus more than twice allows us to find a variance and mean for that athlete's performance on an apparatus. We are left with 2210 observations in our filtered data set to conduct simulations, with 157 unique male athletes and 88 unique female athletes.
+We then proceeded to cut down on the number of observations in our data set for two purposes: 1) so that our simulations later could run more quickly, and 2) we felt that it was unnecessary to simulate scores for athletes that had little to no chance of medaling given their previous records, given the scarcity of athletes that will attend the Olympic finals. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterward, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes who competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. Additionally, filtering for athletes' scores when an athleted has competed in that apparatus more than twice allows us to find a variance and mean for that athlete's performance on an apparatus. We are left with 2210 observations in our filtered data set to conduct simulations, with 157 unique male athletes and 88 unique female athletes.
 
 ### Simulations
 
@@ -309,16 +309,15 @@ $$
 p(\theta |x_i) \propto p(x| \theta) p(\theta)
 $$
 
-To simulate a score for an athlete we sample $\theta^{(s)} \sim p(\theta | x_i)$ from the posterior distribution and then a new value, and then sample $\tilde{x_i} \sim p(x| \theta^{(s)})$. This represents a new predicted data point for athlete $i$ using the posterior distribution, a common practice for estimating values from a posterior predictive distribution in Bayesian Monte Carlo Simulations (Hoff, 2009). Thus, given we can simulate an athlete's scores, we can then simulate a competition between all candidate athletes and allocate gold, silver, and bronze medals to the top three athletes. 
+To simulate a score for an athlete we sample $\theta^{(s)} \sim p(\theta | x_i)$ from the posterior distribution and then a new value, and then sample $\tilde{x_i} \sim p(x| \theta^{(s)})$. This represents a new predicted data point for athlete $i$ using the posterior distribution, a common practice for estimating values from a posterior predictive distribution in Bayesian Monte Carlo Simulations (Hoff, 2009). Thus, given we can simulate an athlete's scores, we can then simulate a competition between all candidate athletes and allocate gold, silver, and bronze medals to the top three athletes.
 
 #### Prior Distribution Creation:
 
 We began by creating prior distributions for each apparatus' total score. Splitting the data set by apparatus and gender resulted in multiple separate smaller data sets, see Exploratory Data Visualizations for the apparatus-gender level distribution. Observing the combined score distributions, they appear to be unimodal and slightly right-skewed. Various distributions were considered, like the beta distribution which is conveniently upper and lower-bounded, but the normal distribution was chosen for its simplicity, ease of use, and effective fit.
 
-For ease of use, we depended on conjugacy to derive the parameters of the normal distribution. Since both the mean and variance of the normal distribution are unknown, we used normal-inverse gamma priors for both parameters. At this point, the issue arises that a plurality of athletes have only ever done a single competition in any given apparatus, resulting in a large amount of athletes with 0 variance and skewing the distribution. Due to the unlikely nature of athletes who do not compete regularly participating in the Olympics, we have decided to truncate the apparatus level data set to exclude athletes with less than three competition appearances for that given apparatus.
+For ease of use, we depended on conjugacy to derive the parameters of the normal distribution. Since both the mean and variance of the normal distribution are unknown, we used normal-inverse gamma priors for both parameters. At this point, the issue arises that a plurality of athletes has only ever done a single competition in any given apparatus, resulting in a large number of athletes with 0 variances and skewing the distribution. Due to the unlikely nature of athletes who do not compete regularly participating in the Olympics, we have decided to truncate the apparatus level data set to exclude athletes with less than three competition appearances for that given apparatus.
 
 To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means from the data using the maximum likelihood method and the `fitdist()` function (Muller, 2023). The maximum likelihood estimates for the mean and variance were then used as the prior parameters for the normal part of the normal-inverse gamma distribution. Similarly, for the inverse-gamma parameters, we fit an inverse-gamma distribution to the distribution of athlete's variances from the data using a similar method and used these parameters as the prior parameters for the inverse-gamma part of the normal-inverse gamma distribution. This process was done independently for all apparatus-gender combinations to produce a different set of prior parameters for each independently.
-
 
 ### Conditioning on Individual Results:
 
@@ -326,7 +325,7 @@ Following the establishment of the prior distributions, we updated these distrib
 
 ### Simulation of Gymnastics Events:
 
-To simulate gymnastics events, we performed 1000 iterations for each apparatus event. For every iteration, we simulated a score for each athlete in the event by sampling $\tilde{x_i}$ from the posterior distribution. Furthermore, since the normal distribution is unbounded, we truncated the distribution at 0 and 20 to reflect the scoring system. We then ranked the athletes by their simulated scores and awarded gold, silver, and bronze medals to the top three athletes. Notably, we chose not to go with a qualification structure and had a simple one-shot round for victory. This decision was made due to computational constraints and introduced more variance in the medal distribution, which we take into account when identifying which athletes to pick for Team USA. We repeated the simulation process for each apparatus event, resulting in about 11 million simulated scores across all competitions. 
+To simulate gymnastics events, we performed 500 iterations for each apparatus event. For every iteration, we simulated a score for each athlete in the event by sampling $\tilde{x_i}$ from the posterior distribution. Furthermore, since the normal distribution is unbounded, we truncated the distribution at 0 and 20 to reflect the scoring system. We then ranked the athletes by their simulated scores and awarded gold, silver, and bronze medals to the top three athletes. Notably, we chose not to go with a qualification structure and had a simple one-shot round for victory. This decision was made due to computational constraints and introduced more variance in the medal distribution, which we take into account when identifying which athletes to pick for Team USA. We repeated the simulation process for each apparatus event, resulting in about 11 million simulated scores across all competitions.
 
 ### Assumptions:
 
@@ -369,7 +368,7 @@ analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0) {
 ```
 
 ```{r creating-medals}
-# So this represents one simulation, we could probably run this like 1000 times and average out the medal counts
+# So this represents one simulation, we could probably run this like 500 times and average out the medal counts
 simulate_results <- function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medals = TRUE) {
   simul_data <- data %>%
     filter(Apparatus == apparatus
@@ -392,7 +391,7 @@ simulate_results <- function(data, apparatus, gender, m_0, sig_0, k_0, v_0, meda
 ```
 
 ```{r competition-simulation }
-# full competition simulation, gets pretty slow with 1000 simulations
+# full competition simulation, gets pretty slow with 500 simulations
 simulate_full_competition <- function(data, apparatus, gender, mu_0, sig_0, k_0, v_0, smc) {
   athletes_medals <- data %>%
     dplyr::select(unique_id) %>%
@@ -425,7 +424,7 @@ simulate_full_competition <- function(data, apparatus, gender, mu_0, sig_0, k_0,
 
 ## Results
 
-We ran simulations for each apparatus for each gender (women's 4 apparatuses and men's 6 apparatuses) 1000 times. Overall, the most successful American athletes were: 
+We ran simulations for each apparatus for each gender (women's 4 apparatuses and men's 6 apparatuses) 500 times. Overall, the most successful American athletes were:
 
 # LIST HERE PLZ
 
@@ -433,7 +432,7 @@ Indicating that the most successful american team would likely be composed of:
 
 # LIST HERE PLZ
 
-With a total of (number of medals) across 1000 simulations of each apparatus.
+With a total of (number of medals) across 500 simulations of each apparatus.
 
 ### Female Athletes' Results
 
@@ -449,7 +448,7 @@ sig_0 <- fxw_prior_parameters[2]
 k_0 <- fxw_prior_parameters[3]
 v_0 <- fxw_prior_parameters[4]
 
-FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 1000)
+FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 500)
 
 FX_w_simul |>
   head(10) |>
@@ -496,7 +495,7 @@ sig_0 <- bbw_prior_parameters[2]
 k_0 <- bbw_prior_parameters[3]
 v_0 <- bbw_prior_parameters[4]
 
-BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 1000)
+BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 500)
 
 BB_w_simul |>
   head(10) |>
@@ -543,7 +542,7 @@ sig_0 <- vtw_prior_parameters[2]
 k_0 <- vtw_prior_parameters[3]
 v_0 <- vtw_prior_parameters[4]
 
-VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 1000)
+VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 500)
 VT_w_simul |>
   head(10) |>
   mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
@@ -589,7 +588,7 @@ sig_0 <- ubw_prior_parameters[2]
 k_0 <- ubw_prior_parameters[3]
 v_0 <- ubw_prior_parameters[4]
 
-UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 1000)
+UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ### Male Athletes' Results
@@ -606,7 +605,7 @@ sig_0 <- fxm_prior_parameters[2]
 k_0 <- fxm_prior_parameters[3]
 v_0 <- fxm_prior_parameters[4]
 
-FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 1000)
+FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ```{r VT-men-sims}
@@ -619,7 +618,7 @@ sig_0 <- vtm_prior_parameters[2]
 k_0 <- vtm_prior_parameters[3]
 v_0 <- vtm_prior_parameters[4]
 
-VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 1000)
+VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 500)
 
 VT_m_simul |>
   head(10) |>
@@ -684,7 +683,7 @@ sig_0 <- phm_prior_parameters[2]
 k_0 <- phm_prior_parameters[3]
 v_0 <- phm_prior_parameters[4]
 
-PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 1000)
+PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ```{r HB-men-sims}
@@ -697,7 +696,7 @@ sig_0 <- hbm_prior_parameters[2]
 k_0 <- hbm_prior_parameters[3]
 v_0 <- hbm_prior_parameters[4]
 
-HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 1000)
+HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ```{r SR-men-sims}
@@ -710,7 +709,7 @@ sig_0 <- srm_prior_parameters[2]
 k_0 <- srm_prior_parameters[3]
 v_0 <- srm_prior_parameters[4]
 
-SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 1000)
+SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ```{r PB-men-sims}
@@ -723,7 +722,7 @@ sig_0 <- pbm_prior_parameters[2]
 k_0 <- pbm_prior_parameters[3]
 v_0 <- pbm_prior_parameters[4]
 
-PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 1000)
+PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 500)
 
 PB_m_simul |>
   head(10) |>
@@ -811,7 +810,6 @@ tot_w_simul <- tot_w_simul %>%
 tot_w_simul
 ```
 
-
 ## Discussion
 
 ```{r include = FALSE}
@@ -866,17 +864,49 @@ Considering that female USA medalists tend to represent a much higher proportion
 
 ### Objective 2: Value of Medals for Each Event Type (Team AA \> Individual AA \> Individual Apparatus)
 
-From the table of the top 10 most decorated gold medal female athletes by apparatus, the USA, China, Brazil, and Great Britain make multiple appearances. The USA has athletes in the top 10 most decorated gold medalist for each apparatus as well as the top 5, but other countries do not (Appendix: Image 9). This allows us to assume that the USA has great potential in winning the team all-around since it is the only country with many of the most successful athletes in each apparatus in terms of the number of gold medals. In this case, valuing the team's all-around medal more than the individual all-around and individual apparatus will hopefully increase medal success in terms of gold medal count. Also when viewing the top 10 most decorated gold medal female athletes by apparatus, the USA's Simone Biles, appears in the balance beam as first, in floor exercise as first, in uneven bars as ninth, and in vault as first. Valuing the individual all-around events higher also may help team USA increase in our metric of success. Furthermore, since these events are harder to achieve than individual apparatuses because of the multiple sections within the event that need to also meet a standard, it will be harder for other countries to also benefit from this increased value.
+From the table of the top 10 most decorated gold medal female athletes by apparatus from the simulated data, the USA, China, Brazil, and Great Britain make multiple appearances. The USA has athletes in the top 10 most decorated gold medalists for each apparatus as well as the top 5, but other countries do not (Appendix: Image 9). This allows us to assume that the USA has great potential in winning the team all-around since it is the only country with many of the most successful athletes in each apparatus in terms of the number of gold medals. In this case, valuing the team's all-around medal more than the individual all-around and individual apparatus will hopefully increase medal success in terms of gold medal count. Also when viewing the top 10 most decorated gold medal female athletes by apparatus, the USA's Simone Biles, appears in the balance beam as first, in floor exercise as first, in uneven bars as ninth, and in vault as first. Valuing the individual all-around events higher also may help team USA increase in our metric of success. Furthermore, since these events are harder to achieve than individual apparatuses because of the multiple sections within the event that need to also meet a standard, it will be harder for other countries to also benefit from this increased value.
 
 From the table of the top 10 most decorated gold medal male athletes by apparatus, the USA, Japan, and China make multiple appearances. The only country that has an athlete in each apparatus for the top 10, is the USA (Appendix: Image 11). It could be slightly beneficial to the men's team to value the team's all-around success more than the other events. The US men's team also does not have a well-rounded athlete that places in the top 10 most decorated gold male athletes for each apparatus so we can assume valuing individual all-around successes over the other events would not help the US men's team but it also would not hurt it since other countries also do not have a highly decorated well-rounded competitor.
 
 In the dot plots of the top 5 decorated gold medal female athletes' countries by number of gold medals for each apparatus, US athletes make multiple appearances (Appendix: Image 10). In the dot plots of the top 5 decorated gold medal male athlete's countries by number of gold medals for each apparatus, US athletes are present in multiple apparatuses but not many athletes are well decorated within each apparatus. But in vault there are two US athletes in the top 5 (Appendix: Image 12). Valuing individual apparatus events as regular events of weight 1 would best suit both the male and female teams' success against their competitors. Weighing the team all-around as 3 points is viable because not only do both the men's and women's USA have the potential to win based on this simulation, but there is less reliance and pressure on one singular person. Weighing the individual all-around as 2 will hopefully benefit the women's team with Simone Biles as the potential representative for this event. These weights will in hope best accommodate the male and female athletes and give them the best chance at success against other countries in terms of the total number of gold medals.
 
-### Objective 3: All-Around vs Event Specialist vs Mixture
+### Objective 3: All-Around vs Event Specialist vs Mixture (Women: Even Specialist, Men: Mixture)
 
-In our metric of success, we chose the total count of gold medals and we decided to weigh team all-around events as greater than individual all-around events and individual all-around great than the individual apparatuses. For the women's team, we believe it is best to select a team of five female athletes who are a combination of all-around and event-specialist gymnasts. Since the US women's team has a strong shot at winning the individual all-around with multi-apparatus highly gold medal decorated athlete Simone Biles and team all-around with other multiple highly decorated gold medalists who specialize in their apparatus, focusing on both would be an optimal strategy (Appendix: Image 10). For the men's team, we believe it is best to select a team of five male athletes who are also a combination of both all-around gymnasts and specialists. In the simulation, since 3 of the top 10 most gold medal-decorated male gymnasts in parallel bars are from the US and 7 of the top 10 in vault are from the US, there is a good chance that a male athlete from the US may be successful in those apparatuses (Appendix: Image 11). Since the US does not seem to have very many strong gold medal specialists in the other apparatuses, the men's team should fill the remaining positions with all-around gymnasts.
+In our metric of success, we chose the total count of gold medals and we decided to weigh team all-around events as greater than individual all-around events and individual all-around great than the individual apparatuses. For the women's team, we believe it is best to select a team of five female athletes who are event-specialist gymnasts. The US women's team has a strong shot at winning the individual all-around and many individual apparatus events with multiple-apparatus specialist and highly decorated gold medalist athlete Simone Biles as well as win team all-around with other highly decorated gold medalists who specialize in their apparatus. So focusing on athletes that specialize in apparatuses would be the best strategy (Appendix: Image 10). For the men's team, we believe it is best to select a team of five male athletes who are all-around gymnasts. The top male competitors for each apparatus from Team USA are almost always severely overshadowed by top male competitors from other countries by number of gold medal count. Team USA does not have comparable male competitors who specialize. But in vault the US makes up 7 of the top 10 most decorated gold medalists in the apparatus, so including as vault specialist could help the US men's gymnastics team increase chances of success. (Appendix: Image 12)
 
-### Objective 4: Identifying 5 Athletes ...
+### Objective 4: Identifying 5 Athletes
+
+Considering the conclusions of the previous objectives, we predict that the following athletes would best optimize gold medal count success for both the male and female US gymnastics team in the 2024 Paris Summer Olympics:
+
+#### Women's USA Gymnastics Team: (event specialists)
+-   Simone Biles 
+-   Shilese Jones 
+-   Zoe Miller 
+-   Konnor Mcclain 
+-   Jade Carey
+
+Based on our simulations, Simone Biles has the highest count of gold medals in balance beam, floor exercise, and vault. Therefore, she is expected to be a strong contender in the individual apparatus events, individual all-around events, as well as a the team all-around since only three members compete in each apparatus for that event. Due to Simone Biles placing in ninth for highest number of gold medals for uneven bars, Shilese Jones and Zoe Miller are both great additions to the team. They are both specialists in uneven bars with Shilese coming in third place and Zoe coming in fifth place for number of gold medals for that apparatus. Konnor Mcclain specializes in balance beam coming in third for highest count of gold medals. Jade Carey specializes in vault coming in third place for highest count of gold medals. This selection provides two of the strongest USA specialists by medal count for almost each apparatus besides floor exercise since Simone received a whopping count of 192 gold medals in comparison the second place Brazilian contender with 58 gold medals in the simulation. (Appendix: Image 9)
+
+#### Men's USA Gymnastics Team: mixture (primarily all-around) 
+-   Brody Malone 
+-   Donnell Whittenburg 
+-   Colt Walker 
+-   Asher Hong 
+-   Curran Phillips
+
+In order to find the expected best all-around male athletes from the simulation, we gave rankings of total count of gold medals for each apparatus, took the average of those rankings for each athlete and picked the top five athletes with the highest average ranking (Appendix: Image 13). Also, Asher Hong is an event specialist in vault that ranks second in number of simulated gold medals for that apparatus who also ranked in the top 5 predicted best all-around male athletes.
+
+### Methodology Evalution
+
+*insert answer for: Was your methodology fully appropriate? What alternative techniques might have been useful?*
+
+### Data Limitations
+
+*insert answer for: Are there any issues with reliability or validity of the data?*
+
+### Implications and Conclusions
+
+*insert answer for: What would you do differently if you had to approach the study again? What additional data sources, variables, or techniques might help you create a stronger manuscript?*
 
 \newpage
 
@@ -890,7 +920,7 @@ In our metric of success, we chose the total count of gold medals and we decided
 
 -   Meyers, Dvora. "Time for the End of the Teen Gymnast." FiveThirtyEight, 27 July 2021, fivethirtyeight.com/features/gymnasts-age-olympics/. Accessed 20 Nov. 2023.
 
--   Muller, Marie Laure Delignette, and Christophe Dutang. “Overview of the Fitdistrplus Package.” R-Project, CRAN, 25 Apr. 2023, cran.r-project.org/web/packages/fitdistrplus/vignettes/fitdistrplus_vignette.html.
+-   Muller, Marie Laure Delignette, and Christophe Dutang. "Overview of the Fitdistrplus Package." R-Project, CRAN, 25 Apr. 2023, cran.r-project.org/web/packages/fitdistrplus/vignettes/fitdistrplus_vignette.html.
 
 -   "Paris 2024 Olympic Games: How Do Athletes Qualify?" Olympics, 8 Aug. 2021, olympics.com/en/news/paris-2024-olympic-games-how-do-athletes-qualify. Accessed 20 Nov. 2023.
 
@@ -905,7 +935,6 @@ In our metric of success, we chose the total count of gold medals and we decided
 ### Additional Simulation Results
 
 Given women compete on 4 apparatuses and men compete on 4 apparatuses, we have tables of the simulation outcomes for all 10 apparatuses, and the 5 simluation outcome tables where US gymnasts do not perform as well relative to athletes from other countries are outputted below.
-
 
 ```{r additional-sims-tables}
 #womens additional
@@ -1242,7 +1271,6 @@ combined %>%
         axis.title = element_text(size = 7))
 ```
 
-
 ```{r scoremeans-var, message = FALSE}
 # ** Include plot of distribution of score means and variances for a chosen apparatus **
 
@@ -1276,7 +1304,6 @@ combined_apparatus %>%
         axis.text = element_text(size = 7),
         axis.title = element_text(size = 7))
 ```
-
 
 ```{r unique-athletes}
 number_athletes |>
@@ -1448,13 +1475,14 @@ For the men's simulation when looking at the top 5 athletes by:
 
     -   USA makes up 23% of the weight of men's medals in the simulation.
 
-**Image 9)**
+**Image 9)** Top ten most successful female gymnast using total gold medal count by apparatus
 
 ```{r}
 tot_w_simul %>% 
   dplyr::select(unique_id, Golds, Country, Apparatus, USA) %>% 
   group_by(Apparatus) %>% 
-  slice_max(order_by = Golds, n = 10)
+  slice_max(order_by = Golds, n = 10) %>% 
+  kable()
 ```
 
 **Image 10)**
@@ -1467,13 +1495,14 @@ top10_women <- tot_w_simul %>%
 ggplot(data = top10_women,aes(x = Country, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 200) + labs(title = "10) Women: Country of Top 5 Athletes by Number of Gold Medals", subtitle = "by Apparatus", x = "Country ", y = "Number of Gold Medals")
 ```
 
-**Image 11)**
+**Image 11)** Top ten most successful male gymnast using total gold medal count by apparatus
 
 ```{r}
 tot_m_simul %>% 
   dplyr::select(unique_id, Golds, Country, Apparatus, USA) %>% 
   group_by(Apparatus) %>% 
-  slice_max(order_by = Golds, n = 10)
+  slice_max(order_by = Golds, n = 10) %>% 
+  kable()
 ```
 
 **Image 12)**
@@ -1487,6 +1516,45 @@ ggplot(data = top10_men,aes(x = Country, y =Golds, color = USA, shape = Apparatu
 ```
 
 ***Note:*** The excessive number of countries display that there is not much overlap in the top 5 most gold medal decorated athletes on the men's team and therefore the lack of well-rounded gymnasts.
+
+**Image 13)**
+
+Average of total gold medal count ranking by apparatus of all US male gymnasts in ascending order (to find best all around gymnast for men's team)
+
+```{r}
+#ADDS RANK TO EACH MALE ATHLETE FOR EACH APPARATUS BY NUMBER OF GOLD MEDALS
+ordered_m_simul <- tot_m_simul %>% 
+  arrange(Apparatus, desc(Golds))
+
+ordered_m_simul <- ordered_m_simul %>%
+  mutate(Gold_Count_Rank = NA)
+ordered_m_simul$Gold_Count_Rank[1] <- 1
+
+for (i in 2:nrow(ordered_m_simul)){
+  if ((ordered_m_simul$Apparatus[i] == ordered_m_simul$Apparatus[i-1]) & (ordered_m_simul$Golds[i] == ordered_m_simul$Golds[i-1])) {
+    ordered_m_simul$Gold_Count_Rank[i] <- ordered_m_simul$Gold_Count_Rank[i-1]
+  } 
+  else if ((ordered_m_simul$Apparatus[i] == ordered_m_simul$Apparatus[i-1])) {
+    ordered_m_simul$Gold_Count_Rank[i] <- ordered_m_simul$Gold_Count_Rank[i-1]+1
+  }
+  else {
+    ordered_m_simul$Gold_Count_Rank[i] <- 1
+  }
+}
+
+ordered_m_simul
+
+#AVERAGE OVERALL RANK OF EACH MALE ATHLETE BY NUMBER OF GOLD MEDALS
+menGoldRank <- ordered_m_simul %>% 
+  dplyr::select(unique_id,Golds,Country,Apparatus,Gold_Count_Rank)
+
+menGoldRank %>% 
+  filter(Country == 'USA') %>% 
+  group_by(unique_id) %>% 
+  summarise(avgRank = mean(Gold_Count_Rank)) %>% 
+  arrange(avgRank) %>% 
+  kable()
+```
 
 ### Diagnostics
 
