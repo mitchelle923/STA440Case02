@@ -66,7 +66,7 @@ We have the following objectives for this study: (UCSAS, 2023)
 
 1)  Decide on whether to maximize total medal count, gold medal count, or a weighted medal count
 
-2)  Decide on whether to value the medals of an event (team, individual all-around, individual apparatus) over others. 
+2)  Decide on whether to value the medals of an event (team, individual all-around, individual apparatus) over others.
 
 3)  Decide on whether Team USA should maximize its total medal count by selecting a team of five gymnasts who are all-around gymnasts, event specialists (gymnasts who focus on 1 or more apparatus but not all apparatus), or a combination of those.
 
@@ -894,28 +894,30 @@ In our metric of success, we chose the total count of gold medals and we decided
 Considering the conclusions of the previous objectives, we predict that the following athletes would best optimize gold medal count success for both the male and female US gymnastics team in the 2024 Paris Summer Olympics:
 
 #### Women's USA Gymnastics Team: Event Specialists Preference
--   Simone Biles 
--   Shilese Jones 
--   Zoe Miller 
--   Konnor Mcclain 
+
+-   Simone Biles
+-   Shilese Jones
+-   Zoe Miller
+-   Konnor Mcclain
 -   Jade Carey
 
 In our results, we saw that Simone Biles was a strong individual apparatus (particularly in floor exercise, vault, and balance beam), individual all-around, and team all-around top-finisher contender--she is both a specialist and a generalist. To supplement Biles's performance and add strength to the US uneven bars performance, we choose Shilese Jones and Zoe Miller for their strong uneven bars rankings as specialists in the event. Furthermore, we choose Konnor McClain as a specialist in balance beam, as she has more simulated gold medals than does Simone Biles, but she may also compete on vault given fifth overall simulated ranking in vault total medals and fourth overall simulated ranking in vault gold medals. Lastly, Jade Carey we choose as another vault specialist given her third overall simulated ranking in vault, but she may also compete in floor exercise given her sixth overall simulated medal ranking in floor exercise.This selection provides two of the strongest USA specialists by medal count for almost each apparatus besides floor exercise since Simone received a whopping count of 192 gold medals in comparison the second place Brazilian contender with 58 gold medals in the simulation (Appendix: Image 9).
 
 #### Men's USA Gymnastics Team: Mixture of Specialist and All-Around, All-Around Preference
--   Asher Hong 
+
+-   Asher Hong
 -   Curran Phillips
--   Donnell Whittenburg 
--   Colt Walker 
+-   Donnell Whittenburg
+-   Colt Walker
 -   Brody Malone
 
 In order to find the expected best all-around male athletes from the simulation, we gave rankings of total count of gold medals for each apparatus, took the average of those rankings for each athlete and picked the top five athletes with the highest average ranking (Appendix: Image 13). This method also matches our simulation results, which shows these five athletes (except for Asher Hong as a vault specialist, yet Asher can also rank high in all-around male athletes) as all-around gymnasts who can place in the top 10 of simulated total medals in at least two apparatuses, and cover all the apparatuses except for pommel horse. We see that other countries have event specialists that may do better than one specific US athlete, but the ability of each selected athlete to cover multiple apparatuses well bodes well for individual all-around and team all-around event medals.
 
 ### Methodology Evalution
 
-The baseline choices in the methodology: taking a Bayesian approach and relying on the Monte Carlo method, provide a robust foundation and allow for generally informed predictions. However, there are several areas where the implementation of this methodology could be improved. Firstly, the normal distribution is a simple and effective choice for the posterior distributions, but it is not a perfect fit for the data. The normal distribution is unbounded, while gymnastics scores are bounded between 0 and 20. This discrepancy is addressed by truncating the distribution at 0 and 20, but this is not a perfect solution. Furthermore, when determining the prior parameters we use the mean and standard deviation of athlete results in a given apparatus, but this does not account for the fact that athletes are not equally sampled and some have far more data points than others. 
+The baseline choices in the methodology: taking a Bayesian approach and relying on the Monte Carlo method, provide a robust foundation and allow for generally informed predictions. However, there are several areas where the implementation of this methodology could be improved. Firstly, the normal distribution is a simple and effective choice for the posterior distributions, but it is not a perfect fit for the data. The normal distribution is unbounded, while gymnastics scores are bounded between 0 and 20. This discrepancy is addressed by truncating the distribution at 0 and 20, but this is not a perfect solution. Furthermore, when determining the prior parameters we use the mean and standard deviation of athlete results in a given apparatus, but this does not account for the fact that athletes are not equally sampled and some have far more data points than others.
 
-We use a single distribution to model final scores, when in reality we should be sampling from a distribution of difficulty scores, then conditioning on difficulty to sample from a distribution of execution scores and penalty scores, and then summing these values to get a final score. This would allow us to more accurately model the data and incorporate the fact that difficulty and execution scores are not independent. Additionally, the simulated competitions include every gymnast in the dataset, so the results are not representative of the actual competition. In reality we should sample the best athletes from every nation and then simulate the multiple individual and team rounds in a gymnastics competition. The choice to avoid this modelling process, alongside the choice to only run 500 competition simulations, were done due to computational constraints. Finally, we assume that the athletes' abilities are constant over time, which is not necessarily true. This assumption is addressed by using the most recent data, but it is still a simplification of the true process. 
+We use a single distribution to model final scores, when in reality we should be sampling from a distribution of difficulty scores, then conditioning on difficulty to sample from a distribution of execution scores and penalty scores, and then summing these values to get a final score. This would allow us to more accurately model the data and incorporate the fact that difficulty and execution scores are not independent. Additionally, the simulated competitions include every gymnast in the dataset, so the results are not representative of the actual competition. In reality we should sample the best athletes from every nation and then simulate the multiple individual and team rounds in a gymnastics competition. The choice to avoid this modelling process, alongside the choice to only run 500 competition simulations, were done due to computational constraints. Finally, we assume that the athletes' abilities are constant over time, which is not necessarily true. This assumption is addressed by using the most recent data, but it is still a simplification of the true process.
 
 ### Data Limitations
 
@@ -923,9 +925,7 @@ We run our Monte Carlo experiments on a subsetted group of observations from 202
 
 ### Implications and Conclusions
 
-*insert answer for: What would you do differently if you had to approach the study again? What additional data sources, variables, or techniques might help you create a stronger manuscript?*
-
-An iteration of this study would be stronger if it addressed the methodological limitations mentioned above. Additionally, including more historical data and athletes' age in the model would create a much more robust model. The current methodology also lacks a selection mechanism, relying on us to manually select the top five athletes. A more robust model would include a selection mechanism that would automatically select the top five athletes based on the results of the Monte Carlo simulations.
+An iteration of this study would be stronger if it addressed the methodological limitations mentioned above. Additionally, including more historical data and athletes' age in the model would create a much more robust model. The current methodology also lacks a selection mechanism, relying on us to manually select the top five athletes. A more robust model would include a selection mechanism that would automatically select the top five athletes based on the results of the Monte Carlo simulations. Another change that would have advanced the specificity in the vault apparatus scores within our simulations would have been handling vault 1 and vault 2 as separate entities. Within individual apparatus events, two different vaults are required in the qualification and final event but in our simulation we used the mean of both vault events instead. Lastly, another change in our methodology would be to run 1000 competition simulations to produce more generalizable resulting scores for each athlete. Instead 500 competition simulations were used to be computationally conservative considering there were a multitude of  athlete- and apparatus-level score observations. Overall, this study provides valuable insights on an optimal team selection strategy that would best aid the United States artistic gymnastics male and female team achieve success in the 2024 Paris Summer Olympics Games. 
 
 \newpage
 
@@ -1350,8 +1350,7 @@ combined_apparatus %>%
         axis.title = element_text(size = 7))
 ```
 
-
-The below plots visualize how many unique athletes are competing at each round in a competition, spearated by gender, so that we can understand sample size for when we filter out data. 
+The below plots visualize how many unique athletes are competing at each round in a competition, spearated by gender, so that we can understand sample size for when we filter out data.
 
 ```{r unique-athletes, message = FALSE, warning = FALSE}
 number_athletes |>
@@ -1601,7 +1600,6 @@ menGoldRank %>%
   arrange(avgRank) %>% 
   kable()
 ```
-
 
 ```{r}
 #MCMC diagnostic check
