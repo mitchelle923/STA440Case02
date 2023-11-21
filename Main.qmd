@@ -83,7 +83,12 @@ We created some exploratory data visualizations to examine the distributions of 
 laterdata <- laterdata |>
   mutate(FirstName = ifelse(LastName == "ABIYURAFI" & FirstName == ".", "Abiyu", FirstName),
     LastName = ifelse(LastName == "ABIYURAFI", "RAFI", LastName),
-    Apparatus = if_else(Apparatus == 'hb', 'HB', Apparatus))
+    FirstName = ifelse(LastName == "CLENAGHAN" & FirstName == "Mc Rhys", "Rhys", FirstName),
+    LastName = ifelse(LastName == "CLENAGHAN" | LastName == "MC CLENAGHAN", "MCCLENAGHAN", LastName),
+    LastName = ifelse(LastName == "SOUD", "ABU AL SOUD", LastName),
+    FirstName = ifelse(FirstName == "Ahmad Abu Al", "Ahmad", FirstName),
+    Apparatus = if_else(Apparatus == 'hb', 'HB', Apparatus)) |>
+  mutate(Country = ifelse(LastName == "MCCLENAGHAN", "IRL", Country))
 
 
 laterdata <- laterdata |>
@@ -454,7 +459,7 @@ sig_0 <- fxw_prior_parameters[2]
 k_0 <- fxw_prior_parameters[3]
 v_0 <- fxw_prior_parameters[4]
 
-FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
+FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 500)
 
 FX_w_simul |>
   head(10) |>
@@ -501,7 +506,7 @@ sig_0 <- bbw_prior_parameters[2]
 k_0 <- bbw_prior_parameters[3]
 v_0 <- bbw_prior_parameters[4]
 
-BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 100)
+BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 500)
 
 BB_w_simul |>
   head(10) |>
@@ -548,7 +553,7 @@ sig_0 <- vtw_prior_parameters[2]
 k_0 <- vtw_prior_parameters[3]
 v_0 <- vtw_prior_parameters[4]
 
-VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 100)
+VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 500)
 VT_w_simul |>
   head(10) |>
   mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
@@ -594,7 +599,7 @@ sig_0 <- ubw_prior_parameters[2]
 k_0 <- ubw_prior_parameters[3]
 v_0 <- ubw_prior_parameters[4]
 
-UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 100)
+UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ### Male Athletes' Results
@@ -611,7 +616,7 @@ sig_0 <- fxm_prior_parameters[2]
 k_0 <- fxm_prior_parameters[3]
 v_0 <- fxm_prior_parameters[4]
 
-FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 100)
+FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ```{r VT-men-sims}
@@ -624,10 +629,57 @@ sig_0 <- vtm_prior_parameters[2]
 k_0 <- vtm_prior_parameters[3]
 v_0 <- vtm_prior_parameters[4]
 
-VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 100)
+VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 500)
 
 VT_m_simul |>
   head(10) |>
+  mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
   kable(caption = "Men's Vault Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
@@ -642,7 +694,7 @@ sig_0 <- phm_prior_parameters[2]
 k_0 <- phm_prior_parameters[3]
 v_0 <- phm_prior_parameters[4]
 
-PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 100)
+PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ```{r HB-men-sims}
@@ -655,7 +707,7 @@ sig_0 <- hbm_prior_parameters[2]
 k_0 <- hbm_prior_parameters[3]
 v_0 <- hbm_prior_parameters[4]
 
-HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 100)
+HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ```{r SR-men-sims}
@@ -668,7 +720,7 @@ sig_0 <- srm_prior_parameters[2]
 k_0 <- srm_prior_parameters[3]
 v_0 <- srm_prior_parameters[4]
 
-SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 100)
+SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 500)
 ```
 
 ```{r PB-men-sims}
@@ -681,10 +733,57 @@ sig_0 <- pbm_prior_parameters[2]
 k_0 <- pbm_prior_parameters[3]
 v_0 <- pbm_prior_parameters[4]
 
-PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 100)
+PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 500)
 
 PB_m_simul |>
   head(10) |>
+   mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
   kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
@@ -857,21 +956,209 @@ UB_w_simul |>
 #mens additional
 FX_m_simul |>
   head(10) |>
+   mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
   kable(caption = "Men's Floor Exercise Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
 HB_m_simul |>
   head(10) |>
+   mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
   kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
 PH_m_simul |>
   head(10) |>
+   mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
   kable(caption = "Men's Pommel Horse Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
 SR_m_simul |>
   head(10) |>
+   mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
   kable(caption = "Men's Still Rings Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
