@@ -88,7 +88,13 @@ laterdata <- laterdata |>
     LastName = ifelse(LastName == "SOUD", "ABU AL SOUD", LastName),
     FirstName = ifelse(FirstName == "Ahmad Abu Al", "Ahmad", FirstName),
     Apparatus = if_else(Apparatus == 'hb', 'HB', Apparatus)) |>
-  mutate(Country = ifelse(LastName == "MCCLENAGHAN", "IRL", Country))
+  mutate(Country = ifelse(LastName == "MCCLENAGHAN", "IRL", Country),
+         LastName = ifelse(LastName %in% c("HOCK", "HOECK"), "HÖCK", LastName),
+         FirstName = ifelse(LastName == "SHIAO" & FirstName == "Yu", "Yu-Jan", FirstName)) |>
+  mutate(FirstName = ifelse(LastName == "SHIAO" & FirstName == "Yu Jan", "Yu-Jan", FirstName)) |>
+  mutate(FirstName = ifelse(LastName == "LIN" & FirstName == "Yi", "Yi-Chen", FirstName)) |>
+  mutate(FirstName = ifelse(LastName == "LIN" & FirstName == "Yi Chen", "Yi-Chen", FirstName)) |>
+  mutate(FirstName = ifelse(LastName == "LIAO" & FirstName == "Yi Chun", "Yi-Chun", FirstName))
 
 
 laterdata <- laterdata |>
@@ -480,7 +486,8 @@ FX_w_simul |>
                                unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
                                unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
                                unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
-                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER")) |>
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU")) |>
   kable(caption = "Women's Floor Exercise Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
@@ -527,7 +534,8 @@ BB_w_simul |>
                                unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
                                unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
                                unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
-                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER")) |>
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU")) |>
   kable(caption = "Women's Balance Beam Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
@@ -573,7 +581,8 @@ VT_w_simul |>
                                unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
                                unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
                                unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
-                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER")) |>
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU")) |>
   kable(caption = "Women's Vault Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
@@ -667,8 +676,13 @@ VT_m_simul |>
                                unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
                                unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
                                unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
-                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
-                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
   kable(caption = "Men's Vault Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
@@ -771,8 +785,13 @@ PB_m_simul |>
                                unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
                                unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
                                unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
-                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
-                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
   kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
@@ -968,7 +987,8 @@ UB_w_simul |>
                                unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
                                unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
                                unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
-                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER")) |>
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU")) |>
   kable(caption = "Women's Uneven Bars Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
@@ -1020,8 +1040,13 @@ FX_m_simul |>
                                unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
                                unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
                                unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
-                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
-                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
   kable(caption = "Men's Floor Exercise Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
@@ -1072,8 +1097,13 @@ HB_m_simul |>
                                unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
                                unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
                                unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
-                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
-                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
   kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
@@ -1124,8 +1154,13 @@ PH_m_simul |>
                                unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
                                unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
                                unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
-                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
-                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
   kable(caption = "Men's Pommel Horse Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
@@ -1176,8 +1211,13 @@ SR_m_simul |>
                                unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
                                unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
                                unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
-                               unique_id == "KaiSUG_USA" ~ "Kaito Sugimoto: USA",
-                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA")) |>
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
   kable(caption = "Men's Still Rings Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
@@ -1305,7 +1345,10 @@ combined_apparatus %>%
         axis.title = element_text(size = 7))
 ```
 
-```{r unique-athletes}
+
+The below plots visualize how many unique athletes are competing at each round in a competition, spearated by gender, so that we can understand sample size for when we filter out data. 
+
+```{r unique-athletes, message = FALSE, warning = FALSE}
 number_athletes |>
   filter(Round %in% AA_team) |>
   ggplot(aes(x = athletes_participated)) +
@@ -1507,7 +1550,7 @@ tot_m_simul %>%
 
 **Image 12)**
 
-```{r}
+```{r top5-decorated, warning = FALSE}
 #selects top 5 decorated gold medal athletes by apparatus
 top10_men <- tot_m_simul %>% 
   group_by(Apparatus) %>% 
@@ -1542,8 +1585,6 @@ for (i in 2:nrow(ordered_m_simul)){
   }
 }
 
-ordered_m_simul
-
 #AVERAGE OVERALL RANK OF EACH MALE ATHLETE BY NUMBER OF GOLD MEDALS
 menGoldRank <- ordered_m_simul %>% 
   dplyr::select(unique_id,Golds,Country,Apparatus,Gold_Count_Rank)
@@ -1556,68 +1597,67 @@ menGoldRank %>%
   kable()
 ```
 
-### Diagnostics
 
 ```{r}
 #MCMC diagnostic check
-get_mcmc_samples <- function(simulation_results) {
-  mcmc_data <- as.mcmc(simulation_results$Total_Medals)
-  return(mcmc_data)
-}
-
-mcmc_results <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
-mcmc_samples <- get_mcmc_samples(mcmc_results)
-
-coda::traceplot(mcmc_samples, main = "Trace Plot of Total Medals")
-
-# Effective sample size
-effectiveSize(mcmc_samples)
-#A common rule of thumb is that an effective sample size should be at least 1% or 5% of the total number of samples, depending on the context.
-
-# Autocorrelation plot
-autocorr.plot(mcmc_samples)
-
-mcmc_samples <- get_mcmc_samples(mcmc_results)
-
-# Histogram of MCMC samples
-hist(mcmc_samples, main = "Histogram of Total Medals", xlab = "Total Medals")
+# get_mcmc_samples <- function(simulation_results) {
+#   mcmc_data <- as.mcmc(simulation_results$Total_Medals)
+#   return(mcmc_data)
+# }
+# 
+# mcmc_results <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
+# mcmc_samples <- get_mcmc_samples(mcmc_results)
+# 
+# coda::traceplot(mcmc_samples, main = "Trace Plot of Total Medals")
+# 
+# # Effective sample size
+# effectiveSize(mcmc_samples)
+# #A common rule of thumb is that an effective sample size should be at least 1% or 5% of the total number of samples, depending on the context.
+# 
+# # Autocorrelation plot
+# autocorr.plot(mcmc_samples)
+# 
+# mcmc_samples <- get_mcmc_samples(mcmc_results)
+# 
+# # Histogram of MCMC samples
+# hist(mcmc_samples, main = "Histogram of Total Medals", xlab = "Total Medals")
 
 ```
 
 ```{r}
-# Diagnositcs for Women
-
-# Summary stats for total w medals
-mcmcTrace <- mcmc(tot_w_simul$Total_Medals)
-summary(mcmcTrace)
-
-# Acceptance rate for total w medals
-acceptanceRate <- 1 - rejectionRate(mcmcTrace)
-acceptanceRate
-
-# Effective size for total w medals
-effectiveSize(mcmcTrace)
-
-# Mixing total w medals
-plot(mcmcTrace)
-
-autocorr.plot(mcmcTrace)
-
-# Diagnostics For Men
-
-# Summary stats for total w medals
-mcmcTrace1 <- mcmc(tot_m_simul$Total_Medals)
-summary(mcmcTrace1)
-
-# Acceptance rate for total w medals
-acceptanceRate <- 1 - rejectionRate(mcmcTrace1)
-acceptanceRate
-
-# Effective size for total w medals
-effectiveSize(mcmcTrace1)
-
-# Mixing total w medals
-plot(mcmcTrace1)
-
-autocorr.plot(mcmcTrace1)
+# # Diagnositcs for Women
+# 
+# # Summary stats for total w medals
+# mcmcTrace <- mcmc(tot_w_simul$Total_Medals)
+# summary(mcmcTrace)
+# 
+# # Acceptance rate for total w medals
+# acceptanceRate <- 1 - rejectionRate(mcmcTrace)
+# acceptanceRate
+# 
+# # Effective size for total w medals
+# effectiveSize(mcmcTrace)
+# 
+# # Mixing total w medals
+# plot(mcmcTrace)
+# 
+# autocorr.plot(mcmcTrace)
+# 
+# # Diagnostics For Men
+# 
+# # Summary stats for total w medals
+# mcmcTrace1 <- mcmc(tot_m_simul$Total_Medals)
+# summary(mcmcTrace1)
+# 
+# # Acceptance rate for total w medals
+# acceptanceRate <- 1 - rejectionRate(mcmcTrace1)
+# acceptanceRate
+# 
+# # Effective size for total w medals
+# effectiveSize(mcmcTrace1)
+# 
+# # Mixing total w medals
+# plot(mcmcTrace1)
+# 
+# autocorr.plot(mcmcTrace1)
 ```
