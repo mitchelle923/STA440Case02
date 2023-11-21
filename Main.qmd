@@ -430,7 +430,7 @@ We ran simulations for each apparatus for each gender (women's 4 apparatuses and
 
 ### Female Athletes' Results
 
-For women's apparatuses, we outputted the tables of simulation outcomes for floor exercise, balance beam, and vault because of the high presence of medals for US gymnasts. The table of simulation outcomes for uneven bars is in the appendix.
+For women's apparatuses, we outputted the tables of simulation outcomes for floor exercise, balance beam, and vault because of the high presence of medals for US gymnasts. The table of simulation outcomes for other apparatuses are in the appendix.
 
 ```{r FX-womens-sims}
 set.seed(123)
@@ -492,7 +492,7 @@ v_0 <- bbw_prior_parameters[4]
 
 BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 500)
 
-BB_w_simul |>
+BB_w_table = BB_w_simul |>
   head(10) |>
     mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
                                unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
@@ -539,7 +539,7 @@ k_0 <- vtw_prior_parameters[3]
 v_0 <- vtw_prior_parameters[4]
 
 VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 500)
-VT_w_simul |>
+VT_w_table = VT_w_simul |>
   head(10) |>
   mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
                                unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
@@ -621,7 +621,7 @@ v_0 <- vtm_prior_parameters[4]
 
 VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 500)
 
-VT_m_simul |>
+VT_m_table = VT_m_simul |>
   head(10) |>
   mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
                                unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
@@ -913,17 +913,19 @@ In order to find the expected best all-around male athletes from the simulation,
 
 ### Methodology Evalution
 
-*insert answer for: Was your methodology fully appropriate? What alternative techniques might have been useful?*
+The baseline choices in the methodology: taking a Bayesian approach and relying on the Monte Carlo method, provide a robust foundation and allow for generally informed predictions. However, there are several areas where the implementation of this methodology could be improved. Firstly, the normal distribution is a simple and effective choice for the posterior distributions, but it is not a perfect fit for the data. The normal distribution is unbounded, while gymnastics scores are bounded between 0 and 20. This discrepancy is addressed by truncating the distribution at 0 and 20, but this is not a perfect solution. Furthermore, when determining the prior parameters we use the mean and standard deviation of athlete results in a given apparatus, but this does not account for the fact that athletes are not equally sampled and some have far more data points than others. 
 
-write something about only being able to use 500 sims
+We use a single distribution to model final scores, when in reality we should be sampling from a distribution of difficulty scores, then conditioning on difficulty to sample from a distribution of execution scores and penalty scores, and then summing these values to get a final score. This would allow us to more accurately model the data and incorporate the fact that difficulty and execution scores are not independent. Additionally, the simulated competitions include every gymnast in the dataset, so the results are not representative of the actual competition. In reality we should sample the best athletes from every nation and then simulate the multiple individual and team rounds in a gymnastics competition. The choice to avoid this modelling process, alongside the choice to only run 500 competition simulations, were done due to computational constraints. Finally, we assume that the athletes' abilities are constant over time, which is not necessarily true. This assumption is addressed by using the most recent data, but it is still a simplification of the true process. 
 
 ### Data Limitations
 
-We run our Monte Carlo simulations are a subsetted group of observations from 2022-2023 gymnastics competition data, and it is possible that this subset of data are not representative of the athletes' overall performances. Given our data prior to 2022 was not used because of the short athletic life-cycle of gymnasts and data only on women, we may have discarded pertinent data to some athletes' performances. Additionally, we had to remove data for athletes' scores when the athlete did not compete in more than 2 competitions for an apparatus, which may have excluded some potentially strong athletes if they had not competed in the 2022-2023 seasons due to injury, medical, or other reasons. Finally, given there are a limited number of international competitions per season, most athletes in the data set were competing in less than ten competitions--some only competing in 1 or 2 competitions across 2022-2023. The limited number of score results per athlete may lead to hard to generalize results.
+We run our Monte Carlo experiments on a subsetted group of observations from 2022-2023 gymnastics competition data, and it is possible that this subset of data are not representative of the athletes' overall performances. Data prior to 2022 was not used because of the short athletic life-cycle of gymnasts and data only on women, so unfortunately we may have discarded pertinent data to some athletes' performances. Additionally, we had to remove data for athletes' scores when the athlete did not compete in more than 2 competitions for an apparatus, which may have excluded some potentially strong athletes if they had not competed in the 2022-2023 seasons due to injury, medical, or other reasons. Finally, given there are a limited number of international competitions per season, most athletes in the data set were competing in less than ten competitions--some only competing in 1 or 2 competitions across 2022-2023. The limited number of score results per athlete may lead to hard to generalize results.
 
 ### Implications and Conclusions
 
 *insert answer for: What would you do differently if you had to approach the study again? What additional data sources, variables, or techniques might help you create a stronger manuscript?*
+
+An iteration of this study would be stronger if it addressed the methodological limitations mentioned above. Additionally, including more historical data and athletes' age in the model would create a much more robust model. The current methodology also lacks a selection mechanism, relying on us to manually select the top five athletes. A more robust model would include a selection mechanism that would automatically select the top five athletes based on the results of the Monte Carlo simulations.
 
 \newpage
 
@@ -955,6 +957,9 @@ Given women compete on 4 apparatuses and men compete on 4 apparatuses, we have t
 
 ```{r additional-sims-tables}
 #womens additional
+BB_w_table
+VT_w_table
+
 UB_w_simul |>
   head(10) |>
     mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
@@ -991,6 +996,8 @@ UB_w_simul |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
 #mens additional
+VT_m_table
+
 FX_m_simul |>
   head(10) |>
    mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
