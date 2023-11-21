@@ -315,19 +315,18 @@ To simulate a score for an athlete we sample $\theta^{(s)} \sim p(\theta | x_i)$
 
 We began by creating prior distributions for each apparatus' total score. Splitting the data set by apparatus and gender resulted in multiple separate smaller data sets, see Exploratory Data Visualizations for the apparatus-gender level distribution. Observing the combined score distributions, they appear to be unimodal and slightly right-skewed. Various distributions were considered, like the beta distribution which is conveniently upper and lower-bounded, but the normal distribution was chosen for its simplicity, ease of use, and effective fit.
 
-For ease of use, we depended on conjugacy to derive the parameters of the normal distribution. Since both the mean, $mu$, and variance, $sigma^2$, of the normal distribution are unknown, we used normal-inverse gamma priors for both parameters. At this point, the issue arises that a plurality of athletes have only ever done a single competition in any given apparatus, resulting in a large amount of athletes with 0 variance and skewing the distribution. Due to the unlikely nature of athletes who do not compete regularly participating in the Olympics, we have decided to truncate the apparatus level data set to exclude athletes with less than three competition appearances for that given apparatus.
+For ease of use, we depended on conjugacy to derive the parameters of the normal distribution. Since both the mean and variance of the normal distribution are unknown, we used normal-inverse gamma priors for both parameters. At this point, the issue arises that a plurality of athletes have only ever done a single competition in any given apparatus, resulting in a large amount of athletes with 0 variance and skewing the distribution. Due to the unlikely nature of athletes who do not compete regularly participating in the Olympics, we have decided to truncate the apparatus level data set to exclude athletes with less than three competition appearances for that given apparatus.
 
 To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means from the data using the maximum likelihood method and the `fitdist()` function (Muller, 2023). The maximum likelihood estimates for the mean and variance were then used as the prior parameters for the normal part of the normal-inverse gamma distribution. Similarly, for the inverse-gamma parameters, we fit an inverse-gamma distribution to the distribution of athlete's variances from the data using a similar method and used these parameters as the prior parameters for the inverse-gamma part of the normal-inverse gamma distribution. This process was done independently for all apparatus-gender combinations to produce a different set of prior parameters for each independently.
 
 
-
 ### Conditioning on Individual Results:
 
-Following the establishment of the prior distributions, we updated these distributions based on individual competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters 1000 times per athlete.
+Following the establishment of the prior distributions, we updated these distributions based on individual competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters for mean and variance and then using these to simulate individual gymnastic scores.
 
 ### Simulation of Gymnastics Events:
 
-To simulate gymnastics events, we performed 500 iterations for each apparatus event. For every iteration, we simulated a score for each athlete in the event by sampling $\tilde{x_i}$ from the posterior distribution. Furthermore, since the normal distribution is unbounded, we truncated the distribution at 0 and 20 to reflect the scoring system. We then ranked the athletes by their simulated scores and awarded gold, silver, and bronze medals to the top three athletes. Notably, we chose not to go with a qualification structure and had a simple one-shot round for victory. This decision was made due to computational constraints and introduced more variance in the medal distribution, which we take into account when identifying which athletes to pick for Team USA. We repeated the simulation process for each apparatus event, resulting in about 11 million simulated scores across all competitions. 
+To simulate gymnastics events, we performed 1000 iterations for each apparatus event. For every iteration, we simulated a score for each athlete in the event by sampling $\tilde{x_i}$ from the posterior distribution. Furthermore, since the normal distribution is unbounded, we truncated the distribution at 0 and 20 to reflect the scoring system. We then ranked the athletes by their simulated scores and awarded gold, silver, and bronze medals to the top three athletes. Notably, we chose not to go with a qualification structure and had a simple one-shot round for victory. This decision was made due to computational constraints and introduced more variance in the medal distribution, which we take into account when identifying which athletes to pick for Team USA. We repeated the simulation process for each apparatus event, resulting in about 11 million simulated scores across all competitions. 
 
 ### Assumptions:
 
@@ -352,7 +351,7 @@ fit_normal_priors <- function(data, apparatus, gender) {
 ```{r simulation-function}
 #code for simulations, inspired by STA360/peter hoff textbook
 
-analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
+analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0) {
   n <- length(athlete_results)
   ybar <- mean(athlete_results)
   var <- var(athlete_results)
@@ -362,8 +361,8 @@ analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
   v_n <- v_0 + n
   m_n <- (k_0*m_0 + n*ybar)/k_n
   sig_n <- (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
-  sig_sample <- mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
-  theta_sample <- mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
+  sig_sample <- rinvgamma(1, v_n/2, sig_n*v_n/2)
+  theta_sample <- rnorm(1, m_n, sqrt(sig_sample/k_n))
   
   return(c(theta_sample, sig_sample))
 }
@@ -377,24 +376,17 @@ simulate_results <- function(data, apparatus, gender, m_0, sig_0, k_0, v_0, meda
            , Gender == gender) %>%
     group_by(unique_id) %>%
     summarise(mean_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[1],
-              var_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2],
-              observations = n(), .groups = "keep") %>%
+              var_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2], .groups = "keep") %>%
     rowwise() %>%
     mutate(simulated_Score = rnorm(1, mean_estimate, var_estimate)) %>% # Truncate scores > 10
-    mutate(simulated_Score = ifelse(simulated_Score > 20, 10, simulated_Score)) %>% # Truncate scores < 0
-    mutate(simulated_Score = ifelse(simulated_Score < 0, 0, simulated_Score)) 
-  
-  if (medals == TRUE) {
-    # order by top 3 results and assign gold, silver, bronze
-    simul_data <- simul_data %>%
-      ungroup() %>%
-      arrange(desc(simulated_Score)) %>%
-      mutate(medal = case_when(row_number() == 1 ~ "Gold",
-                               row_number() == 2 ~ "Silver",
-                               row_number() == 3 ~ "Bronze",
-                               TRUE ~ "NA"))
-    
-  }
+    #mutate(simulated_Score = ifelse(simulated_Score > 20, 10, simulated_Score)) %>% # Truncate scores < 0
+    #mutate(simulated_Score = ifelse(simulated_Score < 0, 0, simulated_Score)) %>% Ignoring truncation since if somebody gets a 20 they'll get the medal anyways
+    ungroup() %>%
+    arrange(desc(simulated_Score)) %>%
+    mutate(medal = case_when(row_number() == 1 ~ "Gold",
+                             row_number() == 2 ~ "Silver",
+                             row_number() == 3 ~ "Bronze",
+                             TRUE ~ "NA"))
   return(simul_data)
 }
 ```
@@ -409,9 +401,7 @@ simulate_full_competition <- function(data, apparatus, gender, mu_0, sig_0, k_0,
   
   for (i in 1:smc) {    
     big_simul <- simulate_results(data, apparatus, gender, mu_0, sig_0, k_0, v_0, TRUE) %>%
-      filter(medal != "NA")
-    
-    big_simul <- big_simul %>%
+      filter(medal != "NA") %>%
       group_by(unique_id) %>%
       summarise(Golds = sum(medal == "Gold"),
                 Silvers = sum(medal == "Silver"),
@@ -426,16 +416,16 @@ simulate_full_competition <- function(data, apparatus, gender, mu_0, sig_0, k_0,
              Silvers = ifelse(is.na(Silvers.y), Silvers.x, Silvers.y + Silvers.x),
              Bronzes = ifelse(is.na(Bronzes.y), Bronzes.x, Bronzes.y + Bronzes.x),
              Total_Medals = ifelse(is.na(Total_Medals.y), Total_Medals.x, Total_Medals.y + Total_Medals.x)) %>%
-      dplyr::select(unique_id, Golds, Silvers, Bronzes, Total_Medals) %>%
-      arrange(desc(Total_Medals))
+      dplyr::select(unique_id, Golds, Silvers, Bronzes, Total_Medals)
   } 
-  return(athletes_medals)
+  
+  return(athletes_medals %>% arrange(desc(Total_Medals)))
 }
 ```
 
 ## Results
 
-We ran simulations for each apparatus for each gender (women's 4 apparatuses and men's 6 apparatuses) 500 times. Overall, the most successful American athletes were: 
+We ran simulations for each apparatus for each gender (women's 4 apparatuses and men's 6 apparatuses) 1000 times. Overall, the most successful American athletes were: 
 
 # LIST HERE PLZ
 
@@ -443,7 +433,7 @@ Indicating that the most successful american team would likely be composed of:
 
 # LIST HERE PLZ
 
-With a total of (number of medals) across 500 simulations of each apparatus.
+With a total of (number of medals) across 1000 simulations of each apparatus.
 
 ### Female Athletes' Results
 
@@ -459,7 +449,7 @@ sig_0 <- fxw_prior_parameters[2]
 k_0 <- fxw_prior_parameters[3]
 v_0 <- fxw_prior_parameters[4]
 
-FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 500)
+FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 1000)
 
 FX_w_simul |>
   head(10) |>
@@ -506,7 +496,7 @@ sig_0 <- bbw_prior_parameters[2]
 k_0 <- bbw_prior_parameters[3]
 v_0 <- bbw_prior_parameters[4]
 
-BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 500)
+BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 1000)
 
 BB_w_simul |>
   head(10) |>
@@ -553,7 +543,7 @@ sig_0 <- vtw_prior_parameters[2]
 k_0 <- vtw_prior_parameters[3]
 v_0 <- vtw_prior_parameters[4]
 
-VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 500)
+VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 1000)
 VT_w_simul |>
   head(10) |>
   mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
@@ -599,7 +589,7 @@ sig_0 <- ubw_prior_parameters[2]
 k_0 <- ubw_prior_parameters[3]
 v_0 <- ubw_prior_parameters[4]
 
-UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 500)
+UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 1000)
 ```
 
 ### Male Athletes' Results
@@ -616,7 +606,7 @@ sig_0 <- fxm_prior_parameters[2]
 k_0 <- fxm_prior_parameters[3]
 v_0 <- fxm_prior_parameters[4]
 
-FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 500)
+FX_m_simul <- simulate_full_competition(combined, "FX", "m", mu_0, sig_0, k_0, v_0, 1000)
 ```
 
 ```{r VT-men-sims}
@@ -629,7 +619,7 @@ sig_0 <- vtm_prior_parameters[2]
 k_0 <- vtm_prior_parameters[3]
 v_0 <- vtm_prior_parameters[4]
 
-VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 500)
+VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v_0, 1000)
 
 VT_m_simul |>
   head(10) |>
@@ -694,7 +684,7 @@ sig_0 <- phm_prior_parameters[2]
 k_0 <- phm_prior_parameters[3]
 v_0 <- phm_prior_parameters[4]
 
-PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 500)
+PH_m_simul <- simulate_full_competition(combined, "PH", "m", mu_0, sig_0, k_0, v_0, 1000)
 ```
 
 ```{r HB-men-sims}
@@ -707,7 +697,7 @@ sig_0 <- hbm_prior_parameters[2]
 k_0 <- hbm_prior_parameters[3]
 v_0 <- hbm_prior_parameters[4]
 
-HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 500)
+HB_m_simul <- simulate_full_competition(combined, "HB", "m", mu_0, sig_0, k_0, v_0, 1000)
 ```
 
 ```{r SR-men-sims}
@@ -720,7 +710,7 @@ sig_0 <- srm_prior_parameters[2]
 k_0 <- srm_prior_parameters[3]
 v_0 <- srm_prior_parameters[4]
 
-SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 500)
+SR_m_simul <- simulate_full_competition(combined, "SR", "m", mu_0, sig_0, k_0, v_0, 1000)
 ```
 
 ```{r PB-men-sims}
@@ -733,7 +723,7 @@ sig_0 <- pbm_prior_parameters[2]
 k_0 <- pbm_prior_parameters[3]
 v_0 <- pbm_prior_parameters[4]
 
-PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 500)
+PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v_0, 1000)
 
 PB_m_simul |>
   head(10) |>

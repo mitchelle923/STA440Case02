@@ -71,7 +71,7 @@ fit_normal_priors = function(data, apparatus, gender) {
 ```
 
 ```{r}
-analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
+analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0) {
   n = length(athlete_results)
   ybar = mean(athlete_results)
   
@@ -86,8 +86,8 @@ analyze_athlete = function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
   v_n = v_0 + n
   m_n = (k_0*m_0 + n*ybar)/k_n
   sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
-  sig_sample = mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
-  theta_sample = mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
+  sig_sample = rinvgamma(1, v_n/2, sig_n*v_n/2)
+  theta_sample = rnorm(1, m_n, sqrt(sig_sample/k_n))
   
   return(c(theta_sample, sig_sample))
 }
@@ -102,41 +102,33 @@ simulate_results = function(data, apparatus, gender, m_0, sig_0, k_0, v_0, medal
            , Gender == gender) %>%
     group_by(FirstName, LastName, Country) %>%
     summarise(mean_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[1],
-              var_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2],
-              observations = n(), .groups = "keep") %>%
+              var_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2], .groups = "keep") %>%
     rowwise() %>%
     mutate(simulated_Score = rnorm(1, mean_estimate, var_estimate)) %>% # Truncate scores > 10
-    mutate(simulated_Score = ifelse(simulated_Score > 20, 10, simulated_Score)) %>% # Truncate scores < 0
-    mutate(simulated_Score = ifelse(simulated_Score < 0, 0, simulated_Score)) 
-  
-  if (medals == TRUE) {
-    # order by top 3 results and assign gold, silver, bronze
-    simul_data = simul_data %>%
-      ungroup() %>%
-      arrange(desc(simulated_Score)) %>%
-      mutate(medal = case_when(row_number() == 1 ~ "Gold",
-                               row_number() == 2 ~ "Silver",
-                               row_number() == 3 ~ "Bronze",
-                               TRUE ~ "NA"))
-    
-  }
+    #mutate(simulated_Score = ifelse(simulated_Score > 20, 10, simulated_Score)) %>% # Truncate scores < 0
+    #mutate(simulated_Score = ifelse(simulated_Score < 0, 0, simulated_Score)) %>% Ignoring truncation since if somebody gets a 20 they'll get the medal anyways
+    ungroup() %>%
+    arrange(desc(simulated_Score)) %>% # assign medals
+    mutate(medal = case_when(row_number() == 1 ~ "Gold",
+                             row_number() == 2 ~ "Silver",
+                             row_number() == 3 ~ "Bronze", 
+                             TRUE ~ "NA"))
   return(simul_data)
 }
 ```
 
-```{r}
+```{r}  
 # full competition simulation, gets pretty slow with 1000 simulations
-simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, v_0, smc = 1000) {
+simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, v_0, smc = 1) {
   athletes_medals = data %>%
     dplyr::select(FirstName, LastName, Country) %>%
     distinct() %>%
     mutate(Golds = 0, Silvers = 0, Bronzes = 0, Total_Medals = 0)
   
+  print("Starting Simulation")
   for (i in 1:smc) {    
     big_simul = simulate_results(data, apparatus, gender, mu_0, sig_0, k_0, v_0, TRUE) %>%
-      filter(medal != "NA")
-    
-    big_simul = big_simul %>%
+      filter(medal != "NA") %>%
       group_by(FirstName, LastName, Country) %>%
       summarise(Golds = sum(medal == "Gold"),
                 Silvers = sum(medal == "Silver"),
@@ -159,9 +151,8 @@ simulate_full_competition = function(data, apparatus, gender, mu_0, sig_0, k_0, 
 ```
 
 ```{r}
-set.seed(123)
 # This is how it sort of would work
-prior_parameters = suppressWarnings(fit_normal_priors(data_23, "HB", "m"))
+prior_parameters = suppressWarnings(fit_normal_priors(data_23, "FX", "w"))
 print(prior_parameters)
 
 mu_0 = prior_parameters[1]
@@ -169,7 +160,7 @@ sig_0 = prior_parameters[2]
 k_0 = prior_parameters[3]
 v_0 = prior_parameters[4]
 
-test_simul = simulate_full_competition(data_23, "HB", "m", mu_0, sig_0, k_0, v_0, 100)
+test_simul = simulate_full_competition(data_23, "FX", "w", mu_0, sig_0, k_0, v_0, 1000)
 head(test_simul)
 ```
 

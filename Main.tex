@@ -40,7 +40,7 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\usepackage[top=15mm, bottom=15mm, left=15mm, right=15mm]{geometry}
+\usepackage[top=13mm, bottom=13mm, left=13mm, right=13mm]{geometry}
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 % Make \paragraph and \subparagraph free-standing
@@ -53,46 +53,6 @@
   \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
 \fi
 
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{241,243,245}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
-\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
-\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
-\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
-\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
-\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
@@ -119,6 +79,20 @@
 \def\fps@figure{htbp}
 \makeatother
 
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 \KOMAoption{captions}{tableheading}
 \makeatletter
 \makeatother
@@ -180,8 +154,8 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
-  pdftitle={US Gymnastics Analysis},
-  pdfauthor={Chris, Enzo, Mitchelle, Zoe},
+  pdftitle={Journey to Paris 2024: A Bayesian Approach to Finding the Best Men's and Women's U.S. Gymnastics Teams},
+  pdfauthor={Chris Liang, Enzo Moraes Mescall, Mitchelle Mojekwu, Zoe Svec},
   colorlinks=true,
   linkcolor={blue},
   filecolor={Maroon},
@@ -189,524 +163,1540 @@
   urlcolor={Blue},
   pdfcreator={LaTeX via pandoc}}
 
-\title{US Gymnastics Analysis}
-\author{Chris, Enzo, Mitchelle, Zoe}
+\title{Journey to Paris 2024: A Bayesian Approach to Finding the Best
+Men's and Women's U.S. Gymnastics Teams}
+\author{Chris Liang, Enzo Moraes Mescall, Mitchelle Mojekwu, Zoe Svec}
 \date{}
 
 \begin{document}
 \maketitle
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, enhanced, interior hidden, sharp corners, boxrule=0pt, breakable, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(tidyverse)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
--- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
-v dplyr     1.1.3     v readr     2.1.4
-v forcats   1.0.0     v stringr   1.5.0
-v ggplot2   3.4.4     v tibble    3.2.1
-v lubridate 1.9.3     v tidyr     1.3.0
-v purrr     1.0.2     
--- Conflicts ------------------------------------------ tidyverse_conflicts() --
-x dplyr::filter() masks stats::filter()
-x dplyr::lag()    masks stats::lag()
-i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(knitr)}
-\FunctionTok{library}\NormalTok{(stringr)}
-\FunctionTok{library}\NormalTok{(dplyr)}
-\FunctionTok{library}\NormalTok{(invgamma)}
-\FunctionTok{library}\NormalTok{(fitdistrplus)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-Loading required package: MASS
-
-Attaching package: 'MASS'
-
-The following object is masked from 'package:dplyr':
-
-    select
-
-Loading required package: survival
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#make sure this is forked to github so it\textquotesingle{}s not a local file path}
-\NormalTok{earlydata }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"Cleaned Data/data\_2017\_2021.csv"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-Rows: 1049 Columns: 14
--- Column specification --------------------------------------------------------
-Delimiter: ","
-chr (9): LastName, FirstName, Gender, Country, Date, Competition, Round, Loc...
-dbl (5): Rank, D_Score, E_Score, Penalty, Score
-
-i Use `spec()` to retrieve the full column specification for this data.
-i Specify the column types or set `show_col_types = FALSE` to quiet this message.
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{laterdata }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"Cleaned Data/data\_2022\_2023.csv"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-Rows: 22842 Columns: 14
--- Column specification --------------------------------------------------------
-Delimiter: ","
-chr (9): LastName, FirstName, Gender, Country, Date, Competition, Round, Loc...
-dbl (5): Rank, D_Score, E_Score, Penalty, Score
-
-i Use `spec()` to retrieve the full column specification for this data.
-i Specify the column types or set `show_col_types = FALSE` to quiet this message.
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#will not be using early dataset because it only contains data about female athletes}
-\NormalTok{early }\OtherTok{\textless{}{-}}\NormalTok{ earlydata }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{drop\_na}\NormalTok{(Score, E\_Score, D\_Score, Apparatus, Round, Location, Competition, Country, Gender)}
-
-\NormalTok{later }\OtherTok{\textless{}{-}}\NormalTok{ laterdata }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{drop\_na}\NormalTok{(Score, E\_Score, D\_Score, Apparatus, Round, Location, Competition, Country, Gender)}
-\end{Highlighting}
-\end{Shaded}
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, frame hidden, interior hidden, borderline west={3pt}{0pt}{shadecolor}, sharp corners, boxrule=0pt, breakable]}{\end{tcolorbox}}\fi
 
 \hypertarget{introduction}{%
 \subsection{Introduction}\label{introduction}}
 
+The Olympic Games are a highly anticipated world-renowned multi-sporting
+event that takes place every four years. Particularly the Summer Olympic
+Games tend to have a wider variety of 32 sports and more viewers than
+that of the Winter Olympics (Olympics, 2021). Athletes from all over the
+world can participate granted they meet the criteria established by
+their nation's Olympic committees and the international sports
+federations. With female qualifying gymnasts from the United States
+placing with medals in the team all-around, individual all-around, and
+each individual apparatus in the 2020 Tokyo Olympics game, there has
+been a surge in media attention on the United States gymnastics teams
+(Olympics, 2020).
+
+As the Paris 2024 Summer Olympic Games is approaching, the United States
+Olympic Men's and Women's Artistic Gymnastics aims to put together a
+team of 5 each that best represents the country on the world's sporting
+stage by optimizing medal success amongst the team all-around,
+individual all-around, and individual apparatus events. At the Paris
+Olympics, during the qualifications round, from the 5 team members, 4
+will compete on each apparatus, and the 3 highest scores will count and
+be summed. In the finals, the top 8 countries will qualify and compete
+in team all-around, where from the 5 team members, 3 will compete on
+each apparatus and all 3 scores will count. In the individual all-around
+finals, 24 athletes will qualify, with maximum 2 athletes per country.
+In the individual apparatus finals, 8 athletes will qualify per
+apparatus with a maximum of 2 athletes per country. The low number of
+athletes that qualify for the finals suggests there must be thoughtful
+crafting of the team of 5. This study aims to use the most recent
+Olympic Games and other world competitions' qualifying and final round
+results data to best assemble a team that is likely to produce optimal
+success in terms of medals within the Olympic qualifiers and final
+criteria (UCSAS, 2023).
+
+The UConn Sports Analytics Symposium provisioned two clean data sets of
+the accumulation of results of teams worldwide that participated in the
+major domestic and international gymnastic qualifying and final
+competition events leading up to the 2024 Summer Olympic Games. The
+first data set includes includes the results of the 2020 (taking place
+in 2021) Tokyo Summer Olympics qualifying and final rounds, and the
+second data set includes competitions in the 2022 and 2023 seasons.
+Observations for both data sets are at the athlete- and apparatus-level
+score for an event in a round at a gymnastics competition--for example,
+Simone Biles's final uneven bars score at the 2023 US Gymnastics
+Championships. It is worth noting, however, that the data from the Tokyo
+Olympics only include results for women's gymnastics, while the data
+from 2022-2023 include results for both men's and women's gymnastics.
+The data are collected from the results on each corresponding
+competition's official website, which are results from the officially
+judged scores of each competition. Variables in the data sets include
+first and last names of each athlete, gender, country, date of
+competition, name of competition, the round of the competition
+(e.g.~qualifier or final of an individual apparatus, individual
+all-around, or team event), the location of the competition, apparatus
+(women compete in ``BB'': balance beam, ``FX'': floor exercise, ``UB'':
+uneven bars, and ``VT'': vault; men compete in ``FX'': floor exercise,
+HB'': high bar, ``PB'': parallel bars, ``PH'': pommel horse, ``SR'':
+still rings, ``VT'': vault; beyond the floor and vault overlap, both men
+and women may compete in vaults ``VT1'' and ``VT2'', which are 2
+different vaults required in individual apparatus qualifications and
+finals), the execution score, difficulty score, penalty, and final score
+for that athlete on that apparatus, and the rank of that athlete in that
+apparatus and round.
+
+We decided to not proceed in using the data set of results from the
+Tokyo Summer Olympics since the data consisted only of female athletes
+and one competition (the Olympic Games). Additionally, in the context of
+Olympic gymnastics, athletes of age 16 and older are eligible to compete
+but gymnastics is a sport in which most athletes retire in their early
+to mid-twenties. Specifically in the summer 2020 Tokyo Olympics only
+three female athletes aged 27 or older qualified to compete (Camenker,
+2021). Furthermore, the average age for female gymnasts in the 2020
+Olympics was approximately 22 years of age, meaning we assume that many
+of the competitors in the older data set will not be competing in the
+2024 Paris Summer Olympics (Meyers, 2021).
+
+We have the following objectives for this study: (UCSAS, 2023)
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  Decide on whether to maximize total medal count, gold medal count, or
+  a weighted medal count (e.g., 3 for gold, 2 for silver, 1 for bronze).
+\item
+  Decide on whether to value the medals of an event over others. For
+  example, consider a team all-around medal to be more valuable than the
+  individual all-around medals and/or consider the individual all-around
+  medals to be more valuable than the individual apparatus medals.
+\item
+  Decide on whether Team USA should maximize its total medal count by
+  selecting a team of five gymnasts who are all-around gymnasts, event
+  specialists (gymnasts who focus on 1 or more apparatus but not all
+  apparatus), or a combination of those. This should consider under what
+  circumstances can Team USA maximize its total medal count by selecting
+  a gymnast who only competes on 1 apparatus (e.g., Stephen Nederoscik,
+  2021 pommel horse World Champion).
+\item
+  Identify the group of five athletes who will most likely enable the
+  Team USA Olympic Men's and Women's Artistic Gymnastics team to
+  maximize medals won in the Paris 2024 Summer Olympics using an
+  analytical model.
+\end{enumerate}
+
+Addressing these objectives will assist the national Olympic Artistic
+Gymnastics teams in best approaching the Olympic gymnastics events in
+totality by offering recommended strategies to best approach team
+selection. In our analysis of the best fit US male and female gymnastics
+teams for the Paris Olympics, we will undertake a Bayesian approach to
+simulate outcomes of individual athletes' scores in an apparatus.
+Bayesian frameworks in sports analytics to simulate athlete's results
+are well-documented and have seen a rise in popularity in the past
+decade (Santos-Fernandez, et. al., 2019). For instance, Yang and Swartz
+use Monte Carlo Markov Chains to simulate the outcomes of baseball games
+(Yang et. al., 2022). We will build upon these analyses and choose the
+appropriate Bayesian method to simulate outcomes of gymnast results in
+each apparatus, after which we will analyze the top performers in each
+apparatus, assign medals, and find the best combination of athletes.
+
+\hypertarget{exploratory-data-visualizations}{%
+\subsubsection{Exploratory Data
+Visualizations}\label{exploratory-data-visualizations}}
+
+We created some exploratory data visualizations to examine the
+distributions of athlete scores and examine the performance of US
+athletes relative to other countries. We find that from the density
+plots of male and female athletes' overall scores (difficulty score +
+execution score - penalty = overall score) per apparatus that the scores
+are approximately normally distributed for the apparatuses for both
+genders. There are some slight deviations from normality, namely women's
+vault scores and uneven bars scores are slightly skewed left and men's
+still rings scores have a slight dip in the peak. Nonetheless, the
+approximate normality of the distribution of athlete's scores by
+apparatus informs our bayesian approach, as we may use normal priors for
+our data. Furthermore, we plotted the number of athletes per country in
+the top 10 of each apparatus internationally, top 10 meaning the
+athletes with top 10 highest mean scores for each apparatus. For
+example, we see that for women's vault, 6 of the top 10 athletes in the
+world are US gymnasts. These plots help inform us of if we should be
+thinking about specialists or generalists in the US team combinations.
+We see that the top 10 for each apparatus have a high concentration of
+US female gymnasts, so we may want specialists in our team makeup,
+whereas that case does not transfer to the US male gymnasts, as there
+are few US male gymnasts in the top 10 for the floor exercise, high bar,
+pommel horse, and still rings apparatuses. In the men's case, we may not
+want to send specialists to take up a spot on team of five, and we shall
+explore this conjecture in our simulations.
+
+\includegraphics{Main_files/figure-pdf/score-distributions-1.pdf}
+
+\includegraphics{Main_files/figure-pdf/top-10-athletes-1.pdf}
+
 \hypertarget{methodology}{%
 \subsection{Methodology}\label{methodology}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#indonesian gymnast\textquotesingle{}s name is Abiyu RAFI not ABIYURAFI}
-\NormalTok{laterdata }\OtherTok{\textless{}{-}}\NormalTok{ laterdata }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{FirstName =} \FunctionTok{ifelse}\NormalTok{(LastName }\SpecialCharTok{==} \StringTok{"ABIYURAFI"} \SpecialCharTok{\&}\NormalTok{ FirstName }\SpecialCharTok{==} \StringTok{"."}\NormalTok{, }\StringTok{"Abiyu"}\NormalTok{, FirstName),}
-    \AttributeTok{LastName =} \FunctionTok{ifelse}\NormalTok{(LastName }\SpecialCharTok{==} \StringTok{"ABIYURAFI"}\NormalTok{, }\StringTok{"RAFI"}\NormalTok{, LastName),}
-    \AttributeTok{Apparatus =} \FunctionTok{if\_else}\NormalTok{(Apparatus }\SpecialCharTok{==} \StringTok{\textquotesingle{}hb\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}HB\textquotesingle{}}\NormalTok{, Apparatus))}
+Prior to conducting simulations, we cleaned our data set on the
+2022-2023 gymnastics competition results. There were several cases of
+missing or inconsistent athlete first and last names, so we created
+unique athlete IDs using string methods by using the first three letters
+of an athlete's first name, the first three letters of an athlete's last
+name, and the country code. We made sure to add in missing names and
+account for names with less than three characters. Furthermore, the
+apparatus code for high bar was inconsistent across the Commonwealth
+Games and all other competitions, so we made sure to consolidate high
+bar into one apparatus code. Because individual apparatus qualifying
+vaults needed athletes to compete two different vaults (VT1, VT2) as
+opposed to one vault in the finals or team or all-around events, we
+decided to take the higher of the two vault scores for an athlete for a
+competition, if there were two vaults completed, and consolidated that
+score as one vault apparatus code. We decided to keep the higher score
+given the vaults were different, and athletes likely compete with the
+vault that gives them the higher score during event finals.
 
-
-\NormalTok{laterdata }\OtherTok{\textless{}{-}}\NormalTok{ laterdata }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{firstname\_check =} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{str\_length}\NormalTok{(FirstName) }\SpecialCharTok{\textgreater{}=} \DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
-         \AttributeTok{lastname\_check =} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{str\_length}\NormalTok{(LastName) }\SpecialCharTok{\textgreater{}=} \DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{))}
-
-\NormalTok{laterdata }\OtherTok{\textless{}{-}}\NormalTok{ laterdata }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{FirstName =} \FunctionTok{ifelse}\NormalTok{(firstname\_check }\SpecialCharTok{==} \DecValTok{0}\NormalTok{, }\FunctionTok{paste0}\NormalTok{(FirstName, }\StringTok{"\_"}\NormalTok{), FirstName),}
-         \AttributeTok{LastName =} \FunctionTok{ifelse}\NormalTok{(lastname\_check }\SpecialCharTok{==} \DecValTok{0}\NormalTok{, }\FunctionTok{paste0}\NormalTok{(LastName, }\StringTok{"\_"}\NormalTok{), LastName))}
-
-\CommentTok{\#based on string methods {-}{-} creating unique athlete IDs}
-\NormalTok{laterdata }\OtherTok{\textless{}{-}}\NormalTok{ laterdata }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{unique\_id =} \FunctionTok{paste0}\NormalTok{(}\FunctionTok{str\_sub}\NormalTok{(FirstName, }\DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{), }\FunctionTok{str\_sub}\NormalTok{(LastName, }\DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{), }\StringTok{"\_"}\NormalTok{, Country))}
-
-\CommentTok{\#create a vector for AA or team}
-\NormalTok{AA\_team }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"AAfinal"}\NormalTok{, }\StringTok{"TeamFinal"}\NormalTok{, }\StringTok{"TeamQual"}\NormalTok{, }\StringTok{"AAqual"}\NormalTok{)}
-\StringTok{\textquotesingle{}\%notin\%\textquotesingle{}} \OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x,y)}\SpecialCharTok{!}\NormalTok{(}\StringTok{\textquotesingle{}\%in\%\textquotesingle{}}\NormalTok{(x,y))}
-
-\NormalTok{finals\_vector }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"AAfinal"}\NormalTok{, }\StringTok{"TeamFinal"}\NormalTok{, }\StringTok{"final"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#these quantiles are already grouped by gender and competition, round, apapratus, etc. so no bleeding}
-\NormalTok{quantiled\_data }\OtherTok{\textless{}{-}}\NormalTok{ laterdata }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{group\_by}\NormalTok{(Gender, Competition, Round, Apparatus) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{quantile\_20s =} \FunctionTok{ntile}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{Score, }\DecValTok{5}\NormalTok{),}
-         \AttributeTok{quantile\_10s =} \FunctionTok{ntile}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{Score, }\DecValTok{10}\NormalTok{))}
-
-\CommentTok{\#filter out the athletes who have NEVER made it to a final, ever}
-\NormalTok{filtered\_data }\OtherTok{\textless{}{-}}\NormalTok{ quantiled\_data }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{group\_by}\NormalTok{(unique\_id) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{filter}\NormalTok{(}\FunctionTok{any}\NormalTok{(Round }\SpecialCharTok{==} \StringTok{"final"} \SpecialCharTok{|}\NormalTok{ Round }\SpecialCharTok{==} \StringTok{"TeamFinal"} \SpecialCharTok{|}\NormalTok{ Round }\SpecialCharTok{==} \StringTok{"AAfinal"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{ungroup}\NormalTok{()}
-
-\CommentTok{\#summary of number of athletes competed in each competition in each round}
-\NormalTok{number\_athletes }\OtherTok{\textless{}{-}}\NormalTok{ filtered\_data }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{group\_by}\NormalTok{(Competition, Round) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{athletes\_participated =} \FunctionTok{n\_distinct}\NormalTok{(unique\_id))}
-
-
-\CommentTok{\# at the oceania continental championships, only 10 unique athletes competed}
-\CommentTok{\# every other competition at each round has at minimum 36 athletes competing}
-\CommentTok{\#at these final rounds, there are at least 40 athletes in each final, so it\textquotesingle{}s fine}
-\CommentTok{\#going to left join to show the number of athletes that participated per round}
-
-\NormalTok{joined\_data }\OtherTok{\textless{}{-}}\NormalTok{ filtered\_data }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{left\_join}\NormalTok{(number\_athletes, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"Competition"}\NormalTok{, }\StringTok{"Round"}\NormalTok{))}
-
-\CommentTok{\#now the athletes\_participated column = how many athletes competed in it}
-
-
-\CommentTok{\#this filters out the individual records for ppl who were not in top quantiles at a competition}
-\NormalTok{final\_data }\OtherTok{\textless{}{-}}\NormalTok{ joined\_data }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{filter}\NormalTok{((athletes\_participated }\SpecialCharTok{\textless{}=} \DecValTok{100} \SpecialCharTok{\&}\NormalTok{ quantile\_20s }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{|}\NormalTok{ (athletes\_participated }\SpecialCharTok{\textgreater{}} \DecValTok{100} \SpecialCharTok{\&}\NormalTok{ quantile\_10s }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{|}\NormalTok{ (Competition }\SpecialCharTok{==} \StringTok{"Oceania Continental Championships 2023"} \SpecialCharTok{\&}\NormalTok{ quantile\_20s }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)))}
-
-\CommentTok{\#now let\textquotesingle{}s check the number of unique athletes left}
-\CommentTok{\# final\_data |\textgreater{}}
-\CommentTok{\#   group\_by(Country) |\textgreater{}}
-\CommentTok{\#   summarise(athletes\_left = n\_distinct(unique\_id))}
-
-\CommentTok{\#there are 679 athletes left in total once we have filtered, USA still has 91 left}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#separating datasets into mens and womens}
-
-\NormalTok{menFinal }\OtherTok{\textless{}{-}}\NormalTok{ final\_data }\SpecialCharTok{\%\textgreater{}\%} 
-  \FunctionTok{filter}\NormalTok{(Gender }\SpecialCharTok{==} \StringTok{\textquotesingle{}m\textquotesingle{}}\NormalTok{)}
-
-\NormalTok{womenFinal }\OtherTok{\textless{}{-}}\NormalTok{ final\_data }\SpecialCharTok{\%\textgreater{}\%} 
-  \FunctionTok{filter}\NormalTok{(Gender }\SpecialCharTok{==} \StringTok{\textquotesingle{}w\textquotesingle{}}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#MENS RANKING SYSTEM}
-
-\CommentTok{\#rank actually shown to be correct here for the early observationsbesides a couple missing ranks}
-\NormalTok{orderMenFinal }\OtherTok{\textless{}{-}}\NormalTok{ menFinal }\SpecialCharTok{\%\textgreater{}\%} 
-  \FunctionTok{arrange}\NormalTok{(Competition, Round, Apparatus, }\FunctionTok{desc}\NormalTok{(Score)) }\SpecialCharTok{\%\textgreater{}\%} 
-\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(unique\_id, Gender, Country,Competition, Round,Apparatus, Rank, D\_Score, E\_Score, Penalty, Score)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes}
-\CommentTok{\#also important to note that rankers did not give same scores the same rank, but this will be done in new rank}
-
-\NormalTok{orderMenFinal }\OtherTok{\textless{}{-}}\NormalTok{ orderMenFinal }\SpecialCharTok{\%\textgreater{}\%}
-  \CommentTok{\#initializes newRank column}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{newRank =} \ConstantTok{NA}\NormalTok{)}
-\CommentTok{\#starts with first row as 1 since data already grouped and ordered}
-\NormalTok{orderMenFinal}\SpecialCharTok{$}\NormalTok{newRank[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{1}
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{2}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(orderMenFinal))\{}
-  \CommentTok{\#ranks for ties of same competition, round, and apparatus}
-  \ControlFlowTok{if}\NormalTok{ ((orderMenFinal}\SpecialCharTok{$}\NormalTok{Competition[i] }\SpecialCharTok{==}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{Competition[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderMenFinal}\SpecialCharTok{$}\NormalTok{Round[i] }\SpecialCharTok{==}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{Round[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderMenFinal}\SpecialCharTok{$}\NormalTok{Apparatus[i] }\SpecialCharTok{==}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{Apparatus[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderMenFinal}\SpecialCharTok{$}\NormalTok{Score[i] }\SpecialCharTok{==}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{Score[i}\DecValTok{{-}1}\NormalTok{])) \{}
-\NormalTok{    orderMenFinal}\SpecialCharTok{$}\NormalTok{newRank[i] }\OtherTok{\textless{}{-}}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{newRank[i}\DecValTok{{-}1}\NormalTok{]}
-\NormalTok{  \} }
-  \CommentTok{\#ranks for non ties of same competition, round, and apparatus}
-  \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ ((orderMenFinal}\SpecialCharTok{$}\NormalTok{Competition[i] }\SpecialCharTok{==}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{Competition[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderMenFinal}\SpecialCharTok{$}\NormalTok{Round[i] }\SpecialCharTok{==}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{Round[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderMenFinal}\SpecialCharTok{$}\NormalTok{Apparatus[i] }\SpecialCharTok{==}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{Apparatus[i}\DecValTok{{-}1}\NormalTok{])) \{}
-\NormalTok{    orderMenFinal}\SpecialCharTok{$}\NormalTok{newRank[i] }\OtherTok{\textless{}{-}}\NormalTok{ orderMenFinal}\SpecialCharTok{$}\NormalTok{newRank[i}\DecValTok{{-}1}\NormalTok{]}\SpecialCharTok{+}\DecValTok{1}
-\NormalTok{  \}}
-  \CommentTok{\#ranks for new competition, round, and apparatus}
-  \ControlFlowTok{else}\NormalTok{ \{}
-\NormalTok{    orderMenFinal}\SpecialCharTok{$}\NormalTok{newRank[i] }\OtherTok{\textless{}{-}} \DecValTok{1}
-\NormalTok{  \}}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#WOMENS RANKING SYSTEM}
-\NormalTok{orderWomenFinal }\OtherTok{\textless{}{-}}\NormalTok{ womenFinal }\SpecialCharTok{\%\textgreater{}\%} 
-  \FunctionTok{arrange}\NormalTok{(Competition, Round, Apparatus, }\FunctionTok{desc}\NormalTok{(Score)) }\SpecialCharTok{\%\textgreater{}\%} 
-\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(unique\_id, Gender, Country,Competition, Round,Apparatus, Rank, D\_Score, E\_Score, Penalty, Score)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#this ranking works works to individually rank the observations rather than taking into account team/all around sum score rankings since we are aiming to choose best individual atheletes}
-\CommentTok{\#also important to note that rankers did not give same scores the same rank, but this will be done in new rank}
-\NormalTok{orderWomenFinal }\OtherTok{\textless{}{-}}\NormalTok{ orderWomenFinal }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{newRank =} \ConstantTok{NA}\NormalTok{)}
-\NormalTok{orderWomenFinal}\SpecialCharTok{$}\NormalTok{newRank[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{1}
-
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{2}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(orderWomenFinal))\{}
-  \ControlFlowTok{if}\NormalTok{ ((orderWomenFinal}\SpecialCharTok{$}\NormalTok{Competition[i] }\SpecialCharTok{==}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{Competition[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderWomenFinal}\SpecialCharTok{$}\NormalTok{Round[i] }\SpecialCharTok{==}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{Round[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderWomenFinal}\SpecialCharTok{$}\NormalTok{Apparatus[i] }\SpecialCharTok{==}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{Apparatus[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderWomenFinal}\SpecialCharTok{$}\NormalTok{Score[i] }\SpecialCharTok{==}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{Score[i}\DecValTok{{-}1}\NormalTok{])) \{}
-\NormalTok{    orderWomenFinal}\SpecialCharTok{$}\NormalTok{newRank[i] }\OtherTok{\textless{}{-}}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{newRank[i}\DecValTok{{-}1}\NormalTok{]}
-\NormalTok{  \} }
-  \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ ((orderWomenFinal}\SpecialCharTok{$}\NormalTok{Competition[i] }\SpecialCharTok{==}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{Competition[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderWomenFinal}\SpecialCharTok{$}\NormalTok{Round[i] }\SpecialCharTok{==}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{Round[i}\DecValTok{{-}1}\NormalTok{]) }\SpecialCharTok{\&}\NormalTok{ (orderWomenFinal}\SpecialCharTok{$}\NormalTok{Apparatus[i] }\SpecialCharTok{==}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{Apparatus[i}\DecValTok{{-}1}\NormalTok{])) \{}
-\NormalTok{    orderWomenFinal}\SpecialCharTok{$}\NormalTok{newRank[i] }\OtherTok{\textless{}{-}}\NormalTok{ orderWomenFinal}\SpecialCharTok{$}\NormalTok{newRank[i}\DecValTok{{-}1}\NormalTok{]}\SpecialCharTok{+}\DecValTok{1}
-\NormalTok{  \}}
-  \ControlFlowTok{else}\NormalTok{ \{}
-\NormalTok{    orderWomenFinal}\SpecialCharTok{$}\NormalTok{newRank[i] }\OtherTok{\textless{}{-}} \DecValTok{1}
-\NormalTok{  \}}
-\NormalTok{\}}
-
-\CommentTok{\#concatenating the 2 again}
-\NormalTok{combined\_final }\OtherTok{\textless{}{-}}\NormalTok{ orderMenFinal }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{full\_join}\NormalTok{(orderWomenFinal)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#summary stats for each athlete for each apparatus}
-\NormalTok{combined\_apparatus }\OtherTok{\textless{}{-}}\NormalTok{ combined\_final }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{group\_by}\NormalTok{(Apparatus, unique\_id, Country, Gender) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean\_score =} \FunctionTok{mean}\NormalTok{(Score),}
-            \AttributeTok{var\_score =} \FunctionTok{var}\NormalTok{(Score),}
-            \AttributeTok{number\_obs =} \FunctionTok{n}\NormalTok{(),}
-            \AttributeTok{mean\_D =} \FunctionTok{mean}\NormalTok{(D\_Score),}
-            \AttributeTok{var\_D =} \FunctionTok{var}\NormalTok{(D\_Score),}
-            \AttributeTok{mean\_E =} \FunctionTok{mean}\NormalTok{(E\_Score),}
-            \AttributeTok{var\_E =} \FunctionTok{var}\NormalTok{(E\_Score)) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{filter}\NormalTok{(number\_obs }\SpecialCharTok{\textgreater{}=} \DecValTok{3}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+We then proceeded to cut down on the number of observations in our data
+set for two purposes: 1) so that our simulations later could run more
+quickly, and 2) we felt that it was unnecessary to simulate scores for
+athletes that had little to no chance of medaling given their previous
+records, given the scarcity of athletes that will attend the Olympic
+finals. To filter the observations, we first removed any individual
+athletes entirely who had never made the finals in any event in any
+competition in the data set. Afterwards, we created quantiles of 20\%
+increments and 10\% increments for each round in a competition for each
+apparatus, separated by gender because men and women compete separately.
+We checked the number of unique athletes that competed at each
+competition in each round (see Appendix), and found that for all rounds
+in competitions other than the Oceania Championships, at least 36 unique
+athletes participated. For some rounds, hundreds of athletes
+participated--so we decided to filter for: if more than 100 athletes
+competed in a round in an apparatus, then we filtered for athletes'
+scores in the top 10\%; if less than 100 athletes competed in a round in
+an apparatus, then we filtered for athletes' scores in the top 20\%; for
+the Oceania Championships, we filtered for the top 40\% (four athletes).
+The reason we adopted a quantile-based filtering approach is because of
+the variation in number of athletes competed at different competitions,
+so simply taking the top 20 athletes, for example, of each competition
+may not account for that variation. Our last method of filtering was to
+remove observations of athletes' scores for apparatuses if an athlete
+had not competed more than twice in that apparatus in the entire
+2022-2023 data set. Our rationale was that there were 37 distinct
+competitions in the data set, so if an athlete has not competed more
+than twice in the past two years in an apparatus, they are likely not
+that active in that apparatus. Additionally, filtering for athletes'
+scores when an athleted has competed in that apparatus more than twice
+allows us to find a variance and mean for that athlete's performance on
+an apparatus. We are left with 2210 observations in our filtered data
+set to conduct simulations, with 157 unique male athletes and 88 unique
+female athletes.
 
 \hypertarget{simulations}{%
-\subsection{Simulations}\label{simulations}}
+\subsubsection{Simulations}\label{simulations}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{fit\_normal\_priors }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data, apparatus, gender) \{}
-  \CommentTok{\#fitting normal prior for mean scores}
-\NormalTok{  normal\_mu\_fit }\OtherTok{=} \FunctionTok{fitdist}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{mean\_score, }\StringTok{"norm"}\NormalTok{)}
-  \CommentTok{\#fitting inv gamma prior for variance of scores}
-\NormalTok{  invgamma\_var\_fit }\OtherTok{=} \FunctionTok{fitdist}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{var\_score, }\StringTok{"invgamma"}\NormalTok{)}
-  
-\NormalTok{  m\_0 }\OtherTok{=}\NormalTok{  normal\_mu\_fit}\SpecialCharTok{$}\NormalTok{estimate[[}\DecValTok{1}\NormalTok{]]}
-\NormalTok{  sig\_0 }\OtherTok{=}\NormalTok{ normal\_mu\_fit}\SpecialCharTok{$}\NormalTok{estimate[[}\DecValTok{2}\NormalTok{]]}
-\NormalTok{  k\_0 }\OtherTok{=}\NormalTok{ invgamma\_var\_fit}\SpecialCharTok{$}\NormalTok{estimate[[}\DecValTok{1}\NormalTok{]] }
-\NormalTok{  v\_0 }\OtherTok{=}\NormalTok{ invgamma\_var\_fit}\SpecialCharTok{$}\NormalTok{estimate[[}\DecValTok{2}\NormalTok{]]}
+\hypertarget{bayesian-monte-carlo-model}{%
+\subsubsection{Bayesian Monte Carlo
+Model}\label{bayesian-monte-carlo-model}}
 
-  \FunctionTok{return}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\AttributeTok{m\_0 =}\NormalTok{ m\_0, }\AttributeTok{sig\_0 =}\NormalTok{ sig\_0, }\AttributeTok{k\_0 =}\NormalTok{ k\_0, }\AttributeTok{v\_0 =}\NormalTok{ v\_0))}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
+In this study, we present a Bayesian statistical Monte Carlo approach to
+select the top male and female American gymnast candidates for
+participation in the 2024 Olympics. Our method involves the creation of
+prior distributions based on historical performance data, conditioning
+these distributions on individual competition results, and simulating
+medal outcomes by predicting scores for each gymnast in each apparatus
+event. The approach offers a robust framework for incorporating both
+prior beliefs and observed data to make informed predictions about
+athletes' performances in simulated events (Hoff, 2009). Utilizing
+Bayes' law for probability density functions, where \(x\) is a vector of
+all the data from an apparatus and gender combination, \(x_i\)
+represents the vector of observed data for athlete \(i\), and \(\theta\)
+represents the parameters of the distribution we will be using to model
+the competition. We are under the assumption that all gymnastic scores
+are independent and identically distributed for every athlete and that
+every athlete's scores come from the same distribution type.
+Furthermore, for modeling purposes, we assume a common prior
+\(p(x| \theta)\) for all athletes such that
+\(p(x_i | \theta) = p(x| \theta)\) for all \(i\). This allows us to
+write the posterior distribution as:
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#code for simulations, inspired by STA360/peter hoff textbook}
+\[
+p(\theta |x_i) \propto p(x| \theta) p(\theta)
+\]
 
-\NormalTok{analyze\_athlete }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(athlete\_results, m\_0, sig\_0, k\_0, v\_0) \{}
-\NormalTok{  n }\OtherTok{=} \FunctionTok{length}\NormalTok{(athlete\_results)}
-\NormalTok{  ybar }\OtherTok{=} \FunctionTok{mean}\NormalTok{(athlete\_results)}
-\NormalTok{  var }\OtherTok{=} \FunctionTok{var}\NormalTok{(athlete\_results)}
-  
-  \CommentTok{\#NEED TO CHECK THIS BAYESIAN}
-\NormalTok{  k\_n }\OtherTok{=}\NormalTok{ k\_0 }\SpecialCharTok{+}\NormalTok{ n}
-\NormalTok{  v\_n }\OtherTok{=}\NormalTok{ v\_0 }\SpecialCharTok{+}\NormalTok{ n}
-\NormalTok{  m\_n }\OtherTok{=}\NormalTok{ (k\_0}\SpecialCharTok{*}\NormalTok{m\_0 }\SpecialCharTok{+}\NormalTok{ n}\SpecialCharTok{*}\NormalTok{ybar)}\SpecialCharTok{/}\NormalTok{k\_n}
-\NormalTok{  sig\_n }\OtherTok{=}\NormalTok{ (v\_0}\SpecialCharTok{*}\NormalTok{sig\_0 }\SpecialCharTok{+}\NormalTok{ (n}\DecValTok{{-}1}\NormalTok{)}\SpecialCharTok{*}\NormalTok{var }\SpecialCharTok{+}\NormalTok{ k\_0}\SpecialCharTok{*}\NormalTok{n}\SpecialCharTok{*}\NormalTok{(ybar }\SpecialCharTok{{-}}\NormalTok{ m\_0)}\SpecialCharTok{**}\DecValTok{2}\SpecialCharTok{/}\NormalTok{k\_n)}\SpecialCharTok{/}\NormalTok{v\_n}
-\NormalTok{  sig\_sample }\OtherTok{=} \FunctionTok{mean}\NormalTok{(}\FunctionTok{rinvgamma}\NormalTok{(smc, v\_n}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, sig\_n}\SpecialCharTok{*}\NormalTok{v\_n}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
-\NormalTok{  theta\_sample }\OtherTok{=} \FunctionTok{mean}\NormalTok{(}\FunctionTok{rnorm}\NormalTok{(smc, m\_n, }\FunctionTok{sqrt}\NormalTok{(sig\_sample}\SpecialCharTok{/}\NormalTok{k\_n)))}
-  
-  \FunctionTok{return}\NormalTok{(}\FunctionTok{c}\NormalTok{(theta\_sample, sig\_sample))}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
+To simulate a score for an athlete we sample
+\(\theta^{(s)} \sim p(\theta | x_i)\) from the posterior distribution
+and then a new value, and then sample
+\(\tilde{x_i} \sim p(x| \theta^{(s)})\). This represents a new predicted
+data point for athlete \(i\) using the posterior distribution, a common
+practice for estimating values from a posterior predictive distribution
+in Bayesian Monte Carlo Simulations (Hoff, 2009). Thus, given we can
+simulate an athlete's scores, we can then simulate a competition between
+all candidate athletes and allocate gold, silver, and bronze medals to
+the top three athletes.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# So this represents one simulation, we could probably run this like 1000 times and average out the medal counts}
-\NormalTok{simulate\_results }\OtherTok{=} \ControlFlowTok{function}\NormalTok{(data, apparatus, gender, m\_0, sig\_0, k\_0, v\_0, }\AttributeTok{medals =} \ConstantTok{TRUE}\NormalTok{) \{}
-\NormalTok{  simul\_data }\OtherTok{=}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{filter}\NormalTok{(Apparatus }\SpecialCharTok{==}\NormalTok{ apparatus}
-\NormalTok{           , Gender }\SpecialCharTok{==}\NormalTok{ gender) }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{group\_by}\NormalTok{(unique\_id, Country) }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean\_estimate =} \FunctionTok{analyze\_athlete}\NormalTok{(Score, }\AttributeTok{m\_0 =}\NormalTok{ m\_0, }\AttributeTok{sig\_0 =}\NormalTok{ sig\_0, }\AttributeTok{k\_0 =}\NormalTok{ k\_0, }\AttributeTok{v\_0 =}\NormalTok{ v\_0)[}\DecValTok{1}\NormalTok{],}
-              \AttributeTok{var\_estimate =} \FunctionTok{analyze\_athlete}\NormalTok{(Score, }\AttributeTok{m\_0 =}\NormalTok{ m\_0, }\AttributeTok{sig\_0 =}\NormalTok{ sig\_0, }\AttributeTok{k\_0 =}\NormalTok{ k\_0, }\AttributeTok{v\_0 =}\NormalTok{ v\_0)[}\DecValTok{2}\NormalTok{],}
-              \AttributeTok{observations =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{"keep"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{rowwise}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{simulated\_Score =} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{, mean\_estimate, var\_estimate)) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# Truncate scores \textgreater{} 10}
-    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{simulated\_Score =} \FunctionTok{ifelse}\NormalTok{(simulated\_Score }\SpecialCharTok{\textgreater{}} \DecValTok{20}\NormalTok{, }\DecValTok{10}\NormalTok{, simulated\_Score)) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# Truncate scores \textless{} 0}
-    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{simulated\_Score =} \FunctionTok{ifelse}\NormalTok{(simulated\_Score }\SpecialCharTok{\textless{}} \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, simulated\_Score)) }
-  
-  \ControlFlowTok{if}\NormalTok{ (medals }\SpecialCharTok{==} \ConstantTok{TRUE}\NormalTok{) \{}
-    \CommentTok{\# order by top 3 results and assign gold, silver, bronze}
-\NormalTok{    simul\_data }\OtherTok{=}\NormalTok{ simul\_data }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(simulated\_Score)) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{medal =} \FunctionTok{case\_when}\NormalTok{(}\FunctionTok{row\_number}\NormalTok{() }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\textasciitilde{}} \StringTok{"Gold"}\NormalTok{,}
-                               \FunctionTok{row\_number}\NormalTok{() }\SpecialCharTok{==} \DecValTok{2} \SpecialCharTok{\textasciitilde{}} \StringTok{"Silver"}\NormalTok{,}
-                               \FunctionTok{row\_number}\NormalTok{() }\SpecialCharTok{==} \DecValTok{3} \SpecialCharTok{\textasciitilde{}} \StringTok{"Bronze"}\NormalTok{,}
-                               \ConstantTok{TRUE} \SpecialCharTok{\textasciitilde{}} \StringTok{"NA"}\NormalTok{))}
-    
-\NormalTok{  \}}
-  \FunctionTok{return}\NormalTok{(simul\_data)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
+\hypertarget{prior-distribution-creation}{%
+\paragraph{Prior Distribution
+Creation:}\label{prior-distribution-creation}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# full competition simulation, gets pretty slow with 1000 simulations}
-\NormalTok{simulate\_full\_competition }\OtherTok{=} \ControlFlowTok{function}\NormalTok{(data, apparatus, gender, mu\_0, sig\_0, k\_0, v\_0, smc) \{}
-\NormalTok{  athletes\_medals }\OtherTok{=}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
-\NormalTok{    dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(unique\_id, Country) }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{distinct}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Golds =} \DecValTok{0}\NormalTok{, }\AttributeTok{Silvers =} \DecValTok{0}\NormalTok{, }\AttributeTok{Bronzes =} \DecValTok{0}\NormalTok{, }\AttributeTok{Total\_Medals =} \DecValTok{0}\NormalTok{)}
-  
-  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{smc) \{    }
-\NormalTok{    big\_simul }\OtherTok{=} \FunctionTok{simulate\_results}\NormalTok{(data, apparatus, gender, mu\_0, sig\_0, k\_0, v\_0, }\ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{filter}\NormalTok{(medal }\SpecialCharTok{!=} \StringTok{"NA"}\NormalTok{)}
-    
-\NormalTok{    big\_simul }\OtherTok{=}\NormalTok{ big\_simul }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{group\_by}\NormalTok{(unique\_id, Country) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{summarise}\NormalTok{(}\AttributeTok{Golds =} \FunctionTok{sum}\NormalTok{(medal }\SpecialCharTok{==} \StringTok{"Gold"}\NormalTok{),}
-                \AttributeTok{Silvers =} \FunctionTok{sum}\NormalTok{(medal }\SpecialCharTok{==} \StringTok{"Silver"}\NormalTok{),}
-                \AttributeTok{Bronzes =} \FunctionTok{sum}\NormalTok{(medal }\SpecialCharTok{==} \StringTok{"Bronze"}\NormalTok{),}
-                \AttributeTok{Total\_Medals =} \FunctionTok{sum}\NormalTok{(medal }\SpecialCharTok{!=} \StringTok{"NA"}\NormalTok{),}
-                \AttributeTok{.groups =} \StringTok{"keep"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{ungroup}\NormalTok{()}
-    
-\NormalTok{    athletes\_medals }\OtherTok{=}\NormalTok{ athletes\_medals }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{left\_join}\NormalTok{(big\_simul, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"unique\_id"}\NormalTok{, }\StringTok{"Country"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Golds =} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(Golds.y), Golds.x, Golds.y }\SpecialCharTok{+}\NormalTok{ Golds.x),}
-             \AttributeTok{Silvers =} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(Silvers.y), Silvers.x, Silvers.y }\SpecialCharTok{+}\NormalTok{ Silvers.x),}
-             \AttributeTok{Bronzes =} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(Bronzes.y), Bronzes.x, Bronzes.y }\SpecialCharTok{+}\NormalTok{ Bronzes.x),}
-             \AttributeTok{Total\_Medals =} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(Total\_Medals.y), Total\_Medals.x, Total\_Medals.y }\SpecialCharTok{+}\NormalTok{ Total\_Medals.x)) }\SpecialCharTok{\%\textgreater{}\%}
-\NormalTok{      dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(unique\_id, Country, Golds, Silvers, Bronzes, Total\_Medals) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(Total\_Medals))}
-\NormalTok{  \} }
-  \FunctionTok{return}\NormalTok{(athletes\_medals)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
+We began by creating prior distributions for each apparatus' total
+score. Splitting the data set by apparatus and gender resulted in
+multiple separate smaller data sets, see Exploratory Data Visualizations
+for the apparatus-gender level distribution. Observing the combined
+score distributions, they appear to be unimodal and slightly
+right-skewed. Various distributions were considered, like the beta
+distribution which is conveniently upper and lower-bounded, but the
+normal distribution was chosen for its simplicity, ease of use, and
+effective fit.
+
+For ease of use, we depended on conjugacy to derive the parameters of
+the normal distribution. Since both the mean, \(mu\), and variance,
+\(sigma^2\), of the normal distribution are unknown, we used
+normal-inverse gamma priors for both parameters. At this point, the
+issue arises that a plurality of athletes have only ever done a single
+competition in any given apparatus, resulting in a large amount of
+athletes with 0 variance and skewing the distribution. Due to the
+unlikely nature of athletes who do not compete regularly participating
+in the Olympics, we have decided to truncate the apparatus level data
+set to exclude athletes with less than three competition appearances for
+that given apparatus.
+
+To estimate prior parameters, we fit a normal distribution to the
+distribution of athletes' means from the data using the maximum
+likelihood method and the \texttt{fitdist()} function (Muller, 2023).
+The maximum likelihood estimates for the mean and variance were then
+used as the prior parameters for the normal part of the normal-inverse
+gamma distribution. Similarly, for the inverse-gamma parameters, we fit
+an inverse-gamma distribution to the distribution of athlete's variances
+from the data using a similar method and used these parameters as the
+prior parameters for the inverse-gamma part of the normal-inverse gamma
+distribution. This process was done independently for all
+apparatus-gender combinations to produce a different set of prior
+parameters for each independently.
+
+\hypertarget{conditioning-on-individual-results}{%
+\subsubsection{Conditioning on Individual
+Results:}\label{conditioning-on-individual-results}}
+
+Following the establishment of the prior distributions, we updated these
+distributions based on individual competition results. We rely on
+existing literature for the formulas for the posterior parameters (Hoff,
+2009). We then employ a Monte Carlo method to sample new data,
+simulating the posterior parameters 1000 times per athlete.
+
+\hypertarget{simulation-of-gymnastics-events}{%
+\subsubsection{Simulation of Gymnastics
+Events:}\label{simulation-of-gymnastics-events}}
+
+To simulate gymnastics events, we performed 500 iterations for each
+apparatus event. For every iteration, we simulated a score for each
+athlete in the event by sampling \(\tilde{x_i}\) from the posterior
+distribution. Furthermore, since the normal distribution is unbounded,
+we truncated the distribution at 0 and 20 to reflect the scoring system.
+We then ranked the athletes by their simulated scores and awarded gold,
+silver, and bronze medals to the top three athletes. Notably, we chose
+not to go with a qualification structure and had a simple one-shot round
+for victory. This decision was made due to computational constraints and
+introduced more variance in the medal distribution, which we take into
+account when identifying which athletes to pick for Team USA. We
+repeated the simulation process for each apparatus event, resulting in
+about 11 million simulated scores across all competitions.
+
+\hypertarget{assumptions}{%
+\subsubsection{Assumptions:}\label{assumptions}}
+
+Inherent in our methodology are several assumptions. Firstly, we assume
+that gymnastic scores are normally distributed, justifying the use of
+the normal distribution for both prior and posterior distributions.
+Additionally, we assume independence between events, allowing us to
+treat each apparatus event as a separate and identically distributed
+random variable. We also assumed that athletes prioritize all stages of
+every event identically. Furthermore, we assume that historical
+performance data adequately represents the gymnasts' true abilities and
+that changing age is not a factor in gymnastic ability. While this
+assumption simplifies the modeling process, it may not fully capture the
+complexities of individual development and improvements over time.
 
 \hypertarget{results}{%
 \subsection{Results}\label{results}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
-\CommentTok{\# This is how it sort of would work}
-\NormalTok{prior\_parameters }\OtherTok{=} \FunctionTok{suppressWarnings}\NormalTok{(}\FunctionTok{fit\_normal\_priors}\NormalTok{(combined\_apparatus, }\StringTok{"FX"}\NormalTok{, }\StringTok{"w"}\NormalTok{))}
-\FunctionTok{print}\NormalTok{(prior\_parameters)}
-\end{Highlighting}
-\end{Shaded}
+We ran simulations for each apparatus for each gender (women's 4
+apparatuses and men's 6 apparatuses) 500 times. Overall, the most
+successful American athletes were:
 
-\begin{verbatim}
-       m_0      sig_0        k_0        v_0 
-14.0574616  0.5891628  0.6657795 79.5576545 
-\end{verbatim}
+\hypertarget{list-here-plz}{%
+\section{LIST HERE PLZ}\label{list-here-plz}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{mu\_0 }\OtherTok{=}\NormalTok{ prior\_parameters[}\DecValTok{1}\NormalTok{]}
-\NormalTok{sig\_0 }\OtherTok{=}\NormalTok{ prior\_parameters[}\DecValTok{2}\NormalTok{]}
-\NormalTok{k\_0 }\OtherTok{=}\NormalTok{ prior\_parameters[}\DecValTok{3}\NormalTok{]}
-\NormalTok{v\_0 }\OtherTok{=}\NormalTok{ prior\_parameters[}\DecValTok{4}\NormalTok{]}
+Indicating that the most successful american team would likely be
+composed of:
 
-\CommentTok{\# test\_simul = simulate\_full\_competition(combined\_final, "FX", "w", mu\_0, sig\_0, k\_0, v\_0, 100)}
-\CommentTok{\# head(test\_simul)}
-\end{Highlighting}
-\end{Shaded}
+\hypertarget{list-here-plz-1}{%
+\section{LIST HERE PLZ}\label{list-here-plz-1}}
+
+With a total of (number of medals) across 500 simulations of each
+apparatus.
+
+\hypertarget{female-athletes-results}{%
+\subsubsection{Female Athletes' Results}\label{female-athletes-results}}
+
+For women's apparatuses, we outputted the tables of simulation outcomes
+for floor exercise, balance beam, and vault because of the high presence
+of medals for US gymnasts. The table of simulation outcomes for uneven
+bars is in the appendix.
+
+\begin{table}[H]
+
+\caption{Women's Floor Exercise Simulation Results }
+\centering
+\fontsize{8}{10}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Simone Biles: USA & 206 & 68 & 61 & 335\\
+\hline
+Rebeca Andrade: BRA & 48 & 63 & 51 & 162\\
+\hline
+Kaliya Lincoln: USA & 37 & 35 & 34 & 106\\
+\hline
+Jessica Gadirova: GBR & 30 & 36 & 36 & 102\\
+\hline
+Jade Carey: USA & 18 & 27 & 36 & 81\\
+\hline
+Flavia Saraiva: BRA & 22 & 33 & 19 & 74\\
+\hline
+Shilese Jones: USA & 12 & 22 & 28 & 62\\
+\hline
+Martina Maggio: ITA & 14 & 22 & 25 & 61\\
+\hline
+Jordan Chiles: USA & 20 & 20 & 21 & 61\\
+\hline
+Joscelyn Roberson: USA & 15 & 11 & 18 & 44\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+
+\caption{Women's Balance Beam Simulation Results }
+\centering
+\fontsize{8}{10}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Simone Biles: USA & 93 & 61 & 54 & 208\\
+\hline
+Yaqin Zhou: CHN & 73 & 71 & 44 & 188\\
+\hline
+Konnor McClain: USA & 80 & 43 & 43 & 166\\
+\hline
+Qingying Zhang: CHN & 55 & 58 & 37 & 150\\
+\hline
+Sunisa Lee: USA & 34 & 30 & 40 & 104\\
+\hline
+Yushan Ou: CHN & 21 & 24 & 27 & 72\\
+\hline
+Huan Luo: CHN & 18 & 13 & 21 & 52\\
+\hline
+Urara Ashikawa: JPN & 13 & 15 & 21 & 49\\
+\hline
+Skye Blakely: USA & 11 & 16 & 14 & 41\\
+\hline
+NA & 7 & 5 & 18 & 30\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+
+\caption{Women's Vault Simulation Results }
+\centering
+\fontsize{8}{10}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Simone Biles: USA & 176 & 100 & 58 & 334\\
+\hline
+Rebeca Andrade: BRA & 108 & 99 & 73 & 280\\
+\hline
+Jade Carey: USA & 74 & 74 & 61 & 209\\
+\hline
+Shilese Jones: USA & 29 & 31 & 50 & 110\\
+\hline
+Konnor McClain: USA & 18 & 37 & 46 & 101\\
+\hline
+Ondine Achampong: GBR & 17 & 30 & 38 & 85\\
+\hline
+Joscelyn Roberson: USA & 15 & 30 & 38 & 83\\
+\hline
+Shokyo Miyata: JPN & 14 & 24 & 41 & 79\\
+\hline
+Jordan Chiles: USA & 12 & 34 & 31 & 77\\
+\hline
+Skye Blakely: USA & 22 & 16 & 36 & 74\\
+\hline
+\end{tabular}
+\end{table}
+
+\hypertarget{male-athletes-results}{%
+\subsubsection{Male Athletes' Results}\label{male-athletes-results}}
+
+For men's apparatuses, we outputted the tables of simulation outcomes
+for vault and parallel bars because of the high presence of medals for
+US gymnasts relative to the other apparatuses. The tables of simulation
+outcomes for floor exercise, still rings, pommel horse, and high bar are
+in the appendix.
+
+\begin{table}[H]
+
+\caption{Men's Vault Simulation Results }
+\centering
+\fontsize{8}{10}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Jake Jarman: GBR & 103 & 53 & 61 & 217\\
+\hline
+Asher Hong: USA & 63 & 52 & 59 & 174\\
+\hline
+Daiki Hashimoto: JPN & 55 & 46 & 48 & 149\\
+\hline
+Boheng Zhang: CHN & 47 & 48 & 36 & 131\\
+\hline
+Donnell Whittenburg: USA & 43 & 47 & 37 & 127\\
+\hline
+Khoi Young: USA & 37 & 45 & 39 & 121\\
+\hline
+Curran Phillips: USA & 33 & 39 & 36 & 108\\
+\hline
+Dallas Hale: USA & 28 & 44 & 31 & 103\\
+\hline
+Taylor Burkhart: USA & 25 & 38 & 31 & 94\\
+\hline
+Colt Walker: USA & 21 & 25 & 36 & 82\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+
+\caption{Men's Parallel Bars Simulation Results }
+\centering
+\fontsize{8}{10}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Jingyuan Zou: CHN & 192 & 75 & 46 & 313\\
+\hline
+Lukas Dauser: GER & 38 & 53 & 41 & 132\\
+\hline
+Boheng Zhang: CHN & 38 & 33 & 30 & 101\\
+\hline
+Carlos Yulo: PHI & 23 & 27 & 23 & 73\\
+\hline
+Blake Sun: USA & 20 & 21 & 23 & 64\\
+\hline
+Curran Phillips: USA & 17 & 23 & 24 & 64\\
+\hline
+Illia Kovtun: UKR & 14 & 21 & 28 & 63\\
+\hline
+Joe Fraser: GBR & 18 & 24 & 17 & 59\\
+\hline
+Colt Walker: USA & 19 & 15 & 22 & 56\\
+\hline
+NA & 8 & 19 & 21 & 48\\
+\hline
+\end{tabular}
+\end{table}
 
 \hypertarget{discussion}{%
 \subsection{Discussion}\label{discussion}}
 
+\hypertarget{objective-1-choice-of-medal-success-metric-total-number-of-gold-medals}{%
+\subsubsection{Objective 1: Choice of Medal Success Metric (Total Number
+of Gold
+Medals)}\label{objective-1-choice-of-medal-success-metric-total-number-of-gold-medals}}
+
+From the dot plot visualizations of the women's simulation of the three
+considered success metrics (gold medal count, total medal count, and
+weighted medal count) for each apparatus by USA and non-USA teams, there
+looks to be at least one USA athlete that places higher than of all
+non-USA athletes in each medal metric for each apparatus except uneven
+bars (Appendix: Image 5). The women's USA team makes up 51\% of the
+total women's gold medals in the simulation which is a higher proportion
+than the 47\% of the total medal count and 48\% of the weighted medals
+(Appendix: Image 7). From the dot plot visualizations of the men's
+simulation of the three considered success metrics, for each apparatus
+by USA and non-USA teams, there are non-USA athletes for each apparatus
+that exceed the USA in each medal success metric (Appendix: Image 6).
+The men's USA team makes up 24\% of the total medal count in the
+simulation which is a higher proportion than the 21\% of the total gold
+medal count and 23\% of the weighted medals. (Appendix: Image 8) When
+viewing the top 5 most successful female athletes (top 5 most decorated
+by that medal metric) in each apparatus for each medal success metric,
+the USA makes a good portion of these athletes. There tend to be 2-4 USA
+athletes in the top 5 depending on the success metric and apparatus
+(Appendix: Image 7). When viewing the top 5 most successful male
+athletes in each apparatus for each medal success metric, there tend to
+be 0-3 (mostly 0) US male athletes present (Appendix: Image 8).
+
+Considering that female USA medalists tend to represent a much higher
+proportion of medal successes (no matter the success metric) than male
+USA athletes, it is best to prioritize the success metric that the
+female team performs the best in. Also viewing the male top 5 most
+decorated athlete by each metric for each apparatus, the men's USA team
+has a higher proportion of athletes in the top 5 when using the total
+number of gold medals as a success metric (Appendix: Image 8).
+Therefore, the success metric that we aim to maximize to best ensure the
+USA team's success is the total number of gold medals.
+
+\hypertarget{objective-2-value-of-medals-for-each-event-type-team-aa-individual-aa-individual-apparatus}{%
+\subsubsection{Objective 2: Value of Medals for Each Event Type (Team AA
+\textgreater{} Individual AA \textgreater{} Individual
+Apparatus)}\label{objective-2-value-of-medals-for-each-event-type-team-aa-individual-aa-individual-apparatus}}
+
+From the table of the top 10 most decorated gold medal female athletes
+by apparatus, the USA, China, Brazil, and Great Britain make multiple
+appearances. The USA has athletes in the top 10 most decorated gold
+medalist for each apparatus as well as the top 5, but other countries do
+not (Appendix: Image 9). This allows us to assume that the USA has great
+potential in winning the team all-around since it is the only country
+with many of the most successful athletes in each apparatus in terms of
+the number of gold medals. In this case, valuing the team's all-around
+medal more than the individual all-around and individual apparatus will
+hopefully increase medal success in terms of gold medal count. Also when
+viewing the top 10 most decorated gold medal female athletes by
+apparatus, the USA's Simone Biles, appears in the balance beam as first,
+in floor exercise as first, in uneven bars as ninth, and in vault as
+first. Valuing the individual all-around events higher also may help
+team USA increase in our metric of success. Furthermore, since these
+events are harder to achieve than individual apparatuses because of the
+multiple sections within the event that need to also meet a standard, it
+will be harder for other countries to also benefit from this increased
+value.
+
+From the table of the top 10 most decorated gold medal male athletes by
+apparatus, the USA, Japan, and China make multiple appearances. The only
+country that has an athlete in each apparatus for the top 10, is the USA
+(Appendix: Image 11). It could be slightly beneficial to the men's team
+to value the team's all-around success more than the other events. The
+US men's team also does not have a well-rounded athlete that places in
+the top 10 most decorated gold male athletes for each apparatus so we
+can assume valuing individual all-around successes over the other events
+would not help the US men's team but it also would not hurt it since
+other countries also do not have a highly decorated well-rounded
+competitor.
+
+In the dot plots of the top 5 decorated gold medal female athletes'
+countries by number of gold medals for each apparatus, US athletes make
+multiple appearances (Appendix: Image 10). In the dot plots of the top 5
+decorated gold medal male athlete's countries by number of gold medals
+for each apparatus, US athletes are present in multiple apparatuses but
+not many athletes are well decorated within each apparatus. But in vault
+there are two US athletes in the top 5 (Appendix: Image 12). Valuing
+individual apparatus events as regular events of weight 1 would best
+suit both the male and female teams' success against their competitors.
+Weighing the team all-around as 3 points is viable because not only do
+both the men's and women's USA have the potential to win based on this
+simulation, but there is less reliance and pressure on one singular
+person. Weighing the individual all-around as 2 will hopefully benefit
+the women's team with Simone Biles as the potential representative for
+this event. These weights will in hope best accommodate the male and
+female athletes and give them the best chance at success against other
+countries in terms of the total number of gold medals.
+
+\hypertarget{objective-3-all-around-vs-event-specialist-vs-mixture}{%
+\subsubsection{Objective 3: All-Around vs Event Specialist vs
+Mixture}\label{objective-3-all-around-vs-event-specialist-vs-mixture}}
+
+In our metric of success, we chose the total count of gold medals and we
+decided to weigh team all-around events as greater than individual
+all-around events and individual all-around great than the individual
+apparatuses. For the women's team, we believe it is best to select a
+team of five female athletes who are a combination of all-around and
+event-specialist gymnasts. Since the US women's team has a strong shot
+at winning the individual all-around with multi-apparatus highly gold
+medal decorated athlete Simone Biles and team all-around with other
+multiple highly decorated gold medalists who specialize in their
+apparatus, focusing on both would be an optimal strategy (Appendix:
+Image 10). For the men's team, we believe it is best to select a team of
+five male athletes who are also a combination of both all-around
+gymnasts and specialists. In the simulation, since 3 of the top 10 most
+gold medal-decorated male gymnasts in parallel bars are from the US and
+7 of the top 10 in vault are from the US, there is a good chance that a
+male athlete from the US may be successful in those apparatuses
+(Appendix: Image 11). Since the US does not seem to have very many
+strong gold medal specialists in the other apparatuses, the men's team
+should fill the remaining positions with all-around gymnasts.
+
+\hypertarget{objective-4-identifying-5-athletes}{%
+\subsubsection{Objective 4: Identifying 5 Athletes
+\ldots{}}\label{objective-4-identifying-5-athletes}}
+
+\newpage
+
 \hypertarget{appendix}{%
 \subsection{Appendix}\label{appendix}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{number\_athletes }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{filter}\NormalTok{(Round }\SpecialCharTok{\%in\%}\NormalTok{ AA\_team) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ athletes\_participated)) }\SpecialCharTok{+}
-    \FunctionTok{geom\_histogram}\NormalTok{() }\SpecialCharTok{+}
-    \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Round) }\SpecialCharTok{+}
-    \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Number of Unique Athletes Competed"}\NormalTok{,}
-         \AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{,}
-         \AttributeTok{title =} \StringTok{"Distribution of Athletes Competed at Competition Rounds"}\NormalTok{,}
-         \AttributeTok{subtitle =} \StringTok{"All Around or Team All Arounds"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\hypertarget{works-cited}{%
+\subsubsection{Works Cited}\label{works-cited}}
+
+\begin{itemize}
+\item
+  Camenker, Jacob. ``How Old Is Simone Biles? Why Elite Olympic Gymnasts
+  Typically Retire at a Young Age.'' Sporting News, 18 Sept.~2021,
+  www.sportingnews.com/us/athletics/news/simone-biles-retire-age-olympics/1laom4i4u4wh1thcgta4nun2x.
+  Accessed 20 Nov.~2023.
+\item
+  Hoff, Peter D. A First Course in Bayesian Statistical Methods.
+  Springer, 2009.
+\item
+  Meyers, Dvora. ``Time for the End of the Teen Gymnast.''
+  FiveThirtyEight, 27 July 2021,
+  fivethirtyeight.com/features/gymnasts-age-olympics/. Accessed 20
+  Nov.~2023.
+\item
+  Muller, Marie Laure Delignette, and Christophe Dutang. ``Overview of
+  the Fitdistrplus Package.'' R-Project, CRAN, 25 Apr.~2023,
+  cran.r-project.org/web/packages/fitdistrplus/vignettes/fitdistrplus\_vignette.html.
+\item
+  ``Paris 2024 Olympic Games: How Do Athletes Qualify?'' Olympics, 8
+  Aug.~2021,
+  olympics.com/en/news/paris-2024-olympic-games-how-do-athletes-qualify.
+  Accessed 20 Nov.~2023.
+\item
+  Santos-Fernandez, Edgar, et al.~``Bayesian Statistics Meets Sports: A
+  Comprehensive Review.'' Journal of Quantitative Analysis in Sports,
+  vol.~15, no. 4, Dec.~2019, pp.~289--312. www.degruyter.com,
+  https://doi.org/10.1515/jqas-2018-0106.
+\item
+  ``Tokyo 2020 Artistic Gymnastics - Olympic Results by Discipline.''
+  Olympics,
+  olympics.com/en/olympic-games/tokyo-2020/results/artistic-gymnastics.
+  Accessed 20 Nov.~2023.
+\item
+  ``UCSAS 2024 USOPC DATA CHALLENGE.'' UConn Sports Analytics Symposium
+  (UCSAS), statds.org/events/ucsas2024/challenge.html. Accessed 20
+  Nov.~2023.
+\item
+  Yang, Tae Young, and Tim Swartz. ``A Two-Stage Bayesian Model for
+  Predicting Winners in Major League Baseball.'' Journal of Data
+  Science, vol.~2, no. 1, Aug.~2022, pp.~61--73. jds-online.org,
+  https://doi.org/10.6339/JDS.2004.02(1).142.
+\end{itemize}
+
+\hypertarget{additional-simulation-results}{%
+\subsubsection{Additional Simulation
+Results}\label{additional-simulation-results}}
+
+Given women compete on 4 apparatuses and men compete on 4 apparatuses,
+we have tables of the simulation outcomes for all 10 apparatuses, and
+the 5 simluation outcome tables where US gymnasts do not perform as well
+relative to athletes from other countries are outputted below.
+
+\begin{table}[H]
+
+\caption{Women's Uneven Bars Simulation Results }
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Kayla Neymour: ALG & 92 & 63 & 46 & 201\\
+\hline
+Qiyan Qiu: CHN & 72 & 69 & 43 & 184\\
+\hline
+Shilese Jones: USA & 44 & 46 & 44 & 134\\
+\hline
+Xiaoyuan Wei: CHN & 47 & 32 & 26 & 105\\
+\hline
+Zoe Miller: USA & 37 & 26 & 38 & 101\\
+\hline
+Alice D'Amato: ITA & 30 & 29 & 32 & 91\\
+\hline
+Xijing Tang: CHN & 28 & 27 & 31 & 86\\
+\hline
+Rebeca Andrade: BRA & 22 & 28 & 31 & 81\\
+\hline
+Simone Biles: USA & 11 & 22 & 21 & 54\\
+\hline
+Elisabeth Seitz: GER & 15 & 22 & 16 & 53\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+
+\caption{Men's Floor Exercise Simulation Results }
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Carlos Yulo: PHI & 62 & 43 & 47 & 152\\
+\hline
+Artem Dolgopyat: ISR & 33 & 29 & 26 & 88\\
+\hline
+Ryosuke Doi: JPN & 32 & 21 & 24 & 77\\
+\hline
+Paul Juda: USA & 17 & 20 & 21 & 58\\
+\hline
+Daiki Hashimoto: JPN & 19 & 15 & 22 & 56\\
+\hline
+Brody Malone: USA & 18 & 18 & 14 & 50\\
+\hline
+NA & 13 & 20 & 16 & 49\\
+\hline
+Boheng Zhang: CHN & 23 & 10 & 13 & 46\\
+\hline
+Kazuki Minami: JPM & 19 & 16 & 8 & 43\\
+\hline
+Nicola Bartolini: ITA & 13 & 18 & 10 & 41\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+
+\caption{Men's High Bar Simulation Results }
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Daiki Hashimoto: JPN & 62 & 60 & 22 & 144\\
+\hline
+Cong Shi: CHN & 57 & 30 & 23 & 110\\
+\hline
+Boheng Zhang: CHN & 52 & 32 & 25 & 109\\
+\hline
+Wei Sun: CHN & 30 & 24 & 26 & 80\\
+\hline
+Brody Malone: USA & 29 & 27 & 20 & 76\\
+\hline
+Milad Karimi: KAZ & 16 & 30 & 20 & 66\\
+\hline
+Weide Su: CHN & 31 & 18 & 15 & 64\\
+\hline
+Ilias Georgiou: CYP & 8 & 20 & 21 & 49\\
+\hline
+Shohei Kawakami: JPN & 13 & 20 & 15 & 48\\
+\hline
+NA & 18 & 12 & 15 & 45\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+
+\caption{Men's Pommel Horse Simulation Results }
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Max Whitlock: GBR & 93 & 41 & 37 & 171\\
+\hline
+Nariman Kurbanov: KAZ & 62 & 47 & 35 & 144\\
+\hline
+Chih Lee: TPE & 55 & 37 & 39 & 131\\
+\hline
+Rhys McClenaghan: IRL & 26 & 33 & 24 & 83\\
+\hline
+Ahmad Abu Al Soud: JOR & 25 & 20 & 28 & 73\\
+\hline
+Gagik Khachikyan: ARM & 22 & 29 & 15 & 66\\
+\hline
+Stephen Nedoroscik: USA & 20 & 19 & 26 & 65\\
+\hline
+NA & 20 & 25 & 16 & 61\\
+\hline
+NA & 16 & 20 & 19 & 55\\
+\hline
+NA & 18 & 12 & 15 & 45\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+
+\caption{Men's Still Rings Simulation Results }
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Athlete \& Country & Golds & Silvers & Bronzes & Total Medals\\
+\hline
+Yang Liu: CHN & 92 & 57 & 35 & 184\\
+\hline
+Xingyu Lan: CHN & 68 & 34 & 48 & 150\\
+\hline
+Eleftherious Petrounias: GRE & 27 & 49 & 39 & 115\\
+\hline
+Jingyuan Zou: CHN & 47 & 22 & 29 & 98\\
+\hline
+Adem Asil: TUR & 17 & 29 & 33 & 79\\
+\hline
+Salvatore Maresca: ITA & 22 & 18 & 33 & 73\\
+\hline
+Ibrahim Colak: TUR & 15 & 23 & 18 & 56\\
+\hline
+Hao You: CHN & 14 & 27 & 15 & 56\\
+\hline
+NA & 18 & 18 & 19 & 55\\
+\hline
+Boheng Zhang: CHN & 15 & 16 & 20 & 51\\
+\hline
+\end{tabular}
+\end{table}
+
+\hypertarget{extra-visualizations}{%
+\subsubsection{Extra Visualizations}\label{extra-visualizations}}
+
+The following visualizations show the distribution of difficulty and
+execution scores by apparatus for male and female gymnasts, which are
+still approximately normal but do show more drastic deviations from
+normality than do the overall scores for each gymnast at an apparatus in
+a competition round. So, we thought it would be more fitting to fit
+normal-inverse gamma priors on the means and variances of the overall
+scores.
+
+\includegraphics{Main_files/figure-pdf/execution-difficulty-distributions-1.pdf}
+
+\includegraphics{Main_files/figure-pdf/execution-difficulty-distributions-2.pdf}
+
+\includegraphics{Main_files/figure-pdf/execution-difficulty-distributions-3.pdf}
+
+\includegraphics{Main_files/figure-pdf/execution-difficulty-distributions-4.pdf}
+
+Additionally, we look at the distribution of mean scores and the
+distribution of variance scores for men's high bar apparatus as an
+example of how we will fit normal-inverse gamma priors for the means and
+variances. We can see that the distribution of mean scores follows an
+approximately normal distribution and the distribution of variance
+scores follow an approximately inverse-gamma distribution.
+
+\includegraphics{Main_files/figure-pdf/highbar-fit-1.pdf}
+
+\includegraphics{Main_files/figure-pdf/scoremeans-var-1.pdf}
+
+\includegraphics{Main_files/figure-pdf/scoremeans-var-2.pdf}
+
+\includegraphics{Main_files/figure-pdf/unique-athletes-1.pdf}
+
+\includegraphics{Main_files/figure-pdf/unique-athletes-2.pdf}
+
+\includegraphics{Main_files/figure-pdf/unique-athletes-3.pdf}
+
+\includegraphics{Main_files/figure-pdf/unique-athletes-4.pdf}
+
+\textbf{Image 5)}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-4-1.pdf}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-4-2.pdf}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-4-3.pdf}
+
+\textbf{Image 6)}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-5-1.pdf}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-5-2.pdf}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-5-3.pdf}
+
+\textbf{Image 7)}
+
+Women:
+
+\begin{itemize}
+\item
+  Top 5 athletes by apparatus for each of the 3 success metrics
+\item
+  Sum of each of the 3 metrics made by athletes from the US and non-US
+  countries
+\end{itemize}
+
+\begin{tabular}{l|r|r|r|r|l|r|l|l}
+\hline
+unique\_id & Golds & Silvers & Bronzes & Total\_Medals & Country & Medal\_Weight & Apparatus & USA\\
+\hline
+SimBIL\_USA & 93 & 61 & 54 & 208 & USA & 455 & BB & USA\\
+\hline
+KonMCC\_USA & 80 & 43 & 43 & 166 & USA & 369 & BB & USA\\
+\hline
+YaqZHO\_CHN & 73 & 71 & 44 & 188 & CHN & 405 & BB & nonUSA\\
+\hline
+QinZHA\_CHN & 55 & 58 & 37 & 150 & CHN & 318 & BB & nonUSA\\
+\hline
+SunLEE\_USA & 34 & 30 & 40 & 104 & USA & 202 & BB & USA\\
+\hline
+SimBIL\_USA & 206 & 68 & 61 & 335 & USA & 815 & FX & USA\\
+\hline
+RebAND\_BRA & 48 & 63 & 51 & 162 & BRA & 321 & FX & nonUSA\\
+\hline
+KalLIN\_USA & 37 & 35 & 34 & 106 & USA & 215 & FX & USA\\
+\hline
+JesGAD\_GBR & 30 & 36 & 36 & 102 & GBR & 198 & FX & nonUSA\\
+\hline
+FlaSAR\_BRA & 22 & 33 & 19 & 74 & BRA & 151 & FX & nonUSA\\
+\hline
+KayNEM\_ALG & 92 & 63 & 46 & 201 & ALG & 448 & UB & nonUSA\\
+\hline
+QiyQIU\_CHN & 72 & 69 & 43 & 184 & CHN & 397 & UB & nonUSA\\
+\hline
+XiaWEI\_CHN & 47 & 32 & 26 & 105 & CHN & 231 & UB & nonUSA\\
+\hline
+ShiJON\_USA & 44 & 46 & 44 & 134 & USA & 268 & UB & USA\\
+\hline
+ZoeMIL\_USA & 37 & 26 & 38 & 101 & USA & 201 & UB & USA\\
+\hline
+SimBIL\_USA & 176 & 100 & 58 & 334 & USA & 786 & VT & USA\\
+\hline
+RebAND\_BRA & 108 & 99 & 73 & 280 & BRA & 595 & VT & nonUSA\\
+\hline
+JadCAR\_USA & 74 & 74 & 61 & 209 & USA & 431 & VT & USA\\
+\hline
+ShiJON\_USA & 29 & 31 & 50 & 110 & USA & 199 & VT & USA\\
+\hline
+SkyBLA\_USA & 22 & 16 & 36 & 74 & USA & 134 & VT & USA\\
+\hline
+\end{tabular}
+
+\begin{tabular}{l|r|r|r|r|l|r|l|l}
+\hline
+unique\_id & Golds & Silvers & Bronzes & Total\_Medals & Country & Medal\_Weight & Apparatus & USA\\
+\hline
+SimBIL\_USA & 93 & 61 & 54 & 208 & USA & 455 & BB & USA\\
+\hline
+YaqZHO\_CHN & 73 & 71 & 44 & 188 & CHN & 405 & BB & nonUSA\\
+\hline
+KonMCC\_USA & 80 & 43 & 43 & 166 & USA & 369 & BB & USA\\
+\hline
+QinZHA\_CHN & 55 & 58 & 37 & 150 & CHN & 318 & BB & nonUSA\\
+\hline
+SunLEE\_USA & 34 & 30 & 40 & 104 & USA & 202 & BB & USA\\
+\hline
+SimBIL\_USA & 206 & 68 & 61 & 335 & USA & 815 & FX & USA\\
+\hline
+RebAND\_BRA & 48 & 63 & 51 & 162 & BRA & 321 & FX & nonUSA\\
+\hline
+KalLIN\_USA & 37 & 35 & 34 & 106 & USA & 215 & FX & USA\\
+\hline
+JesGAD\_GBR & 30 & 36 & 36 & 102 & GBR & 198 & FX & nonUSA\\
+\hline
+JadCAR\_USA & 18 & 27 & 36 & 81 & USA & 144 & FX & USA\\
+\hline
+KayNEM\_ALG & 92 & 63 & 46 & 201 & ALG & 448 & UB & nonUSA\\
+\hline
+QiyQIU\_CHN & 72 & 69 & 43 & 184 & CHN & 397 & UB & nonUSA\\
+\hline
+ShiJON\_USA & 44 & 46 & 44 & 134 & USA & 268 & UB & USA\\
+\hline
+XiaWEI\_CHN & 47 & 32 & 26 & 105 & CHN & 231 & UB & nonUSA\\
+\hline
+ZoeMIL\_USA & 37 & 26 & 38 & 101 & USA & 201 & UB & USA\\
+\hline
+SimBIL\_USA & 176 & 100 & 58 & 334 & USA & 786 & VT & USA\\
+\hline
+RebAND\_BRA & 108 & 99 & 73 & 280 & BRA & 595 & VT & nonUSA\\
+\hline
+JadCAR\_USA & 74 & 74 & 61 & 209 & USA & 431 & VT & USA\\
+\hline
+ShiJON\_USA & 29 & 31 & 50 & 110 & USA & 199 & VT & USA\\
+\hline
+KonMCC\_USA & 18 & 37 & 46 & 101 & USA & 174 & VT & USA\\
+\hline
+\end{tabular}
+
+\begin{tabular}{l|r|r|r|r|l|r|l|l}
+\hline
+unique\_id & Golds & Silvers & Bronzes & Total\_Medals & Country & Medal\_Weight & Apparatus & USA\\
+\hline
+SimBIL\_USA & 93 & 61 & 54 & 208 & USA & 455 & BB & USA\\
+\hline
+YaqZHO\_CHN & 73 & 71 & 44 & 188 & CHN & 405 & BB & nonUSA\\
+\hline
+KonMCC\_USA & 80 & 43 & 43 & 166 & USA & 369 & BB & USA\\
+\hline
+QinZHA\_CHN & 55 & 58 & 37 & 150 & CHN & 318 & BB & nonUSA\\
+\hline
+SunLEE\_USA & 34 & 30 & 40 & 104 & USA & 202 & BB & USA\\
+\hline
+SimBIL\_USA & 206 & 68 & 61 & 335 & USA & 815 & FX & USA\\
+\hline
+RebAND\_BRA & 48 & 63 & 51 & 162 & BRA & 321 & FX & nonUSA\\
+\hline
+KalLIN\_USA & 37 & 35 & 34 & 106 & USA & 215 & FX & USA\\
+\hline
+JesGAD\_GBR & 30 & 36 & 36 & 102 & GBR & 198 & FX & nonUSA\\
+\hline
+FlaSAR\_BRA & 22 & 33 & 19 & 74 & BRA & 151 & FX & nonUSA\\
+\hline
+KayNEM\_ALG & 92 & 63 & 46 & 201 & ALG & 448 & UB & nonUSA\\
+\hline
+QiyQIU\_CHN & 72 & 69 & 43 & 184 & CHN & 397 & UB & nonUSA\\
+\hline
+ShiJON\_USA & 44 & 46 & 44 & 134 & USA & 268 & UB & USA\\
+\hline
+XiaWEI\_CHN & 47 & 32 & 26 & 105 & CHN & 231 & UB & nonUSA\\
+\hline
+ZoeMIL\_USA & 37 & 26 & 38 & 101 & USA & 201 & UB & USA\\
+\hline
+SimBIL\_USA & 176 & 100 & 58 & 334 & USA & 786 & VT & USA\\
+\hline
+RebAND\_BRA & 108 & 99 & 73 & 280 & BRA & 595 & VT & nonUSA\\
+\hline
+JadCAR\_USA & 74 & 74 & 61 & 209 & USA & 431 & VT & USA\\
+\hline
+ShiJON\_USA & 29 & 31 & 50 & 110 & USA & 199 & VT & USA\\
+\hline
+KonMCC\_USA & 18 & 37 & 46 & 101 & USA & 174 & VT & USA\\
+\hline
+\end{tabular}
+
+\begin{tabular}{l|r|r|r}
+\hline
+USA & sumGolds & sumTotal & sumWeighted\\
+\hline
+nonUSA & 938 & 3140 & 6135\\
+\hline
+USA & 1062 & 2860 & 5865\\
+\hline
+\end{tabular}
+
+For the women's simulation when looking at the top 5 athletes by:
+
+\begin{itemize}
+\item
+  \emph{Gold Medal Count} for each apparatus there are 10 out of 20 from
+  the US: balance beam (BB): 3, floor exercise (FX): 3, uneven bars
+  (UB): 2, and vault (VT): 2
+
+  \begin{itemize}
+  \tightlist
+  \item
+    USA makes up 51\% of the total women's gold medals in the
+    simulation.
+  \end{itemize}
+\item
+  \emph{Total Medal Count} for each apparatus there are 12 out of 20
+  from the US: balance beam (BB): 3, floor exercise (FX): 4, uneven bars
+  (UB): 1, vault (VT): 4
+
+  \begin{itemize}
+  \tightlist
+  \item
+    USA makes up 47\% of the total women's medals in the simulation.
+  \end{itemize}
+\item
+  \emph{Weighted Medal Count} for each apparatus there are 10 out of 20
+  from the US: balance beam (BB): 3, floor exercise (FX): 2, uneven bars
+  (UB): 1, vault (VT): 4
+
+  \begin{itemize}
+  \tightlist
+  \item
+    USA makes up 48\% of the weight of women's medals in the simulation.
+  \end{itemize}
+\end{itemize}
+
+\textbf{Image 8)}
+
+Men:
+
+\begin{itemize}
+\item
+  Top 5 athletes by apparatus for each of the 3 success metrics
+\item
+  Sum of each of the 3 metrics made by athletes from the US and non-US
+  countries
+\end{itemize}
+
+\begin{tabular}{l|r|r|r|r|l|r|l|l}
+\hline
+unique\_id & Golds & Silvers & Bronzes & Total\_Medals & Country & Medal\_Weight & Apparatus & USA\\
+\hline
+CarYUL\_PHI & 62 & 43 & 47 & 152 & PHI & 319 & FX & nonUSA\\
+\hline
+ArtDOL\_ISR & 33 & 29 & 26 & 88 & ISR & 183 & FX & nonUSA\\
+\hline
+RyoDOI\_JPN & 32 & 21 & 24 & 77 & JPN & 162 & FX & nonUSA\\
+\hline
+BohZHA\_CHN & 23 & 10 & 13 & 46 & CHN & 102 & FX & nonUSA\\
+\hline
+DaiHAS\_JPN & 19 & 15 & 22 & 56 & JPN & 109 & FX & nonUSA\\
+\hline
+KazMIN\_JPN & 19 & 16 & 8 & 43 & JPN & 97 & FX & nonUSA\\
+\hline
+DaiHAS\_JPN & 62 & 60 & 22 & 144 & JPN & 328 & HB & nonUSA\\
+\hline
+ConSHI\_CHN & 57 & 30 & 23 & 110 & CHN & 254 & HB & nonUSA\\
+\hline
+BohZHA\_CHN & 52 & 32 & 25 & 109 & CHN & 245 & HB & nonUSA\\
+\hline
+WeiSU\_\_CHN & 31 & 18 & 15 & 64 & CHN & 144 & HB & nonUSA\\
+\hline
+WeiSUN\_CHN & 30 & 24 & 26 & 80 & CHN & 164 & HB & nonUSA\\
+\hline
+JinZOU\_CHN & 192 & 75 & 46 & 313 & CHN & 772 & PB & nonUSA\\
+\hline
+LukDAU\_GER & 38 & 53 & 41 & 132 & GER & 261 & PB & nonUSA\\
+\hline
+BohZHA\_CHN & 38 & 33 & 30 & 101 & CHN & 210 & PB & nonUSA\\
+\hline
+CarYUL\_PHI & 23 & 27 & 23 & 73 & PHI & 146 & PB & nonUSA\\
+\hline
+BlaSUN\_USA & 20 & 21 & 23 & 64 & USA & 125 & PB & USA\\
+\hline
+MaxWHI\_GBR & 93 & 41 & 37 & 171 & GBR & 398 & PH & nonUSA\\
+\hline
+NarKUR\_KAZ & 62 & 47 & 35 & 144 & KAZ & 315 & PH & nonUSA\\
+\hline
+ChiLEE\_TPE & 55 & 37 & 39 & 131 & TPE & 278 & PH & nonUSA\\
+\hline
+RhyMCC\_IRL & 26 & 33 & 24 & 83 & IRL & 168 & PH & nonUSA\\
+\hline
+AhmABU\_JOR & 25 & 20 & 28 & 73 & JOR & 143 & PH & nonUSA\\
+\hline
+YanLIU\_CHN & 92 & 57 & 35 & 184 & CHN & 425 & SR & nonUSA\\
+\hline
+XinLAN\_CHN & 68 & 34 & 48 & 150 & CHN & 320 & SR & nonUSA\\
+\hline
+JinZOU\_CHN & 47 & 22 & 29 & 98 & CHN & 214 & SR & nonUSA\\
+\hline
+ElePET\_GRE & 27 & 49 & 39 & 115 & GRE & 218 & SR & nonUSA\\
+\hline
+SalMAR\_ITA & 22 & 18 & 33 & 73 & ITA & 135 & SR & nonUSA\\
+\hline
+JakJAR\_GBR & 103 & 53 & 61 & 217 & GBR & 476 & VT & nonUSA\\
+\hline
+AshHON\_USA & 63 & 52 & 59 & 174 & USA & 352 & VT & USA\\
+\hline
+DaiHAS\_JPN & 55 & 46 & 48 & 149 & JPN & 305 & VT & nonUSA\\
+\hline
+BohZHA\_CHN & 47 & 48 & 36 & 131 & CHN & 273 & VT & nonUSA\\
+\hline
+DonWHI\_USA & 43 & 47 & 37 & 127 & USA & 260 & VT & USA\\
+\hline
+\end{tabular}
+
+\begin{tabular}{l|r|r|r|r|l|r|l|l}
+\hline
+unique\_id & Golds & Silvers & Bronzes & Total\_Medals & Country & Medal\_Weight & Apparatus & USA\\
+\hline
+CarYUL\_PHI & 62 & 43 & 47 & 152 & PHI & 319 & FX & nonUSA\\
+\hline
+ArtDOL\_ISR & 33 & 29 & 26 & 88 & ISR & 183 & FX & nonUSA\\
+\hline
+RyoDOI\_JPN & 32 & 21 & 24 & 77 & JPN & 162 & FX & nonUSA\\
+\hline
+PauJUD\_USA & 17 & 20 & 21 & 58 & USA & 112 & FX & USA\\
+\hline
+DaiHAS\_JPN & 19 & 15 & 22 & 56 & JPN & 109 & FX & nonUSA\\
+\hline
+DaiHAS\_JPN & 62 & 60 & 22 & 144 & JPN & 328 & HB & nonUSA\\
+\hline
+ConSHI\_CHN & 57 & 30 & 23 & 110 & CHN & 254 & HB & nonUSA\\
+\hline
+BohZHA\_CHN & 52 & 32 & 25 & 109 & CHN & 245 & HB & nonUSA\\
+\hline
+WeiSUN\_CHN & 30 & 24 & 26 & 80 & CHN & 164 & HB & nonUSA\\
+\hline
+BroMAL\_USA & 29 & 27 & 20 & 76 & USA & 161 & HB & USA\\
+\hline
+JinZOU\_CHN & 192 & 75 & 46 & 313 & CHN & 772 & PB & nonUSA\\
+\hline
+LukDAU\_GER & 38 & 53 & 41 & 132 & GER & 261 & PB & nonUSA\\
+\hline
+BohZHA\_CHN & 38 & 33 & 30 & 101 & CHN & 210 & PB & nonUSA\\
+\hline
+CarYUL\_PHI & 23 & 27 & 23 & 73 & PHI & 146 & PB & nonUSA\\
+\hline
+BlaSUN\_USA & 20 & 21 & 23 & 64 & USA & 125 & PB & USA\\
+\hline
+CurPHI\_USA & 17 & 23 & 24 & 64 & USA & 121 & PB & USA\\
+\hline
+MaxWHI\_GBR & 93 & 41 & 37 & 171 & GBR & 398 & PH & nonUSA\\
+\hline
+NarKUR\_KAZ & 62 & 47 & 35 & 144 & KAZ & 315 & PH & nonUSA\\
+\hline
+ChiLEE\_TPE & 55 & 37 & 39 & 131 & TPE & 278 & PH & nonUSA\\
+\hline
+RhyMCC\_IRL & 26 & 33 & 24 & 83 & IRL & 168 & PH & nonUSA\\
+\hline
+AhmABU\_JOR & 25 & 20 & 28 & 73 & JOR & 143 & PH & nonUSA\\
+\hline
+YanLIU\_CHN & 92 & 57 & 35 & 184 & CHN & 425 & SR & nonUSA\\
+\hline
+XinLAN\_CHN & 68 & 34 & 48 & 150 & CHN & 320 & SR & nonUSA\\
+\hline
+ElePET\_GRE & 27 & 49 & 39 & 115 & GRE & 218 & SR & nonUSA\\
+\hline
+JinZOU\_CHN & 47 & 22 & 29 & 98 & CHN & 214 & SR & nonUSA\\
+\hline
+AdeASI\_TUR & 17 & 29 & 33 & 79 & TUR & 142 & SR & nonUSA\\
+\hline
+JakJAR\_GBR & 103 & 53 & 61 & 217 & GBR & 476 & VT & nonUSA\\
+\hline
+AshHON\_USA & 63 & 52 & 59 & 174 & USA & 352 & VT & USA\\
+\hline
+DaiHAS\_JPN & 55 & 46 & 48 & 149 & JPN & 305 & VT & nonUSA\\
+\hline
+BohZHA\_CHN & 47 & 48 & 36 & 131 & CHN & 273 & VT & nonUSA\\
+\hline
+DonWHI\_USA & 43 & 47 & 37 & 127 & USA & 260 & VT & USA\\
+\hline
+\end{tabular}
+
+\begin{tabular}{l|r|r|r|r|l|r|l|l}
+\hline
+unique\_id & Golds & Silvers & Bronzes & Total\_Medals & Country & Medal\_Weight & Apparatus & USA\\
+\hline
+CarYUL\_PHI & 62 & 43 & 47 & 152 & PHI & 319 & FX & nonUSA\\
+\hline
+ArtDOL\_ISR & 33 & 29 & 26 & 88 & ISR & 183 & FX & nonUSA\\
+\hline
+RyoDOI\_JPN & 32 & 21 & 24 & 77 & JPN & 162 & FX & nonUSA\\
+\hline
+PauJUD\_USA & 17 & 20 & 21 & 58 & USA & 112 & FX & USA\\
+\hline
+DaiHAS\_JPN & 19 & 15 & 22 & 56 & JPN & 109 & FX & nonUSA\\
+\hline
+DaiHAS\_JPN & 62 & 60 & 22 & 144 & JPN & 328 & HB & nonUSA\\
+\hline
+ConSHI\_CHN & 57 & 30 & 23 & 110 & CHN & 254 & HB & nonUSA\\
+\hline
+BohZHA\_CHN & 52 & 32 & 25 & 109 & CHN & 245 & HB & nonUSA\\
+\hline
+WeiSUN\_CHN & 30 & 24 & 26 & 80 & CHN & 164 & HB & nonUSA\\
+\hline
+BroMAL\_USA & 29 & 27 & 20 & 76 & USA & 161 & HB & USA\\
+\hline
+JinZOU\_CHN & 192 & 75 & 46 & 313 & CHN & 772 & PB & nonUSA\\
+\hline
+LukDAU\_GER & 38 & 53 & 41 & 132 & GER & 261 & PB & nonUSA\\
+\hline
+BohZHA\_CHN & 38 & 33 & 30 & 101 & CHN & 210 & PB & nonUSA\\
+\hline
+CarYUL\_PHI & 23 & 27 & 23 & 73 & PHI & 146 & PB & nonUSA\\
+\hline
+BlaSUN\_USA & 20 & 21 & 23 & 64 & USA & 125 & PB & USA\\
+\hline
+MaxWHI\_GBR & 93 & 41 & 37 & 171 & GBR & 398 & PH & nonUSA\\
+\hline
+NarKUR\_KAZ & 62 & 47 & 35 & 144 & KAZ & 315 & PH & nonUSA\\
+\hline
+ChiLEE\_TPE & 55 & 37 & 39 & 131 & TPE & 278 & PH & nonUSA\\
+\hline
+RhyMCC\_IRL & 26 & 33 & 24 & 83 & IRL & 168 & PH & nonUSA\\
+\hline
+AhmABU\_JOR & 25 & 20 & 28 & 73 & JOR & 143 & PH & nonUSA\\
+\hline
+YanLIU\_CHN & 92 & 57 & 35 & 184 & CHN & 425 & SR & nonUSA\\
+\hline
+XinLAN\_CHN & 68 & 34 & 48 & 150 & CHN & 320 & SR & nonUSA\\
+\hline
+ElePET\_GRE & 27 & 49 & 39 & 115 & GRE & 218 & SR & nonUSA\\
+\hline
+JinZOU\_CHN & 47 & 22 & 29 & 98 & CHN & 214 & SR & nonUSA\\
+\hline
+AdeASI\_TUR & 17 & 29 & 33 & 79 & TUR & 142 & SR & nonUSA\\
+\hline
+JakJAR\_GBR & 103 & 53 & 61 & 217 & GBR & 476 & VT & nonUSA\\
+\hline
+AshHON\_USA & 63 & 52 & 59 & 174 & USA & 352 & VT & USA\\
+\hline
+DaiHAS\_JPN & 55 & 46 & 48 & 149 & JPN & 305 & VT & nonUSA\\
+\hline
+BohZHA\_CHN & 47 & 48 & 36 & 131 & CHN & 273 & VT & nonUSA\\
+\hline
+DonWHI\_USA & 43 & 47 & 37 & 127 & USA & 260 & VT & USA\\
+\hline
+\end{tabular}
+
+\begin{tabular}{l|r|r|r}
+\hline
+USA & sumGolds & sumTot & sumWeighted\\
+\hline
+nonUSA & 2333 & 6716 & 13589\\
+\hline
+USA & 667 & 2284 & 4411\\
+\hline
+\end{tabular}
+
+For the men's simulation when looking at the top 5 athletes by:
+
+\begin{itemize}
+\item
+  \emph{Gold Medal Count} for each apparatus there are 5 out of 30 from
+  the US: floor exercise (FX): 1, high bar (HB): 1, parallel bars (PB):
+  1 pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
+
+  \begin{itemize}
+  \tightlist
+  \item
+    USA makes up 21\% of the total men's gold medals in the simulation.
+  \end{itemize}
+\item
+  \emph{Total Medal Count} for each apparatus there are 4 out of 30 from
+  the US: floor exercise (FX): 1, high bar (HB): 1, parallel bars (PB):
+  0, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
+
+  \begin{itemize}
+  \tightlist
+  \item
+    USA makes up 24\% of the total men's medals in the simulation.
+  \end{itemize}
+\item
+  \emph{Weighted Medal Count} for each apparatus there are 4 out of 30
+  from the US: floor exercise (FX): 1, high bar (HB): 1, parallel bars
+  (PB): 0, pommel horse (PH): 0, still rings (SR): 0, vault (VT): 2
+
+  \begin{itemize}
+  \tightlist
+  \item
+    USA makes up 23\% of the weight of men's medals in the simulation.
+  \end{itemize}
+\end{itemize}
+
+\textbf{Image 9)}
 
 \begin{verbatim}
-`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+# A tibble: 41 x 5
+# Groups:   Apparatus [4]
+   unique_id  Golds Country Apparatus USA   
+   <chr>      <dbl> <fct>   <chr>     <fct> 
+ 1 SimBIL_USA    93 USA     BB        USA   
+ 2 KonMCC_USA    80 USA     BB        USA   
+ 3 YaqZHO_CHN    73 CHN     BB        nonUSA
+ 4 QinZHA_CHN    55 CHN     BB        nonUSA
+ 5 SunLEE_USA    34 USA     BB        USA   
+ 6 YusOU__CHN    21 CHN     BB        nonUSA
+ 7 HuaLUO_CHN    18 CHN     BB        nonUSA
+ 8 UraASH_JPN    13 JPN     BB        nonUSA
+ 9 SkyBLA_USA    11 USA     BB        USA   
+10 QiyQIU_CHN     9 CHN     BB        nonUSA
+# i 31 more rows
 \end{verbatim}
 
-\begin{figure}[H]
-
-{\centering \includegraphics{Main_files/figure-pdf/unnamed-chunk-6-1.pdf}
-
-}
-
-\end{figure}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{number\_athletes }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{filter}\NormalTok{(Round }\SpecialCharTok{==} \StringTok{"AAfinal"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ athletes\_participated)) }\SpecialCharTok{+}
-    \FunctionTok{geom\_histogram}\NormalTok{() }\SpecialCharTok{+}
-    \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Number of Unique Athletes Competed"}\NormalTok{,}
-         \AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{,}
-         \AttributeTok{title =} \StringTok{"Distribution of Athletes Competed at AA Finals"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\textbf{Image 10)}
 
 \begin{verbatim}
-`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Warning: Removed 1 rows containing missing values (`geom_point()`).
 \end{verbatim}
 
-\begin{figure}[H]
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-9-1.pdf}
 
-{\centering \includegraphics{Main_files/figure-pdf/unnamed-chunk-6-2.pdf}
-
-}
-
-\end{figure}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{number\_athletes }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{filter}\NormalTok{(Round }\SpecialCharTok{==} \StringTok{"final"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
-  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ athletes\_participated)) }\SpecialCharTok{+}
-    \FunctionTok{geom\_histogram}\NormalTok{() }\SpecialCharTok{+}
-    \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Round) }\SpecialCharTok{+}
-    \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Number of Unique Athletes Competed"}\NormalTok{,}
-         \AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{,}
-         \AttributeTok{title =} \StringTok{"Distribution of Athletes Competed at Final Rounds"}\NormalTok{,}
-         \AttributeTok{subtitle =} \StringTok{"Individual Apparatuses"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\textbf{Image 11)}
 
 \begin{verbatim}
-`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+# A tibble: 61 x 5
+# Groups:   Apparatus [6]
+   unique_id  Golds Country Apparatus USA   
+   <chr>      <dbl> <fct>   <chr>     <fct> 
+ 1 CarYUL_PHI    62 PHI     FX        nonUSA
+ 2 ArtDOL_ISR    33 ISR     FX        nonUSA
+ 3 RyoDOI_JPN    32 JPN     FX        nonUSA
+ 4 BohZHA_CHN    23 CHN     FX        nonUSA
+ 5 DaiHAS_JPN    19 JPN     FX        nonUSA
+ 6 KazMIN_JPN    19 JPN     FX        nonUSA
+ 7 BroMAL_USA    18 USA     FX        USA   
+ 8 PauJUD_USA    17 USA     FX        USA   
+ 9 YulMOL_USA    16 USA     FX        USA   
+10 GiaREG_GBR    16 GBR     FX        nonUSA
+# i 51 more rows
 \end{verbatim}
 
-\begin{figure}[H]
-
-{\centering \includegraphics{Main_files/figure-pdf/unnamed-chunk-6-3.pdf}
-
-}
-
-\end{figure}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{ggplot}\NormalTok{(number\_athletes, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ athletes\_participated)) }\SpecialCharTok{+}
-  \FunctionTok{geom\_histogram}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Number of Unique Athletes Competed"}\NormalTok{,}
-       \AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{,}
-       \AttributeTok{title =} \StringTok{"Distribution of Athletes Competed at Competitions"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\textbf{Image 12)}
 
 \begin{verbatim}
-`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Warning: Removed 2 rows containing missing values (`geom_point()`).
 \end{verbatim}
 
-\begin{figure}[H]
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-11-1.pdf}
 
-{\centering \includegraphics{Main_files/figure-pdf/unnamed-chunk-6-4.pdf}
+\textbf{\emph{Note:}} The excessive number of countries display that
+there is not much overlap in the top 5 most gold medal decorated
+athletes on the men's team and therefore the lack of well-rounded
+gymnasts.
 
-}
+\hypertarget{diagnostics}{%
+\subsubsection{Diagnostics}\label{diagnostics}}
 
-\end{figure}
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-12-1.pdf}
+
+\begin{verbatim}
+    var1 
+27.00493 
+\end{verbatim}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-12-2.pdf}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-12-3.pdf}
+
+\begin{verbatim}
+
+Iterations = 1:968
+Thinning interval = 1 
+Number of chains = 1 
+Sample size per chain = 968 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+          Mean             SD       Naive SE Time-series SE 
+        6.1983        28.0299         0.9009         2.4301 
+
+2. Quantiles for each variable:
+
+ 2.5%   25%   50%   75% 97.5% 
+ 0.00  0.00  0.00  0.00 80.65 
+\end{verbatim}
+
+\begin{verbatim}
+     var1 
+0.1085832 
+\end{verbatim}
+
+\begin{verbatim}
+    var1 
+133.0432 
+\end{verbatim}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-13-1.pdf}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-13-2.pdf}
+
+\begin{verbatim}
+
+Iterations = 1:1452
+Thinning interval = 1 
+Number of chains = 1 
+Sample size per chain = 1452 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+          Mean             SD       Naive SE Time-series SE 
+        6.1983        22.0044         0.5775         2.1447 
+
+2. Quantiles for each variable:
+
+ 2.5%   25%   50%   75% 97.5% 
+ 0.00  0.00  0.00  0.00 64.72 
+\end{verbatim}
+
+\begin{verbatim}
+     var1 
+0.1295658 
+\end{verbatim}
+
+\begin{verbatim}
+    var1 
+105.2676 
+\end{verbatim}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-13-3.pdf}
+
+\includegraphics{Main_files/figure-pdf/unnamed-chunk-13-4.pdf}
 
 
 
