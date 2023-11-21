@@ -17,47 +17,40 @@ library(fitdistrplus)
 
 ## Methodology Writeup
 
-In this study, we present a Bayesian statistical approach to select the top male and female American gymnast candidates for participation in the 2024 Olympics. Our method involves the creation of prior distributions based on historical performance data, conditioning these distributions on individual competition results, and simulating medal outcomes by predicting scores for each gymnast in each apparatus event. The approach offers a robust framework for incorporating both prior beliefs and observed data to make informed predictions about athletes' performances in simulated events. Utilizing Bayes' law as follows, where $i$ represents the $i$th athlete, $\dot x_i$ represents the observed data for athlete $i$, and $\theta$ represents the parameters of the distribution we will be using to model:
+In this study, we present a Bayesian statistical Monte Carlo approach to select the top male and female American gymnast candidates for participation in the 2024 Olympics. Our method involves the creation of prior distributions based on historical performance data, conditioning these distributions on individual competition results, and simulating medal outcomes by predicting scores for each gymnast in each apparatus event. The approach offers a robust framework for incorporating both prior beliefs and observed data to make informed predictions about athletes' performances in simulated events (Hoff, 2009). Utilizing Bayes' law for probability density functions, where $x$ is a vector of all the data from an apparatus and gender combination, $x_i$ represents the vector of observed data for athlete $i$, and $\theta$ represents the parameters of the distribution we will be using to model the competition. We are under the assumption that all gymnastic scores are independent and identically distributed for every athlete and that every athlete's scores come from the same distribution type. Furthermore, for modeling purposes, we assume a common prior $p(x| \theta)$ for all athletes such that $p(x_i | \theta) = p(x| \theta)$ for all $i$. This allows us to write the posterior distribution as:
 
 $$
-p(\theta_i | x) = \frac{p(x | \theta) p(\theta)}{p(x)} \\
+p(\theta |x_i) \propto p(x| \theta) p(\theta)
 $$
 
-### Prior Distribution Creation:
+To simulate a score for an athlete we sample $\theta^{(s)} \sim p(\theta | x_i)$ from the posterior distribution and then a new value, and then sample $\tilde{x_i} \sim p(x| \theta^{(s)})$. This represents a new predicted data point for athlete $i$ using the posterior distribution, a common practice for estimating values from a posterior predictive distribution in Bayesian Monte Carlo Simulations (Hoff, 2009). Thus, given we can simulate an athlete's scores, we can then simulate a competition between all candidate athletes and allocate gold, silver, and bronze medals to the top three athletes. 
 
-We began by creating prior distributions for each apparatus' total score. Splitting all competitions in the dataset by apparatus and gender resulted multiple separate datasets, see Exploratory Data Visualizations Sector. Observing the combined score distributions, they appeared be unimodal and be slight-ly right sweked. Various distributions were considered, like the beta distribution which is conveniently upper and lower bounded, but the normal distribution was chosen for its simplicity, ease of use, and effective fit.
+#### Prior Distribution Creation:
+
+We began by creating prior distributions for each apparatus' total score. Splitting the data set by apparatus and gender resulted in multiple separate smaller data sets, see Exploratory Data Visualizations for the apparatus-gender level distribution. Observing the combined score distributions, they appear to be unimodal and slightly right-skewed. Various distributions were considered, like the beta distribution which is conveniently upper and lower-bounded, but the normal distribution was chosen for its simplicity, ease of use, and effective fit.
 
 ** include graphs of fitting normal and beta distributions **
 
-The decision was made then to assume that the parameters leads to the question of how to model the prior distribution of the total score. We chose to model the prior distribution of the total score as a normal-inverse gamma distribution. This is because the total score is the sum of the difficulty score and the execution score, and both of these scores are normally distributed. The difficulty score is the sum of the difficulty values of each skill performed, and the execution score is the sum of the execution values of each skill performed. The difficulty values and execution values of each skill performed are normally distributed. The total score is the sum of normally distributed random variables, and the sum of normally distributed random variables is also normally distributed.
-
-From here, we worked backwards and used the normal distribution to model the prior distribution of the total score. The normal distribution is a continuous probability distribution that is symmetric about the mean. It is used to model the distribution of a random variable that is normally distributed. The normal distribution is a conjugate prior for the mean of a normal distribution. This means that if the prior distribution of the mean is a normal distribution, and the likelihood function is a normal distribution, then the posterior distribution is also a normal distribution. This is useful because it allows us to update our prior distribution of the mean with the likelihood function of the data to get the posterior distribution of the mean.
-
-When constructing the priors we run into the issue of different athletes having different numbers of competitions.
-
-To account for this, we used the inverse gamma distribution to model the variance of the normal distribution. The inverse gamma distribution is a continuous probability distribution that is the inverse of the gamma distribution. It is used to model the variance of a normal distribution. The inverse gamma distribution is a conjugate prior for the variance of a normal distribution. This means that if the prior distribution of the variance is an inverse gamma distribution, and the likelihood function is a normal distribution, then the posterior distribution is also an inverse gamma distribution. This is useful because it allows us to update our prior distribution of the variance with the likelihood function of the data to get the posterior distribution of the variance.
+For ease of use, we depended on conjugacy to derive the parameters of the normal distribution. Since both the mean, $mu$, and variance, $sigma^2$, of the normal distribution are unknown, we used normal-inverse gamma priors for both parameters. To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means from the data using the maximum likelihood method and the `fitdist()` function (Muller, 2023). The maximum likelihood estimates for the mean and variance were then used as the prior parameters for the normal part of the normal-inverse gamma distribution. Similarly, for the inverse-gamma parameters, we fit an inverse-gamma distribution to the distribution of athlete's variances from the data using a similar method and used these parameters as the prior parameters for the inverse-gamma part of the normal-inverse gamma distribution. This process was done independently for all apparatus-gender combinations to produce a different set of prior parameters for each independently.
 
 ** Include plot of distribution of score means and variances for a chosen apparatus **
 
-Conditioning on Individual Results:
+### Conditioning on Individual Results:
 
-Following the establishment of the prior distributions, we updated these distributions based on individual competition results. Bayesian methods, specifically Bayes' theorem, were employed for this purpose. Conditioning on observed data involved updating the mean and variance parameters of the distributions, resulting in posterior distributions that reflected our refined beliefs about each athlete's true ability given their recent performance.
+Following the establishment of the prior distributions, we updated these distributions based on individual competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters 1000 times per athlete.
 
-Assuming independence between events, we used the posterior distributions to simulate individual apparatus events. Conditioning on the observed competition results allowed us to incorporate new information into the model, providing a more accurate representation of the gymnasts' abilities.
+### Simulation of Gymnastics Events:
 
-Simulation of Gymnastics Events:
+To simulate gymnastics events, we performed 500 iterations for each apparatus event. For every iteration, we simulated a score for each athlete in the event by sampling $\tilde{x_i}$ from the posterior distribution. Furthermore, since the normal distribution is unbounded, we truncated the distribution at 0 and 20 to reflect the scoring system. We then ranked the athletes by their simulated scores and awarded gold, silver, and bronze medals to the top three athletes. Notably, we chose not to go with a qualification structure and had a simple one-shot round for victory. This decision was made due to computational constraints and introduced more variance in the medal distribution, which we take into account when identifying which athletes to pick for Team USA. We repeated the simulation process for each apparatus event, resulting in about 11 million simulated scores across all competitions. 
 
-To simulate gymnastics events, we performed 500 iterations for each apparatus event and for each gymnast. Drawing samples from the normal distributions derived from the posterior distributions allowed us to capture the uncertainty in the athletes' abilities. This Monte Carlo simulation generated a distribution of possible scores for each gymnast, reflecting the inherent variability in performance.
+### Assumptions:
 
-The simulated events provided a basis for predicting medal outcomes. The gymnast with the highest simulated score for a given apparatus event was awarded the gold medal, the second-highest the silver, and the third-highest the bronze. This process was repeated across all apparatus events for both male and female gymnasts.
+Inherent in our methodology are several assumptions. Firstly, we assume that gymnastic scores are normally distributed, justifying the use of the normal distribution for both prior and posterior distributions. Additionally, we assume independence between events, allowing us to treat each apparatus event as a separate and identically distributed random variable. We also assumed that athletes prioritize all stages of every event identically. Furthermore, we assume that historical performance data adequately represents the gymnasts' true abilities and that changing age is not a factor in gymnastic ability. While this assumption simplifies the modeling process, it may not fully capture the complexities of individual development and improvements over time.
 
-Assumptions:
+Citations
+Muller, Marie Laure Delignette, and Christophe Dutang. “Overview of the Fitdistrplus Package.” R-Project, CRAN, 25 Apr. 2023, cran.r-project.org/web/packages/fitdistrplus/vignettes/fitdistrplus_vignette.html. 
 
-Inherent in our methodology are several assumptions. Firstly, we assume that gymnastic scores are normally distributed, justifying the use of the normal distribution for both prior and posterior distributions. Additionally, we assume independence between events, allowing us to treat each apparatus event as a separate and identically distributed random variable.
-
-Furthermore, we assume that historical performance data adequately represents the gymnasts' true abilities. While this assumption simplifies the modeling process, it may not fully capture the complexities of individual development and improvements over time.
-
-In conclusion, our methodology integrates Bayesian statistics, conditioning on individual results, and simulation techniques to select the top male and female American gymnasts for the upcoming Olympics. The approach offers a robust framework for incorporating both prior beliefs and observed data to make informed predictions about athletes' performances in simulated events.
+Hoff, Peter D. A First Course in Bayesian Statistical Methods. Springer, 2009.
 
 ## Reading data
 
