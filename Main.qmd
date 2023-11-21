@@ -6,7 +6,7 @@ output:
     latex_engine: xelatex
     keep_tex: true
     latex_args: ["-shell-escape"]
-geometry: "top=13mm, bottom=13mm, left=13mm, right=13mm"
+geometry: "top=12mm, bottom=12mm, left=12mm, right=12mm"
 format: pdf
 editor: visual
 ---
@@ -56,7 +56,7 @@ later <- laterdata |>
 
 The Olympic Games are a highly anticipated world-renowned multi-sporting event that takes place every four years. Particularly the Summer Olympic Games tend to have a wider variety of 32 sports and more viewers than that of the Winter Olympics (Olympics, 2021). Athletes from all over the world can participate granted they meet the criteria established by their nation's Olympic committees and the international sports federations. With female qualifying gymnasts from the United States placing with medals in the team all-around, individual all-around, and each individual apparatus in the 2020 Tokyo Olympics game, there has been a surge in media attention on the United States gymnastics teams (Olympics, 2020).
 
-As the Paris 2024 Summer Olympic Games is approaching, the United States Olympic Men's and Women's Artistic Gymnastics aims to put together a team of 5 each that best represents the country on the world's sporting stage by optimizing medal success amongst the team all-around, individual all-around, and individual apparatus events. At the Paris Olympics, during the qualifications round, from the 5 team members, 4 will compete on each apparatus, and the 3 highest scores will count and be summed. In the finals, the top 8 countries will qualify and compete in team all-around, where from the 5 team members, 3 will compete on each apparatus and all 3 scores will count. In the individual all-around finals, 24 athletes will qualify, with maximum 2 athletes per country. In the individual apparatus finals, 8 athletes will qualify per apparatus with a maximum of 2 athletes per country. The low number of athletes that qualify for the finals suggests there must be thoughtful crafting of the team of 5. This study aims to use the most recent Olympic Games and other world competitions' qualifying and final round results data to best assemble a team that is likely to produce optimal success in terms of medals within the Olympic qualifiers and final criteria (UCSAS, 2023).
+As the Paris 2024 Summer Olympic Games is approaching, the United States Olympic Men's and Women's Artistic Gymnastics aims to put together a team of 5 each that best represents the country on the world's sporting stage by optimizing medal success amongst the team all-around, individual all-around, and individual apparatus events. At the Paris Olympics, there are specific rules about the number of athletes and countries allowed to compete in the events, the low number of athletes that qualify for the finals suggests there must be thoughtful crafting of the team of 5 (UCSAS, 2023). This study aims to use the most recent Olympic Games and other world competitions' qualifying and final round results data to best assemble a team that is likely to produce optimal success in terms of medals within the Olympic qualifiers and final criteria (UCSAS, 2023).
 
 The UConn Sports Analytics Symposium provisioned two clean data sets of the accumulation of results of teams worldwide that participated in the major domestic and international gymnastic qualifying and final competition events leading up to the 2024 Summer Olympic Games. The first data set includes includes the results of the 2020 (taking place in 2021) Tokyo Summer Olympics qualifying and final rounds, and the second data set includes competitions in the 2022 and 2023 seasons. Observations for both data sets are at the athlete- and apparatus-level score for an event in a round at a gymnastics competition--for example, Simone Biles's final uneven bars score at the 2023 US Gymnastics Championships. It is worth noting, however, that the data from the Tokyo Olympics only include results for women's gymnastics, while the data from 2022-2023 include results for both men's and women's gymnastics. The data are collected from the results on each corresponding competition's official website, which are results from the officially judged scores of each competition. Variables in the data sets include first and last names of each athlete, gender, country, date of competition, name of competition, the round of the competition (e.g. qualifier or final of an individual apparatus, individual all-around, or team event), the location of the competition, apparatus (women compete in "BB": balance beam, "FX": floor exercise, "UB": uneven bars, and "VT": vault; men compete in "FX": floor exercise, HB": high bar, "PB": parallel bars, "PH": pommel horse, "SR": still rings, "VT": vault; beyond the floor and vault overlap, both men and women may compete in vaults "VT1" and "VT2", which are 2 different vaults required in individual apparatus qualifications and finals), the execution score, difficulty score, penalty, and final score for that athlete on that apparatus, and the rank of that athlete in that apparatus and round.
 
@@ -64,13 +64,13 @@ We decided to not proceed in using the data set of results from the Tokyo Summer
 
 We have the following objectives for this study: (UCSAS, 2023)
 
-1)  Decide on whether to maximize total medal count, gold medal count, or a weighted medal count (e.g., 3 for gold, 2 for silver, 1 for bronze).
+1)  Decide on whether to maximize total medal count, gold medal count, or a weighted medal count
 
-2)  Decide on whether to value the medals of an event over others. For example, consider a team all-around medal to be more valuable than the individual all-around medals and/or consider the individual all-around medals to be more valuable than the individual apparatus medals.
+2)  Decide on whether to value the medals of an event (team, individual all-around, individual apparatus) over others. 
 
-3)  Decide on whether Team USA should maximize its total medal count by selecting a team of five gymnasts who are all-around gymnasts, event specialists (gymnasts who focus on 1 or more apparatus but not all apparatus), or a combination of those. This should consider under what circumstances can Team USA maximize its total medal count by selecting a gymnast who only competes on 1 apparatus (e.g., Stephen Nederoscik, 2021 pommel horse World Champion).
+3)  Decide on whether Team USA should maximize its total medal count by selecting a team of five gymnasts who are all-around gymnasts, event specialists (gymnasts who focus on 1 or more apparatus but not all apparatus), or a combination of those.
 
-4)  Identify the group of five athletes who will most likely enable the Team USA Olympic Men's and Women's Artistic Gymnastics team to maximize medals won in the Paris 2024 Summer Olympics using an analytical model.
+4)  Identify the group of five athletes who will most likely enable the Team USA Olympic Men's and Women's Artistic Gymnastics team to maximize medals won in the Paris 2024 Summer Olympics.
 
 Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection. In our analysis of the best fit US male and female gymnastics teams for the Paris Olympics, we will undertake a Bayesian approach to simulate outcomes of individual athletes' scores in an apparatus. Bayesian frameworks in sports analytics to simulate athlete's results are well-documented and have seen a rise in popularity in the past decade (Santos-Fernandez, et. al., 2019). For instance, Yang and Swartz use Monte Carlo Markov Chains to simulate the outcomes of baseball games (Yang et. al., 2022). We will build upon these analyses and choose the appropriate Bayesian method to simulate outcomes of gymnast results in each apparatus, after which we will analyze the top performers in each apparatus, assign medals, and find the best combination of athletes.
 
@@ -305,9 +305,7 @@ Prior to conducting simulations, we cleaned our data set on the 2022-2023 gymnas
 
 We then proceeded to cut down on the number of observations in our data set for two purposes: 1) so that our simulations later could run more quickly, and 2) we felt that it was unnecessary to simulate scores for athletes that had little to no chance of medaling given their previous records, given the scarcity of athletes that will attend the Olympic finals. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterward, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes who competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. Additionally, filtering for athletes' scores when an athleted has competed in that apparatus more than twice allows us to find a variance and mean for that athlete's performance on an apparatus. We are left with 2210 observations in our filtered data set to conduct simulations, with 157 unique male athletes and 88 unique female athletes.
 
-### Simulations
-
-### Bayesian Monte Carlo Model
+### Bayesian Monte Carlo Approach
 
 In this study, we present a Bayesian statistical Monte Carlo approach to select the top male and female American gymnast candidates for participation in the 2024 Olympics. Our method involves the creation of prior distributions based on historical performance data, conditioning these distributions on individual competition results, and simulating medal outcomes by predicting scores for each gymnast in each apparatus event. The approach offers a robust framework for incorporating both prior beliefs and observed data to make informed predictions about athletes' performances in simulated events (Hoff, 2009). Utilizing Bayes' law for probability density functions, where $x$ is a vector of all the data from an apparatus and gender combination, $x_i$ represents the vector of observed data for athlete $i$, and $\theta$ represents the parameters of the distribution we will be using to model the competition. We are under the assumption that all gymnastic scores are independent and identically distributed for every athlete and that every athlete's scores come from the same distribution type. Furthermore, for modeling purposes, we assume a common prior $p(x| \theta)$ for all athletes such that $p(x_i | \theta) = p(x| \theta)$ for all $i$. This allows us to write the posterior distribution as:
 
@@ -317,7 +315,7 @@ $$
 
 To simulate a score for an athlete we sample $\theta^{(s)} \sim p(\theta | x_i)$ from the posterior distribution and then a new value, and then sample $\tilde{x_i} \sim p(x| \theta^{(s)})$. This represents a new predicted data point for athlete $i$ using the posterior distribution, a common practice for estimating values from a posterior predictive distribution in Bayesian Monte Carlo Simulations (Hoff, 2009). Thus, given we can simulate an athlete's scores, we can then simulate a competition between all candidate athletes and allocate gold, silver, and bronze medals to the top three athletes.
 
-#### Prior Distribution Creation:
+#### Prior Distribution Creation and Conditioning on Individual Results
 
 We began by creating prior distributions for each apparatus' total score. Splitting the data set by apparatus and gender resulted in multiple separate smaller data sets, see Exploratory Data Visualizations for the apparatus-gender level distribution. Observing the combined score distributions, they appear to be unimodal and slightly right-skewed. Various distributions were considered, like the beta distribution which is conveniently upper and lower-bounded, but the normal distribution was chosen for its simplicity, ease of use, and effective fit.
 
@@ -325,15 +323,13 @@ For ease of use, we depended on conjugacy to derive the parameters of the normal
 
 To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means from the data using the maximum likelihood method and the `fitdist()` function (Muller, 2023). The maximum likelihood estimates for the mean and variance were then used as the prior parameters for the normal part of the normal-inverse gamma distribution. Similarly, for the inverse-gamma parameters, we fit an inverse-gamma distribution to the distribution of athlete's variances from the data using a similar method and used these parameters as the prior parameters for the inverse-gamma part of the normal-inverse gamma distribution. This process was done independently for all apparatus-gender combinations to produce a different set of prior parameters for each independently.
 
-### Conditioning on Individual Results:
-
 Following the establishment of the prior distributions, we updated these distributions based on individual competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters for mean and variance and then using these to simulate individual gymnastic scores.
 
-### Simulation of Gymnastics Events:
+### Simulation of Gymnastics Events
 
 To simulate gymnastics events, we performed 500 iterations for each apparatus event. For every iteration, we simulated a score for each athlete in the event by sampling $\tilde{x_i}$ from the posterior distribution. Furthermore, since the normal distribution is unbounded, we truncated the distribution at 0 and 20 to reflect the scoring system. We then ranked the athletes by their simulated scores and awarded gold, silver, and bronze medals to the top three athletes. Notably, we chose not to go with a qualification structure and had a simple one-shot round for victory. This decision was made due to computational constraints and introduced more variance in the medal distribution, which we take into account when identifying which athletes to pick for Team USA. We repeated the simulation process for each apparatus event, resulting in about 11 million simulated scores across all competitions.
 
-### Assumptions:
+### Assumptions
 
 Inherent in our methodology are several assumptions. Firstly, we assume that gymnastic scores are normally distributed, justifying the use of the normal distribution for both prior and posterior distributions. Additionally, we assume independence between events, allowing us to treat each apparatus event as a separate and identically distributed random variable. We also assumed that athletes prioritize all stages of every event identically. Furthermore, we assume that historical performance data adequately represents the gymnasts' true abilities and that changing age is not a factor in gymnastic ability. While this assumption simplifies the modeling process, it may not fully capture the complexities of individual development and improvements over time.
 
@@ -430,15 +426,7 @@ simulate_full_competition <- function(data, apparatus, gender, mu_0, sig_0, k_0,
 
 ## Results
 
-We ran simulations for each apparatus for each gender (women's 4 apparatuses and men's 6 apparatuses) 500 times. Overall, the most successful American athletes were:
-
-# LIST HERE PLZ
-
-Indicating that the most successful american team would likely be composed of:
-
-# LIST HERE PLZ
-
-With a total of (number of medals) across 500 simulations of each apparatus.
+We ran simulations for each apparatus for each gender (women's 4 apparatuses and men's 6 apparatuses) 500 times, then outputted the top athletes by medal count per apparatus.
 
 ### Female Athletes' Results
 
@@ -599,6 +587,10 @@ v_0 <- ubw_prior_parameters[4]
 
 UB_w_simul <- simulate_full_competition(combined, "UB", "w", mu_0, sig_0, k_0, v_0, 500)
 ```
+
+For the women's gymnastics team, we select Simone Biles, Zoe Miller, Shilese Jones, Konnor McClain, and Jade Carey to represent the US at the Paris Olympics. Our rationale for this combination and our framework for optimizing gold medal count, total medal count, and apparatus vs. individual all-around vs. team event wins are explored further in the discussion.
+
+Based on our 500 simulations, Simone Biles has the highest count of total medals in balance beam (170 total medals), floor exercise (328 total medals), and vault (328 total medals), as well as highest gold medal count in floor exercise and vault (186 and 151 gold medals expected of 500 simulations, respectively). Therefore, Biles is expected to be a strong US contender in the individual apparatus events, individual all-around events, as well as a the team all-around since only three members compete in each apparatus for that event. Simone Biles places ninth in simulation outcomes for uneven bars, and we note that US athletes Zoe Miller and Shilese Jones come in third (35 gold medals) and fifth place (32 gold medals), respectively, for number of gold medals won in the uneven bars simulation outcomes (see appendix.) Additionally, Konnor McClain comes second highest for gold medal count for balance beam (65 gold medals) in simulation outcomes, after Yaqin Zhou of China, and Jade Carey comes in third for highest count of total medals (199) and gold medals (61 medals) for vault. Among the simulation results, we generally see the US women gymnasts place very highly in individual apparatuses by both total medal count and gold medal count.
 
 ### Male Athletes' Results
 
@@ -796,7 +788,13 @@ PB_m_simul |>
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
-```{r all-sims-table, include = FALSE}
+For the men's gymnastics team, we select Asher Hong, Curran Phillips, Donnell Whittenburg, Colt Walker, and Brody Malone to represent the US at the Paris Olympics. Our rationale for choosing this combination and optimizing for all-around gymnasts as opposed to event specialists are explored further in the discussion.
+
+We see from our simulation outcomes tables that the US men gymnasts do not come in the top 3 simulated rankings by total medal count for any apparatuses other than Asher Hong in vault, who comes in a simulated second place with 183 total vault medals and 67 total vault gold medals. As a result, it may not be fruitful to pick individual US male athletes by their apparatus-specific performance given athletes from other countries may place ahead of them on individual apparatuses--instead, it's worth noting the overlap of US men gymnasts who place in the top 10 of simulated total medals across the apparatuses. Curran Phillips places in sixth in simulated total medals for vault (112 medals) and fourth in simulated total medals for parallel bars (68 medals). Donnell Whittenburg places seventh in simulated total medals for still rings (56 medals), eighth for simulated total medals in floor exercise (43 medals), and seventh for simulated total medals for vault (111 medals). Colt Walker places ninth in simulated vault total medals (85 medals), fifth in parallel bars simulated total medals (67 medals), ninth in floor exercise simulated total medals (40 medals). Lastly, Brody Malone places fourth in simulated high bar total medals (72 medals) and tenth in simulated floor exercise total medals (39 medals). Because we see that these athletes are still able to place well in multiple events, all the apparatuses except for pommel horse are covered with at least one athlete who performs well in it, but who can also place well in other apparatuses.
+
+## Discussion
+
+```{r women-sims-table, include = FALSE}
 #LARGE WOMEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
 FX_w_copy <- FX_w_simul
 #Creates country variable
@@ -829,9 +827,7 @@ tot_w_simul <- tot_w_simul %>%
 tot_w_simul
 ```
 
-## Discussion
-
-```{r include = FALSE}
+```{r mens-sims-table, include = FALSE}
 #LARGE MEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
 
 FX_m_copy <- FX_m_simul
@@ -897,31 +893,33 @@ In our metric of success, we chose the total count of gold medals and we decided
 
 Considering the conclusions of the previous objectives, we predict that the following athletes would best optimize gold medal count success for both the male and female US gymnastics team in the 2024 Paris Summer Olympics:
 
-#### Women's USA Gymnastics Team: (event specialists)
+#### Women's USA Gymnastics Team: Event Specialists Preference
 -   Simone Biles 
 -   Shilese Jones 
 -   Zoe Miller 
 -   Konnor Mcclain 
 -   Jade Carey
 
-Based on our simulations, Simone Biles has the highest count of gold medals in balance beam, floor exercise, and vault. Therefore, she is expected to be a strong contender in the individual apparatus events, individual all-around events, as well as a the team all-around since only three members compete in each apparatus for that event. Due to Simone Biles placing in ninth for highest number of gold medals for uneven bars, Shilese Jones and Zoe Miller are both great additions to the team. They are both specialists in uneven bars with Shilese coming in third place and Zoe coming in fifth place for number of gold medals for that apparatus. Konnor Mcclain specializes in balance beam coming in third for highest count of gold medals. Jade Carey specializes in vault coming in third place for highest count of gold medals. This selection provides two of the strongest USA specialists by medal count for almost each apparatus besides floor exercise since Simone received a whopping count of 192 gold medals in comparison the second place Brazilian contender with 58 gold medals in the simulation. (Appendix: Image 9)
+In our results, we saw that Simone Biles was a strong individual apparatus (particularly in floor exercise, vault, and balance beam), individual all-around, and team all-around top-finisher contender--she is both a specialist and a generalist. To supplement Biles's performance and add strength to the US uneven bars performance, we choose Shilese Jones and Zoe Miller for their strong uneven bars rankings as specialists in the event. Furthermore, we choose Konnor McClain as a specialist in balance beam, as she has more simulated gold medals than does Simone Biles, but she may also compete on vault given fifth overall simulated ranking in vault total medals and fourth overall simulated ranking in vault gold medals. Lastly, Jade Carey we choose as another vault specialist given her third overall simulated ranking in vault, but she may also compete in floor exercise given her sixth overall simulated medal ranking in floor exercise.This selection provides two of the strongest USA specialists by medal count for almost each apparatus besides floor exercise since Simone received a whopping count of 192 gold medals in comparison the second place Brazilian contender with 58 gold medals in the simulation (Appendix: Image 9).
 
-#### Men's USA Gymnastics Team: mixture (primarily all-around) 
--   Brody Malone 
--   Donnell Whittenburg 
--   Colt Walker 
+#### Men's USA Gymnastics Team: Mixture of Specialist and All-Around, All-Around Preference
 -   Asher Hong 
 -   Curran Phillips
+-   Donnell Whittenburg 
+-   Colt Walker 
+-   Brody Malone
 
-In order to find the expected best all-around male athletes from the simulation, we gave rankings of total count of gold medals for each apparatus, took the average of those rankings for each athlete and picked the top five athletes with the highest average ranking (Appendix: Image 13). Also, Asher Hong is an event specialist in vault that ranks second in number of simulated gold medals for that apparatus who also ranked in the top 5 predicted best all-around male athletes.
+In order to find the expected best all-around male athletes from the simulation, we gave rankings of total count of gold medals for each apparatus, took the average of those rankings for each athlete and picked the top five athletes with the highest average ranking (Appendix: Image 13). This method also matches our simulation results, which shows these five athletes (except for Asher Hong as a vault specialist, yet Asher can also rank high in all-around male athletes) as all-around gymnasts who can place in the top 10 of simulated total medals in at least two apparatuses, and cover all the apparatuses except for pommel horse. We see that other countries have event specialists that may do better than one specific US athlete, but the ability of each selected athlete to cover multiple apparatuses well bodes well for individual all-around and team all-around event medals.
 
 ### Methodology Evalution
 
 *insert answer for: Was your methodology fully appropriate? What alternative techniques might have been useful?*
 
+write something about only being able to use 500 sims
+
 ### Data Limitations
 
-*insert answer for: Are there any issues with reliability or validity of the data?*
+We run our Monte Carlo simulations are a subsetted group of observations from 2022-2023 gymnastics competition data, and it is possible that this subset of data are not representative of the athletes' overall performances. Given our data prior to 2022 was not used because of the short athletic life-cycle of gymnasts and data only on women, we may have discarded pertinent data to some athletes' performances. Additionally, we had to remove data for athletes' scores when the athlete did not compete in more than 2 competitions for an apparatus, which may have excluded some potentially strong athletes if they had not competed in the 2022-2023 seasons due to injury, medical, or other reasons. Finally, given there are a limited number of international competitions per season, most athletes in the data set were competing in less than ten competitions--some only competing in 1 or 2 competitions across 2022-2023. The limited number of score results per athlete may lead to hard to generalize results.
 
 ### Implications and Conclusions
 
