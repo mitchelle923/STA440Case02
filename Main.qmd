@@ -6,7 +6,7 @@ output:
     latex_engine: xelatex
     keep_tex: true
     latex_args: ["-shell-escape"]
-geometry: "top=15mm, bottom=15mm, left=15mm, right=15mm"
+geometry: "top=13mm, bottom=13mm, left=13mm, right=13mm"
 format: pdf
 editor: visual
 ---
@@ -77,105 +77,6 @@ Addressing these objectives will assist the national Olympic Artistic Gymnastics
 ### Exploratory Data Visualizations
 
 We created some exploratory data visualizations to examine the distributions of athlete scores and examine the performance of US athletes relative to other countries. We find that from the density plots of male and female athletes' overall scores (difficulty score + execution score - penalty = overall score) per apparatus that the scores are approximately normally distributed for the apparatuses for both genders. There are some slight deviations from normality, namely women's vault scores and uneven bars scores are slightly skewed left and men's still rings scores have a slight dip in the peak. Nonetheless, the approximate normality of the distribution of athlete's scores by apparatus informs our bayesian approach, as we may use normal priors for our data. Furthermore, we plotted the number of athletes per country in the top 10 of each apparatus internationally, top 10 meaning the athletes with top 10 highest mean scores for each apparatus. For example, we see that for women's vault, 6 of the top 10 athletes in the world are US gymnasts. These plots help inform us of if we should be thinking about specialists or generalists in the US team combinations. We see that the top 10 for each apparatus have a high concentration of US female gymnasts, so we may want specialists in our team makeup, whereas that case does not transfer to the US male gymnasts, as there are few US male gymnasts in the top 10 for the floor exercise, high bar, pommel horse, and still rings apparatuses. In the men's case, we may not want to send specialists to take up a spot on team of five, and we shall explore this conjecture in our simulations.
-
-```{r score-distributions}
-
-#womens score distributions by apparatus
-womensdist <- combined |>
-  filter(Gender == "w") |>
-  ggplot(aes(x = Score)) +
-  geom_density() +
-  facet_wrap(~ Apparatus) +
-   labs(title = "Distribution of Female Gymnasts' Overall Scores",
-       subtitle = "By Apparatus",
-       x = "Overall Score",
-       y = "Density") +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 7),
-        axis.title = element_text(size = 7))
-
-
-#mens score distributions by apparatus
-mensdist <- combined |>
-  filter(Gender == "m") |>
-  ggplot(aes(x = Score)) +
-  geom_density() +
-  facet_wrap(~ Apparatus) +
-   labs(title = "Distribution of Male Gymnasts' Overall Scores",
-       subtitle = "By Apparatus",
-       x = "Overall Score",
-       y = "Density") +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 7),
-        axis.title = element_text(size = 7))
-
-plot_grid(womensdist, mensdist, ncol=2)
-```
-
-```{r top-10-athletes}
-top_10_f_means <- combined_apparatus |>
-  filter(Gender == "w") |>
-  group_by(Apparatus, unique_id) |>
-  arrange(Apparatus, desc(mean_score)) |>
-  group_by(Apparatus) |>
-  slice_head(n = 10) |>
-  ungroup()
-
-topwomens <- top_10_f_means |>
-  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
-  geom_bar() + 
-  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
-  labs(title = "Number of Female Athletes in \n Top 10 of Each Apparatus",
-       subtitle = "By Athlete's Mean Apparatus Score and Country",
-       x = "Country the Athlete Represents",
-       y = "Number of Female Athletes in \n Top 10 of Each Apparatus") +
-  theme_minimal() +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 7),
-        axis.title = element_text(size = 7)) +
-  facet_wrap(~ Apparatus, scales = "free_x") + 
-  coord_flip()
-
-
-top_10_m_means <- combined_apparatus |>
-  filter(Gender == "m") |>
-  group_by(Apparatus, unique_id) |>
-  arrange(Apparatus, desc(mean_score)) |>
-  group_by(Apparatus) |>
-  slice_head(n = 10) |>
-  ungroup()
-
-topmens <- top_10_m_means |>
-  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
-  geom_bar() + 
-  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
-  labs(title = "Number of Male Athletes in \n Top 10 of Each Apparatus",
-       subtitle = "By Athlete's Mean Apparatus Scores and Country",
-       x = "Country the Athlete Represents",
-       y = "Number of Male Athletes in \n Top 10 of Each Apparatus") +
-  theme_minimal() +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 5),
-        axis.title = element_text(size = 7)) +
-  facet_wrap(~ Apparatus, scales = "free_x") + 
-  coord_flip()
-
-plot_grid(topwomens, topmens, ncol=2)
-```
-
-## Methodology
-
-Prior to conducting simulations, we cleaned our data set on the 2022-2023 gymnastics competition results. There were several cases of missing or inconsistent athlete first and last names, so we created unique athlete IDs using string methods by using the first three letters of an athlete's first name, the first three letters of an athlete's last name, and the country code. We made sure to add in missing names and account for names with less than three characters. Furthermore, the apparatus code for high bar was inconsistent across the Commonwealth Games and all other competitions, so we made sure to consolidate high bar into one apparatus code. Because individual apparatus qualifying vaults needed athletes to compete two different vaults (VT1, VT2) as opposed to one vault in the finals or team or all-around events, we decided to take the higher of the two vault scores for an athlete for a competition, if there were two vaults completed, and consolidated that score as one vault apparatus code. We decided to keep the higher score given the vaults were different, and athletes likely compete with the vault that gives them the higher score during event finals.
-
-We then proceeded to cut down on the number of observations in our data set for two purposes: 1) so that our simulations later could run more quickly, and 2) we felt that it was unnecessary to simulate scores for athletes that had little to no chance of medaling given their previous records, given the scarcity of athletes that will attend the Olympic finals. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterwards, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. Additionally, filtering for athletes' scores when an athleted has competed in that apparatus more than twice allows us to find a variance and mean for that athlete's performance on an apparatus. We are left with 2210 observations in our filtered data set to conduct simulations, with 157 unique male athletes and 88 unique female athletes.
 
 ```{r data-cleaning, message = FALSE}
 #indonesian gymnast's name is Abiyu RAFI not ABIYURAFI
@@ -294,6 +195,105 @@ combined <- combined |>
 #combined now has 2210 obs instead of 4040 obs -- using this to run sims
 ```
 
+```{r score-distributions}
+
+#womens score distributions by apparatus
+womensdist <- combined |>
+  filter(Gender == "w") |>
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+   labs(title = "Distribution of Female Gymnasts' Overall Scores",
+       subtitle = "By Apparatus",
+       x = "Overall Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+
+#mens score distributions by apparatus
+mensdist <- combined |>
+  filter(Gender == "m") |>
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  facet_wrap(~ Apparatus) +
+   labs(title = "Distribution of Male Gymnasts' Overall Scores",
+       subtitle = "By Apparatus",
+       x = "Overall Score",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+plot_grid(womensdist, mensdist, ncol=2)
+```
+
+```{r top-10-athletes}
+top_10_f_means <- combined_apparatus |>
+  filter(Gender == "w") |>
+  group_by(Apparatus, unique_id) |>
+  arrange(Apparatus, desc(mean_score)) |>
+  group_by(Apparatus) |>
+  slice_head(n = 10) |>
+  ungroup()
+
+topwomens <- top_10_f_means |>
+  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_bar() + 
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  labs(title = "Number of Female Athletes in \n Top 10 of Each Apparatus",
+       subtitle = "By Athlete's Mean Apparatus Score and Country",
+       x = "Country the Athlete Represents",
+       y = "Number of Female Athletes in \n Top 10 of Each Apparatus") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7)) +
+  facet_wrap(~ Apparatus, scales = "free_x") + 
+  coord_flip()
+
+
+top_10_m_means <- combined_apparatus |>
+  filter(Gender == "m") |>
+  group_by(Apparatus, unique_id) |>
+  arrange(Apparatus, desc(mean_score)) |>
+  group_by(Apparatus) |>
+  slice_head(n = 10) |>
+  ungroup()
+
+topmens <- top_10_m_means |>
+  ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
+  geom_bar() + 
+  scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
+  labs(title = "Number of Male Athletes in \n Top 10 of Each Apparatus",
+       subtitle = "By Athlete's Mean Apparatus Scores and Country",
+       x = "Country the Athlete Represents",
+       y = "Number of Male Athletes in \n Top 10 of Each Apparatus") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 5),
+        axis.title = element_text(size = 7)) +
+  facet_wrap(~ Apparatus, scales = "free_x") + 
+  coord_flip()
+
+plot_grid(topwomens, topmens, ncol=2)
+```
+
+## Methodology
+
+Prior to conducting simulations, we cleaned our data set on the 2022-2023 gymnastics competition results. There were several cases of missing or inconsistent athlete first and last names, so we created unique athlete IDs using string methods by using the first three letters of an athlete's first name, the first three letters of an athlete's last name, and the country code. We made sure to add in missing names and account for names with less than three characters. Furthermore, the apparatus code for high bar was inconsistent across the Commonwealth Games and all other competitions, so we made sure to consolidate high bar into one apparatus code. Because individual apparatus qualifying vaults needed athletes to compete two different vaults (VT1, VT2) as opposed to one vault in the finals or team or all-around events, we decided to take the higher of the two vault scores for an athlete for a competition, if there were two vaults completed, and consolidated that score as one vault apparatus code. We decided to keep the higher score given the vaults were different, and athletes likely compete with the vault that gives them the higher score during event finals.
+
+We then proceeded to cut down on the number of observations in our data set for two purposes: 1) so that our simulations later could run more quickly, and 2) we felt that it was unnecessary to simulate scores for athletes that had little to no chance of medaling given their previous records, given the scarcity of athletes that will attend the Olympic finals. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterwards, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. Additionally, filtering for athletes' scores when an athleted has competed in that apparatus more than twice allows us to find a variance and mean for that athlete's performance on an apparatus. We are left with 2210 observations in our filtered data set to conduct simulations, with 157 unique male athletes and 88 unique female athletes.
+
 ### Simulations
 
 ### Bayesian Monte Carlo Model
@@ -310,46 +310,10 @@ To simulate a score for an athlete we sample $\theta^{(s)} \sim p(\theta | x_i)$
 
 We began by creating prior distributions for each apparatus' total score. Splitting the data set by apparatus and gender resulted in multiple separate smaller data sets, see Exploratory Data Visualizations for the apparatus-gender level distribution. Observing the combined score distributions, they appear to be unimodal and slightly right-skewed. Various distributions were considered, like the beta distribution which is conveniently upper and lower-bounded, but the normal distribution was chosen for its simplicity, ease of use, and effective fit.
 
-```{r}
-## NOTE TO SELF, MAYBE COME BACK HERE AND FIX THIS IF ITS BROKEN
-normal_fit = fitdist(final_data$Score[final_data$Apparatus == "HB"], "norm")
-
-final_data %>%
-  filter(Apparatus == "HB") %>%
-  ggplot(aes(x = Score)) +
-  geom_density() +
-  stat_function(fun = dnorm, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", size = 1) +
-  labs(title = paste("High Bar Score Distribution Compared to Fitted Normal Distribution"),  
-       x = "Difficulty Score",
-       y = "Density")
-```
-
-
 For ease of use, we depended on conjugacy to derive the parameters of the normal distribution. Since both the mean, $mu$, and variance, $sigma^2$, of the normal distribution are unknown, we used normal-inverse gamma priors for both parameters. At this point, the issue arises that a plurality of athletes have only ever done a single competition in any given apparatus, resulting in a large amount of athletes with 0 variance and skewing the distribution. Due to the unlikely nature of athletes who do not compete regularly participating in the Olympics, we have decided to truncate the apparatus level data set to exclude athletes with less than three competition appearances for that given apparatus.
 
 To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means from the data using the maximum likelihood method and the `fitdist()` function (Muller, 2023). The maximum likelihood estimates for the mean and variance were then used as the prior parameters for the normal part of the normal-inverse gamma distribution. Similarly, for the inverse-gamma parameters, we fit an inverse-gamma distribution to the distribution of athlete's variances from the data using a similar method and used these parameters as the prior parameters for the inverse-gamma part of the normal-inverse gamma distribution. This process was done independently for all apparatus-gender combinations to produce a different set of prior parameters for each independently.
 
-```{r}
-# ** Include plot of distribution of score means and variances for a chosen apparatus **
-mean_plot = combined_apparatus %>%
-  filter(Apparatus = "HB") %>%
-  ggplot(aes(x = mean_score)) +
-    geom_histogram() +
-    geom_vline(xintercept = mean(combined_apparatus$mean_score), color = "red") +
-    labs(title = "Distribution of Mean Scores for High Bar",
-         x = "Mean Score",
-         y = "Count")
-var_plot = combined_apparatus %>%
-  filter(Apparatus = "HB") %>%
-  ggplot(aes(x = var_score)) +
-    geom_histogram() +
-    geom_vline(xintercept = mean(combined_apparatus$var_score), color = "red") +
-    labs(title = "Distribution of Variance Scores for High Bar",
-         x = "Variance Score",
-         y = "Count")
-
-plot_grid(mean_plot, var_plot, ncol = 2)
-```
 
 
 ### Conditioning on Individual Results:
@@ -494,8 +458,37 @@ FX_w_simul <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v
 
 FX_w_simul |>
   head(10) |>
-  kable(caption = "Women's Floor Exercise Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+   mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER")) |>
+  kable(caption = "Women's Floor Exercise Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
 ```{r BB-womens-sims}
@@ -509,10 +502,40 @@ k_0 <- bbw_prior_parameters[3]
 v_0 <- bbw_prior_parameters[4]
 
 BB_w_simul <- simulate_full_competition(combined, "BB", "w", mu_0, sig_0, k_0, v_0, 100)
+
 BB_w_simul |>
   head(10) |>
-  kable(caption = "Women's Balance Beam Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+    mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER")) |>
+  kable(caption = "Women's Balance Beam Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
 ```{r VT-womens-sims}
@@ -528,8 +551,37 @@ v_0 <- vtw_prior_parameters[4]
 VT_w_simul <- simulate_full_competition(combined, "VT", "w", mu_0, sig_0, k_0, v_0, 100)
 VT_w_simul |>
   head(10) |>
-  kable(caption = "Women's Vault Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+  mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER")) |>
+  kable(caption = "Women's Vault Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
 ```{r UB-women-sims}
@@ -576,8 +628,8 @@ VT_m_simul <- simulate_full_competition(combined, "VT", "m", mu_0, sig_0, k_0, v
 
 VT_m_simul |>
   head(10) |>
-  kable(caption = "Men's Vault Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+  kable(caption = "Men's Vault Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
 ```{r PH-men-sims}
@@ -633,11 +685,11 @@ PB_m_simul <- simulate_full_competition(combined, "PB", "m", mu_0, sig_0, k_0, v
 
 PB_m_simul |>
   head(10) |>
-  kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
-  kable_styling(font_size = 9, latex_options = "HOLD_position")
+  kable(caption = "Men's Parallel Bars Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
-```{r include = FALSE}
+```{r all-sims-table, include = FALSE}
 #LARGE WOMEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
 FX_w_copy <- FX_w_simul
 #Creates country variable
@@ -664,12 +716,14 @@ UB_w_copy$Apparatus <- "UB"
 
 #Joins all women's medal results table for facet wrapping
 
-#HAVE TO EVENTUALLY ADD VT1 and VT2!!
 tot_w_simul <- bind_rows(FX_w_copy,BB_w_copy, VT_w_copy, UB_w_copy)
 tot_w_simul <- tot_w_simul %>% 
   mutate(USA = as.factor(ifelse(Country == "USA", "USA", "nonUSA")))
 tot_w_simul
 ```
+
+
+## Discussion
 
 ```{r include = FALSE}
 #LARGE MEN'S SIMULATION TABLE W/ ALL POSSIBLE MEDAL METRICS
@@ -709,7 +763,6 @@ PB_m_copy$Apparatus <- "PB"
 
 #Joins all men's medal results table for facet wrapping
 
-#HAVE TO EVENTUALLY ADD VT1 and VT2!!
 tot_m_simul <- bind_rows(FX_m_copy, VT_m_copy,PH_m_copy, HB_m_copy,SR_m_copy, PB_m_copy)
 tot_m_simul <- tot_m_simul %>% 
   mutate(USA = as.factor(ifelse(Country == "USA", "USA", "nonUSA")))
@@ -736,14 +789,12 @@ In our metric of success, we chose the total count of gold medals and we decided
 
 ### Objective 4: Identifying 5 Athletes ...
 
-## Discussion
+\newpage
 
 ## Appendix
 
-### Work Cited
+### Works Cited
 
-
-Citations
 -   Camenker, Jacob. "How Old Is Simone Biles? Why Elite Olympic Gymnasts Typically Retire at a Young Age." Sporting News, 18 Sept. 2021, www.sportingnews.com/us/athletics/news/simone-biles-retire-age-olympics/1laom4i4u4wh1thcgta4nun2x. Accessed 20 Nov. 2023.
 
 -   Hoff, Peter D. A First Course in Bayesian Statistical Methods. Springer, 2009.
@@ -764,36 +815,70 @@ Citations
 
 ### Additional Simulation Results
 
+Given women compete on 4 apparatuses and men compete on 4 apparatuses, we have tables of the simulation outcomes for all 10 apparatuses, and the 5 simluation outcome tables where US gymnasts do not perform as well relative to athletes from other countries are outputted below.
+
+
 ```{r additional-sims-tables}
 #womens additional
 UB_w_simul |>
   head(10) |>
-  kable(caption = "Women's Uneven Bars Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+    mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER")) |>
+  kable(caption = "Women's Uneven Bars Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
 #mens additional
 FX_m_simul |>
   head(10) |>
-  kable(caption = "Men's Floor Exercise Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable(caption = "Men's Floor Exercise Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
 HB_m_simul |>
   head(10) |>
-  kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable(caption = "Men's High Bar Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
 PH_m_simul |>
   head(10) |>
-  kable(caption = "Men's Pommel Horse Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable(caption = "Men's Pommel Horse Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 
 SR_m_simul |>
   head(10) |>
-  kable(caption = "Men's Still Rings Simulation Results ", col.names = c("Athlete", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
+  kable(caption = "Men's Still Rings Simulation Results ", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals")) |>
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
 ### Extra Visualizations
+
+The following visualizations show the distribution of difficulty and execution scores by apparatus for male and female gymnasts, which are still approximately normal but do show more drastic deviations from normality than do the overall scores for each gymnast at an apparatus in a competition round. So, we thought it would be more fitting to fit normal-inverse gamma priors on the means and variances of the overall scores.
 
 ```{r execution-difficulty-distributions}
 ## GOING INTO APPENDIX
@@ -857,6 +942,64 @@ combined |>
         axis.text = element_text(size = 7),
         axis.title = element_text(size = 7))
 ```
+
+Additionally, we look at the distribution of mean scores and the distribution of variance scores for men's high bar apparatus as an example of how we will fit normal-inverse gamma priors for the means and variances. We can see that the distribution of mean scores follows an approximately normal distribution and the distribution of variance scores follow an approximately inverse-gamma distribution.
+
+```{r highbar-fit, message = FALSE}
+## NOTE TO SELF, MAYBE COME BACK HERE AND FIX THIS IF ITS BROKEN
+normal_fit = fitdist(combined$Score[combined$Apparatus == "HB"], "norm")
+
+combined %>%
+  filter(Apparatus == "HB") %>%
+  ggplot(aes(x = Score)) +
+  geom_density() +
+  stat_function(fun = dnorm, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", linewidth = 1) +
+  labs(title = paste("High Bar Score Distribution Compared to Fitted Normal Distribution"),  
+       x = "Difficulty Score",
+       y = "Density") +
+   theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+```
+
+
+```{r scoremeans-var, message = FALSE}
+# ** Include plot of distribution of score means and variances for a chosen apparatus **
+
+combined_apparatus %>%
+  filter(Apparatus == "HB") %>%
+  ggplot(aes(x = mean_score)) +
+    geom_histogram() +
+    geom_vline(xintercept = mean(combined_apparatus$mean_score), color = "red") +
+    labs(title = "Distribution of Mean Scores for High Bar",
+         x = "Mean Score",
+         y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+
+combined_apparatus %>%
+  filter(Apparatus == "HB") %>%
+  ggplot(aes(x = var_score)) +
+    geom_histogram() +
+    geom_vline(xintercept = mean(combined_apparatus$var_score), color = "red") +
+    labs(title = "Distribution of Variance Scores for High Bar",
+         x = "Variance Score",
+         y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 8),
+        plot.subtitle = element_text(size = 7),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7))
+```
+
 
 ```{r unique-athletes}
 number_athletes |>
