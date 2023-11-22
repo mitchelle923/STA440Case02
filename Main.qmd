@@ -59,7 +59,7 @@ The Olympic Games are a highly anticipated world-renowned multi-sporting event t
 
 As the Paris 2024 Summer Olympic Games is approaching, the United States Olympic Men's and Women's Artistic Gymnastics aims to put together a team of 5 each that best represents the country on the world's sporting stage by optimizing medal success amongst the team all-around, individual all-around, and individual apparatus events. At the Paris Olympics, there are specific rules about the number of athletes and countries allowed to compete in the events, the low number of athletes that qualify for the finals suggests there must be thoughtful crafting of the team of 5 (UCSAS, 2023). This study aims to use the most recent Olympic Games and other world competitions' qualifying and final round results data to best assemble a team that is likely to produce optimal success in terms of medals within the Olympic qualifiers and final criteria (UCSAS, 2023).
 
-The UConn Sports Analytics Symposium provisioned two data sets on results of teams worldwide that participated in major gymnastic competitions. Observations were gathered at the athlete/apparatus level scores. It is worth noting, however, that the data from the Tokyo Olympics only include results for women's gymnastics, while the data from 2022-2023 include results for both men's and women's gymnastics. The data are collected from the results on each corresponding competition's official website, which are results from the officially judged scores of each competition. Further discussion of the data sets can be found in the appendix.
+The UConn Sports Analytics Symposium provisioned two data sets on results of teams worldwide that participated in major gymnastic competitions betweeen 2021-2023. Observations were gathered at the athlete/apparatus level scores. It is worth noting, that the data from the 2021 Tokyo Olympics only include results for women's gymnastics, while the data from 2022-2023 include results for both men's and women's gymnastics, so we will not be proceeding with the Tokyo Olympics dataset (further age-based reasoning of not using the Tokyo dataset in Appendix). The data are collected from the results on each corresponding competition's official website. Variables in the data sets include athlete name and gender, country, date of competition, competition, round (qualifier or final of an individual apparatus, individual all-around, or team event), location, apparatus (women compete in "BB": balance beam, "FX": floor exercise, "UB": uneven bars, and "VT": vault; men compete in "FX" and "VT", then HB": high bar, "PB": parallel bars, "PH": pommel horse, "SR": still rings), the execution score, difficulty score, penalty, and final score for that athlete on that apparatus, and the rank of that athlete.
 
 We have the following objectives for this study: (UCSAS, 2023)
 
@@ -71,7 +71,7 @@ We have the following objectives for this study: (UCSAS, 2023)
 
 4)  Identify the group of five athletes who will most likely enable the Team USA Olympic Men's and Women's Artistic Gymnastics team to maximize medals won in the Paris 2024 Summer Olympics.
 
-Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection. In our analysis of the best fit US male and female gymnastics teams for the Paris Olympics, we will undertake a Bayesian approach to simulate outcomes of individual athletes' scores in an apparatus. Bayesian frameworks in sports analytics to simulate athlete's results are well-documented and have seen a rise in popularity in the past decade (Santos-Fernandez, et. al., 2019). For instance, Yang and Swartz use Monte Carlo Markov Chains to simulate the outcomes of baseball games (Yang et. al., 2022). We will build upon these analyses and choose the appropriate Bayesian method to simulate outcomes of gymnast results in each apparatus, after which we will analyze the top performers in each apparatus, assign medals, and find the best combination of athletes.
+Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection. In our analysis of the best fit US male and female gymnastics teams for the Paris Olympics, we will undertake a Bayesian approach to simulate outcomes of individual athletes' scores in an apparatus. Bayesian frameworks in sports analytics to simulate athlete's results are well-documented and have seen a rise in popularity in the past decade (Santos-Fernandez, et. al., 2019). We will build upon these analyses and choose the appropriate Bayesian method to simulate outcomes of gymnast results in each apparatus, after which we will analyze the top performers in each apparatus, assign medals, and find the best combination of athletes.
 
 ### Exploratory Data Visualizations
 
@@ -235,15 +235,13 @@ mensdist <- combined |>
        x = "Overall Score",
        y = "Density") +
   theme_minimal() +
-  theme(plot.title = element_text(size = 8),
+  theme(plot.title = element_text(size = 7),
         plot.subtitle = element_text(size = 7),
         axis.text = element_text(size = 7),
         axis.title = element_text(size = 7))
-
-plot_grid(womensdist, mensdist, ncol=2)
 ```
 
-```{r top-10-athletes}
+```{r top-10-athletes, fig.height = 5.25, fig.width = 6.5}
 top_10_f_means <- combined_apparatus |>
   filter(Gender == "w") |>
   group_by(Apparatus, unique_id) |>
@@ -256,16 +254,16 @@ topwomens <- top_10_f_means |>
   ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
   geom_bar() + 
   scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
-  labs(title = "Number of Female Athletes in \n Top 10 of Each Apparatus",
+  labs(title = "Number of Female Athletes in Top 10 of Each Apparatus",
        subtitle = "By Athlete's Mean Apparatus Score and Country",
        x = "Country the Athlete Represents",
-       y = "Number of Female Athletes in \n Top 10 of Each Apparatus") +
+       y = "Number of Female Athletes in Top 10 of Each Apparatus") +
   theme_minimal() +
   theme(legend.position = "none",
-        plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
-        axis.text = element_text(size = 7),
-        axis.title = element_text(size = 7)) +
+        plot.title = element_text(size = 7),
+        plot.subtitle = element_text(size = 6),
+        axis.text = element_text(size = 6),
+        axis.title = element_text(size = 6)) +
   facet_wrap(~ Apparatus, scales = "free_x") + 
   coord_flip()
 
@@ -282,29 +280,29 @@ topmens <- top_10_m_means |>
   ggplot(aes(x = Country, fill = ifelse(Country == "USA", "Is USA", "Not USA"))) +
   geom_bar() + 
   scale_fill_manual(values = c("Is USA" = "red", "Not USA" = "grey50")) +
-  labs(title = "Number of Male Athletes in \n Top 10 of Each Apparatus",
+  labs(title = "Number of Male Athletes in Top 10 of Each Apparatus",
        subtitle = "By Athlete's Mean Apparatus Scores and Country",
        x = "Country the Athlete Represents",
-       y = "Number of Male Athletes in \n Top 10 of Each Apparatus") +
+       y = "Number of Male Athletes in Top 10 of Each Apparatus") +
   theme_minimal() +
   theme(legend.position = "none",
-        plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
+        plot.title = element_text(size = 7),
+        plot.subtitle = element_text(size = 6),
         axis.text = element_text(size = 5),
-        axis.title = element_text(size = 7)) +
+        axis.title = element_text(size = 6)) +
   facet_wrap(~ Apparatus, scales = "free_x") + 
   coord_flip()
 
-plot_grid(topwomens, topmens, ncol=2)
+plot_grid(womensdist, mensdist, topwomens, topmens, ncol=2, rel_heights = c(1.1, 2))
 ```
 
 # Methodology
 
-Prior to conducting simulations, we cleaned our data set on the 2022-2023 gymnastics competition results. During the process we made certain decisions further discussed in the appendix. We are left with 2210 observations in our filtered data set to conduct simulations, with 157 unique male athletes and 88 unique female athletes.
+Prior to conducting simulations, we cleaned our data set on the 2022-2023 gymnastics competition results. Our data set cleaning semantics--wording, combining observations, etc. are in the appendix. We then proceeded to minimize the number of observations in our data set because we felt that it was unnecessary to simulate scores for athletes that had little to no chance of ever medaling in the Olympics given their previous records. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterward, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes who competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. At this point, the issue arises that a plurality of athletes has only ever done a single competition in any given apparatus, resulting in a large number of athletes with 0 variances and skewing the distribution. Due to the unlikely nature of athletes who do not compete regularly participating in the Olympics, we have decided to truncate the apparatus level data set to exclude athletes with less than three competition appearances for that given apparatus. We are left with 2210 observations in our filtered data set to conduct simulations, with 157 unique male athletes and 88 unique female athletes.
 
 ## Bayesian Monte Carlo Approach
 
-In this study, we present a Bayesian statistical Monte Carlo approach to select the top male and female American gymnast candidates for participation in the 2024 Olympics. Our method involves the creation of prior distributions based on general historical performance data, conditioning these distributions on individual competition results, and simulating medal outcomes by predicting scores for each gymnast in each apparatus event. This approach incorporates both prior beliefs and observed data to make informed predictions about athletes' performances in simulated events (Hoff, 2009). Utilizing Bayes' law for probability density functions, where $x$ is a vector of all the data from an apparatus and gender combination, $x_i$ represents the vector of observed data for athlete $i$, and $\theta$ represents the parameters of the distribution we will be using to model the competition. We are under the assumption that all gymnastic scores are independent and identically distributed for every athlete and that every athlete's scores come from the same distribution type. Furthermore, for modeling purposes, we assume a common prior $p(x| \theta)$ for all athletes such that $p(x_i | \theta) = p(x| \theta)$ for all $i$. This allows us to write the posterior distribution as:
+In this study, we present a Bayesian statistical Monte Carlo approach to select the top male and female American gymnast candidates for participation in the 2024 Olympics. Our method involves the creation of prior distributions based on general historical performance data, conditioning these distributions on individual competition results, and simulating medal outcomes by predicting scores for each gymnast in each apparatus event. This approach incorporates both prior beliefs and observed data to make informed predictions about athletes' performances in simulated events (Hoff, 2009). Utilizing Bayes' law for probability density functions, where $x$ is a vector of all the data from an apparatus and gender combination, $x_i$ represents the vector of observed data for athlete $i$, and $\theta$ represents the parameters of the distribution we will be using to model the competition. We are under the assumption that all gymnastic scores are independent and identically distributed for every athlete and that every athlete's scores come from the same distribution type. Furthermore, for modeling purposes, we assume a common prior $p(x| \theta)$ for all athletes such that $p(x_i | \theta) = p(x| \theta)$ for all $i$. Our posterior distribution is:
 
 $$
 p(\theta |x_i) \propto p(x| \theta) p(\theta)
@@ -318,11 +316,11 @@ We began by creating prior distributions for each apparatus' total score. See Ex
 
 To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means and an inverse-gamma distribution to athletes' variances. We used the maximum likelihood method in the `fitdist()` function (Muller, 2023). The maximum likelihood estimates  were then used as the prior parameters for the normal-inverse gamma distribution. This process was done independently for all apparatuses and genders. Following the establishment of the prior distributions, we updated these distributions based on individuals' competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters for mean and variance and then using these to simulate individual gymnastic scores.
 
-### Simulation of Gymnastics Events
+#### Simulation of Gymnastics Events
 
-To simulate gymnastics events, we performed 500 iterations for each apparatus event, resulting in about 11 million simulated scores. For every iteration, we sampled a score for each athlete, $\tilde{x_i}$, from the posterior normal distribution. Furthermore, we truncated the normal distribution at 0 and 20 to reflect the scoring system. We then ranked the athletes by their simulated scores and awarded gold, silver, and bronze medals to the top three athletes. Notably, we chose not to go with a qualification structure and had a simple one-shot round for victory. This decision was made due to computational constraints and was accounted for when identifying which athletes to pick for Team USA.
+To simulate gymnastics events, we performed 500 iterations for each apparatus event, resulting in about 11 million simulated scores. For every iteration, we sampled a score for each athlete, $\tilde{x_i}$, from the posterior normal distribution. Furthermore, we truncated the normal distribution at 0 and 20 to reflect the scoring system. We then ranked the athletes by their simulated scores and awarded gold, silver, and bronze medals to the top three athletes. Notably, we chose not to go with a qualification structure and had a simple one-shot round for victory. This decision was made due to computational constraints and was accounted for when identifying Team USA athletes.
 
-### Assumptions
+#### Assumptions
 
 We assume that gymnastic scores are normally distributed and conditionally independent on the athlete. Additionally, we assume independence between apparatus, allowing us to treat each apparatus event as a separate and identically distributed random variable. We also assumed that athletes prioritize all stages of every event identically. Furthermore, we assume that historical performance data adequately represents the gymnasts' true abilities and that changing age is not a factor in gymnastic ability. While this assumption simplifies the modeling process, it may not fully capture the complexities of individual development and improvements over time.
 
@@ -423,7 +421,7 @@ We ran simulations for each apparatus for each gender (women's 4 apparatuses and
 
 ### Female Athletes' Results
 
-For women's apparatuses, we outputted the tables of simulation outcomes for floor exercise, balance beam, and vault because of the high presence of medals for US gymnasts. The table of simulation outcomes for other apparatuses are in the appendix.
+For women's apparatuses, we outputted the tables of simulation outcomes for floor exercise because of the high presence of medals for US gymnasts. The table of simulation outcomes for other apparatuses are in the appendix.
 
 ```{r FX-womens-sims}
 set.seed(123)
@@ -587,7 +585,7 @@ Based on our 500 simulations, Simone Biles has the highest count of total medals
 
 ### Male Athletes' Results
 
-For men's apparatuses, we outputted the tables of simulation outcomes for vault and parallel bars because of the high presence of medals for US gymnasts relative to the other apparatuses. The tables of simulation outcomes for floor exercise, still rings, pommel horse, and high bar are in the appendix.
+For men's apparatuses, we outputted the table of simulation outcomes for parallel bars because of the high presence of medals for US gymnasts relative to the other apparatuses. The tables of simulation outcomes for other apparatuses are in the appendix.
 
 ```{r FX-men-sims}
 set.seed(123)
@@ -888,29 +886,19 @@ Considering the conclusions of the previous objectives, we predict that the foll
 
 #### Women's USA Gymnastics Team: Event Specialists Preference
 
--   Simone Biles
--   Shilese Jones
--   Zoe Miller
--   Konnor Mcclain
--   Jade Carey
+Our Team USA women's selection includes: Simone Biles, Shilese Jones, Zoe Miller, Konnor Mcclain, and Jade Carey.
 
 In our results, we saw that Simone Biles was a strong individual apparatus (particularly in floor exercise, vault, and balance beam), individual all-around, and team all-around top-finisher contender--she is both a specialist and a generalist. To supplement Biles's performance and add strength to the US uneven bars performance, we choose Shilese Jones and Zoe Miller for their strong uneven bars rankings as specialists in the event. Furthermore, we choose Konnor McClain as a specialist in balance beam, as she has more simulated gold medals than does Simone Biles, but she may also compete on vault given fifth overall simulated ranking in vault total medals and fourth overall simulated ranking in vault gold medals. Lastly, Jade Carey we choose as another vault specialist given her third overall simulated ranking in vault, but she may also compete in floor exercise given her sixth overall simulated medal ranking in floor exercise. This selection provides two of the strongest USA specialists by medal count for almost each apparatus besides floor exercise since Simone received a whopping count of 192 gold medals in comparison the second place Brazilian contender with 58 gold medals in the simulation (Appendix: Image 9).
 
 #### Men's USA Gymnastics Team: Mixture of Specialist and All-Around, All-Around Preference
 
--   Asher Hong
--   Curran Phillips
--   Donnell Whittenburg
--   Colt Walker
--   Brody Malone
+Our Team USA men's selection includes: Asher Hong, Curran Phillips, Donnell Whittenburg, Colt Walker, and Brody Malone.
 
 In order to find the expected best all-around male athletes from the simulation, we gave rankings of total count of gold medals for each apparatus, took the average of those rankings for each athlete and picked the top five athletes with the highest average ranking (Appendix: Image 13). This method also matches our simulation results, which shows these five athletes (except for Asher Hong as a vault specialist, yet Asher can also rank high in all-around male athletes) as all-around gymnasts who can place in the top 10 of simulated total medals in at least two apparatuses, and cover all the apparatuses except for pommel horse.
 
-### Methodology Evalution
+### Methodology and Data Evaluation
 
 The baseline choices in the methodology: taking a Bayesian approach and relying on the Monte Carlo method, allow for generally informed predictions (Yang, et. al 2022, Hoff 2008). However, there are areas where the implementation could be improved. The normal distribution is a simple choice for the posterior, but is not a perfect fit for the data. The normal distribution is unbounded, while gymnastics scores are bounded between 0 and 20. This discrepancy is addressed imperfectly through truncation, while a beta distribution could potentially be a better fit. Furthermore, when determining the prior parameters we use the mean and standard deviation of athlete results in a given apparatus, not accounting for the difference in sample count between athletes. We use a single distribution to model final scores, when we should be sampling from a distribution of difficulty scores, then conditioning on difficulty to sample execution and penalty scores to get a final score. This would allow us to  incorporate the fact that difficulty and execution scores are not independent. Additionally, the simulated competitions include every gymnast in a single round, unlike the actual Olympics. Ideally, we'd simulate the multiple individual and team rounds in a gymnastics competition. The choice to avoid this modelling process, alongside the choice to only run 500 simulations, were done due to computational constraints. Finally, we assume that the athletes' abilities are constant over time, which is not necessarily true. This assumption is mildly addressed by using the most recent data, but it is still a simplification.
-
-### Data Limitations
 
 We run our model on a subsetted group of observations from 2022-2023 gymnastics competition data; it is likely that this subset is not representative of every athletes' true performances. We had to remove data for athletes' scores when the athlete did not compete in more than 2 competitions for an apparatus, which may have excluded some injured or upcoming athletes Finally, given there are a limited number of international competitions per season, most athletes in the data set were competing in less than ten competitions. The limited number of score results per athlete may lead to hard to generalize results.
 
@@ -940,19 +928,14 @@ A development of this study would be benefited if it addressed the methodologica
 
 -   "UCSAS 2024 USOPC DATA CHALLENGE." UConn Sports Analytics Symposium (UCSAS), statds.org/events/ucsas2024/challenge.html. Accessed 20 Nov. 2023.
 
--   Yang, Tae Young, and Tim Swartz. "A Two-Stage Bayesian Model for Predicting Winners in Major League Baseball." Journal of Data Science, vol. 2, no. 1, Aug. 2022, pp. 61--73. jds-online.org, https://doi.org/10.6339/JDS.2004.02(1).142.
 
-### Data Discussion
+### Data Discussion: Tokyo Olympics
 
-Variables in the data sets include first and last names of each athlete, gender, country, date of competition, name of competition, the round of the competition (e.g. qualifier or final of an individual apparatus, individual all-around, or team event), the location of the competition, apparatus (women compete in "BB": balance beam, "FX": floor exercise, "UB": uneven bars, and "VT": vault; men compete in "FX": floor exercise, HB": high bar, "PB": parallel bars, "PH": pommel horse, "SR": still rings, "VT": vault; beyond the floor and vault overlap, both men and women may compete in vaults "VT1" and "VT2", which are 2 different vaults required in individual apparatus qualifications and finals), the execution score, difficulty score, penalty, and final score for that athlete on that apparatus, and the rank of that athlete in that apparatus and round.
+Additionally, in the context of Olympic gymnastics, athletes of age 16 and older are eligible to compete but gymnastics is a sport in which most athletes retire in their early to mid-twenties. Specifically in the summer 2020 Tokyo Olympics only three female athletes aged 27 or older qualified to compete (Camenker, 2021). Furthermore, the average age for female gymnasts in the 2020 Olympics was approximately 22 years of age, meaning we assume that many of the competitors in the older data set will not be competing in the 2024 Paris Summer Olympics (Meyers, 2021).
 
-We decided to not proceed in using the data set of results from the Tokyo Summer Olympics since the data consisted only of female athletes and one competition (the Olympic Games). Additionally, in the context of Olympic gymnastics, athletes of age 16 and older are eligible to compete but gymnastics is a sport in which most athletes retire in their early to mid-twenties. Specifically in the summer 2020 Tokyo Olympics only three female athletes aged 27 or older qualified to compete (Camenker, 2021). Furthermore, the average age for female gymnasts in the 2020 Olympics was approximately 22 years of age, meaning we assume that many of the competitors in the older data set will not be competing in the 2024 Paris Summer Olympics (Meyers, 2021).
-
-### Data Cleaning Process and Justification
+### Data Cleaning Semantics and Justification
 
 There were several cases of missing or inconsistent athlete first and last names, so we created unique athlete IDs using string methods by using the first three letters of an athlete's first name, the first three letters of an athlete's last name, and the country code. We also manually inserted missing names and accounted for names with less than three characters. Furthermore, the apparatus code for high bar was inconsistent across the Commonwealth Games and all other competitions, so we made sure to consolidate high bar into one apparatus code. Because individual apparatus qualifying vaults needed athletes to compete in two different vaults (VT1, VT2) as opposed to one vault in the finals or team or all-around events, we decided to take the higher of the two vault scores for an athlete for a competition, if there were two vaults completed, and consolidated that score as one vault apparatus code. We decided to keep the higher score given the vaults were different, and athletes likely compete with the vault that gives them the higher score during event finals.
-
-We then proceeded to minimize the number of observations in our data set because we felt that it was unnecessary to simulate scores for athletes that had little to no chance of ever medaling in the Olympics given their previous records. To filter the observations, we first removed any individual athletes entirely who had never made the finals in any event in any competition in the data set. Afterward, we created quantiles of 20% increments and 10% increments for each round in a competition for each apparatus, separated by gender because men and women compete separately. We checked the number of unique athletes that competed at each competition in each round (see Appendix), and found that for all rounds in competitions other than the Oceania Championships, at least 36 unique athletes participated. For some rounds, hundreds of athletes participated--so we decided to filter for: if more than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 10%; if less than 100 athletes competed in a round in an apparatus, then we filtered for athletes' scores in the top 20%; for the Oceania Championships, we filtered for the top 40% (four athletes). The reason we adopted a quantile-based filtering approach is because of the variation in number of athletes who competed at different competitions, so simply taking the top 20 athletes, for example, of each competition may not account for that variation. Our last method of filtering was to remove observations of athletes' scores for apparatuses if an athlete had not competed more than twice in that apparatus in the entire 2022-2023 data set. Our rationale was that there were 37 distinct competitions in the data set, so if an athlete has not competed more than twice in the past two years in an apparatus, they are likely not that active in that apparatus. At this point, the issue arises that a plurality of athletes has only ever done a single competition in any given apparatus, resulting in a large number of athletes with 0 variances and skewing the distribution. Due to the unlikely nature of athletes who do not compete regularly participating in the Olympics, we have decided to truncate the apparatus level data set to exclude athletes with less than three competition appearances for that given apparatus.
 
 ### Additional Simulation Results
 
