@@ -12,6 +12,8 @@ fontsize: 10.5pt
 editor: visual
 ---
 
+\vspace{-20truemm}
+
 ```{r setup-chunk, include = FALSE}
 knitr::opts_chunk$set(message = FALSE, echo = FALSE) 
 ```
