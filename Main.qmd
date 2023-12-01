@@ -73,7 +73,7 @@ We have the following objectives for this study: (UCSAS, 2023)
 
 4)  Identify the group of five athletes who will most likely enable the Team USA Olympic Men's and Women's Artistic Gymnastics team to maximize medals won in the Paris 2024 Summer Olympics.
 
-Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection. In our analysis of the best fit US male and female gymnastics teams for the Paris Olympics, we will undertake a Bayesian approach to simulate outcomes of individual athletes' scores in an apparatus. Bayesian frameworks in sports analytics to simulate athlete's results are well-documented and have seen a rise in popularity in the past decade (Santos-Fernandez, et. al., 2019). We will build upon these analyses and choose the appropriate Bayesian method to simulate outcomes of gymnast results in each apparatus, after which we will analyze the top performers in each apparatus, assign medals, and find the best combination of athletes.
+Addressing these objectives will assist the national Olympic Artistic Gymnastics teams in best approaching the Olympic gymnastics events in totality by offering recommended strategies to best approach team selection. In our analysis of the best fit US male and female gymnastics teams for the Paris Olympics, we will undertake a Bayesian approach to simulate outcomes of individual athletes' scores in an apparatus. Bayesian frameworks in sports analytics to simulate athlete's results are well-documented and have seen a rise in popularity in the past decade (Santos-Fernandez, et. al., 2019)--for instance, a Bayesian time series regression model to predict winning time distributions and the probability of winning for swimming in the 2020 and 2024 Olympics (Wu, et.al., 2021). We will build upon these analyses and choose the appropriate Bayesian method to simulate outcomes of gymnast results in each apparatus, after which we will analyze the top performers in each apparatus, assign medals, and find the best combination of athletes.
 
 ### Exploratory Data Visualizations
 
@@ -930,6 +930,8 @@ A development of this study would be benefited if it addressed the methodologica
 
 -   "UCSAS 2024 USOPC DATA CHALLENGE." UConn Sports Analytics Symposium (UCSAS), statds.org/events/ucsas2024/challenge.html. Accessed 20 Nov. 2023.
 
+-   Wu, Paul Pao-Yen, et. al. (2021) Bayesian prediction of winning times for elite swimming events, Journal of Sports Sciences, 40:1, 24-31, DOI: 10.1080/02640414.2021.1976485
+
 
 ### Data Discussion: Tokyo Olympics
 
@@ -1282,6 +1284,47 @@ combined |>
         axis.title = element_text(size = 7))
 ```
 
+The below plots visualize how many unique athletes are competing at each round in a competition, spearated by gender, so that we can understand sample size for when we filter out data.
+
+```{r unique-athletes, message = FALSE, warning = FALSE}
+number_athletes |>
+  filter(Round %in% AA_team) |>
+  ggplot(aes(x = athletes_participated)) +
+    geom_histogram() +
+    facet_wrap(~ Round) +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "1) Distribution of Athletes Competed at Competition Rounds",
+         subtitle = "All Around or Team All Arounds")
+
+number_athletes |>
+  filter(Round == "AAfinal") |>
+  ggplot(aes(x = athletes_participated)) +
+    geom_histogram() +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "2) Distribution of Athletes Competed at AA Finals")
+
+number_athletes |>
+  filter(Round == "final") |>
+  ggplot(aes(x = athletes_participated)) +
+    geom_histogram() +
+    facet_wrap(~ Round) +
+    labs(x = "Number of Unique Athletes Competed",
+         y = "Frequency",
+         title = "3) Distribution of Athletes Competed at Final Rounds",
+         subtitle = "Individual Apparatuses")
+
+ggplot(number_athletes, aes(x = athletes_participated)) +
+  geom_histogram() +
+  labs(x = "Number of Unique Athletes Competed",
+       y = "Frequency",
+       title = "4) Distribution of Athletes Competed at Competitions")
+
+```
+
+### Posterior Predictive Checks
+
 Additionally, we look at the distribution of mean scores and the distribution of variance scores for men's high bar apparatus as an example of how we will fit normal-inverse gamma priors for the means and variances. We can see that the distribution of mean scores follows an approximately normal distribution and the distribution of variance scores follow an approximately inverse-gamma distribution.
 
 ```{r highbar-fit, message = FALSE}
@@ -1338,44 +1381,7 @@ combined_apparatus %>%
         axis.title = element_text(size = 7))
 ```
 
-The below plots visualize how many unique athletes are competing at each round in a competition, spearated by gender, so that we can understand sample size for when we filter out data.
-
-```{r unique-athletes, message = FALSE, warning = FALSE}
-number_athletes |>
-  filter(Round %in% AA_team) |>
-  ggplot(aes(x = athletes_participated)) +
-    geom_histogram() +
-    facet_wrap(~ Round) +
-    labs(x = "Number of Unique Athletes Competed",
-         y = "Frequency",
-         title = "1) Distribution of Athletes Competed at Competition Rounds",
-         subtitle = "All Around or Team All Arounds")
-
-number_athletes |>
-  filter(Round == "AAfinal") |>
-  ggplot(aes(x = athletes_participated)) +
-    geom_histogram() +
-    labs(x = "Number of Unique Athletes Competed",
-         y = "Frequency",
-         title = "2) Distribution of Athletes Competed at AA Finals")
-
-number_athletes |>
-  filter(Round == "final") |>
-  ggplot(aes(x = athletes_participated)) +
-    geom_histogram() +
-    facet_wrap(~ Round) +
-    labs(x = "Number of Unique Athletes Competed",
-         y = "Frequency",
-         title = "3) Distribution of Athletes Competed at Final Rounds",
-         subtitle = "Individual Apparatuses")
-
-ggplot(number_athletes, aes(x = athletes_participated)) +
-  geom_histogram() +
-  labs(x = "Number of Unique Athletes Competed",
-       y = "Frequency",
-       title = "4) Distribution of Athletes Competed at Competitions")
-
-```
+### Comparing Simulation Results
 
 **Image 5)**
 
@@ -1420,19 +1426,265 @@ Women:
 tot_w_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Golds, n = 5) %>% 
-  kable()
+  mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU", unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
+  kable(caption = "Top Women's Athletes by Gold Medal Count", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals", "Country", "Medal Weight", "Apparatus", "Status")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 #Top 5 athletes by apparatus for total medal count
 tot_w_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Total_Medals, n = 5) %>% 
-  kable()
+    mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU", unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
+  kable(caption = "Top Women's Athletes by Total Medal Count", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals", "Country", "Medal Weight", "Apparatus", "Status")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 #Top 5 athletes by apparatus for weighted medal count
 tot_w_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Medal_Weight, n = 5) %>% 
-  kable()
+    mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU", unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
+   kable(caption = "Top Women's Athletes by Weighted Medal Count", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals", "Country", "Medal Weight", "Apparatus", "Status")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 
 #total proportion for each medal metric
@@ -1441,7 +1693,8 @@ tot_w_simul %>%
   summarise(sumGolds = sum(Golds),
             sumTotal = sum(Total_Medals),
             sumWeighted = sum(Medal_Weight)) %>% 
-  kable()
+  kable(caption = "US Women's Medal Proportion Per Medal Metric", col.names = c("Status", "Sum Total Golds", "Sum Total Medals", "Sum Weighted Medals")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 ```
 
@@ -1473,19 +1726,265 @@ Men:
 tot_m_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Golds, n = 5) %>% 
-  kable()
+    mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU", unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
+    kable(caption = "Top Men's Athletes by Gold Medal Count", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals", "Country", "Medal Weight", "Apparatus", "Status")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 #Top 5 athletes by apparatus for total medal count
 tot_m_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Total_Medals, n = 5) %>% 
-  kable()
+    mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU", unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
+    kable(caption = "Top Men's Athletes by Total Medal Count", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals", "Country", "Medal Weight", "Apparatus", "Status")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 #Top 5 athletes by apparatus for weighted medal count
 tot_m_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Medal_Weight, n = 5) %>% 
-  kable()
+    mutate(unique_id = case_when(unique_id == "SimBIL_USA" ~ "Simone Biles: USA",
+                               unique_id == "YaqZHO_CHN" ~ "Yaqin Zhou: CHN",
+                               unique_id == "KonMCC_USA" ~ "Konnor McClain: USA",
+                               unique_id == "UraASH_JPN" ~ "Urara Ashikawa: JPN",
+                               unique_id == "QinZHA_CHN" ~ "Qingying Zhang: CHN",
+                               unique_id == "SunLEE_USA" ~ "Sunisa Lee: USA",
+                               unique_id == "HuaLUO_CHN" ~ "Huan Luo: CHN",
+                               unique_id == "SkyBLA_USA" ~ "Skye Blakely: USA",
+                               unique_id == "YusOU__CHN" ~ "Yushan Ou: CHN",
+                               unique_id == "LeaWON_USA" ~ "Leanne Wong: USA",
+                               unique_id == "RebAND_BRA" ~ "Rebeca Andrade: BRA",
+                               unique_id == "JesGAD_GBR" ~ "Jessica Gadirova: GBR",
+                               unique_id == "KalLIN_USA" ~ "Kaliya Lincoln: USA",
+                               unique_id == "JadCAR_USA" ~ "Jade Carey: USA",
+                               unique_id == "FlaSAR_BRA" ~ "Flavia Saraiva: BRA",
+                               unique_id == "JorCHI_USA" ~ "Jordan Chiles: USA",
+                               unique_id == "MarMAG_ITA" ~ "Martina Maggio: ITA",
+                               unique_id == "JosROB_USA" ~ "Joscelyn Roberson: USA",
+                               unique_id == "ShiJON_USA" ~ "Shilese Jones: USA",
+                               unique_id == "OndACH_GBR" ~ "Ondine Achampong: GBR",
+                               unique_id == "ShoMIY_JPN" ~ "Shokyo Miyata: JPN",
+                               unique_id == "TiaSUM_USA" ~ "Tiana Sumanasekera: USA",
+                               unique_id == "KayNEM_ALG" ~ "Kayla Neymour: ALG",
+                               unique_id == "QiyQIU_CHN" ~ "Qiyan Qiu: CHN",
+                               unique_id == "XiaWEI_CHN" ~ "Xiaoyuan Wei: CHN",
+                               unique_id == "AliD A_ITA" ~ "Alice D'Amato: ITA",
+                               unique_id == "ZoeMIL_USA" ~ "Zoe Miller: USA",
+                               unique_id == "XijTAN_CHN" ~ "Xijing Tang: CHN",
+                               unique_id == "EliSEI_GER" ~ "Elisabeth Seitz: GER",
+                               unique_id == "SabMAN_ROU" ~ "Sabrina Maneca Voinea: ROU", unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
+  kable(caption = "Top Men's Athletes by Weighted Medal Count", col.names = c("Athlete & Country", "Golds", "Silvers", "Bronzes", "Total Medals", "Country", "Medal Weight", "Apparatus", "Status")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 #total proportion for each medal metric
 tot_m_simul %>% 
@@ -1493,7 +1992,8 @@ tot_m_simul %>%
   summarise(sumGolds = sum(Golds),
             sumTot = sum(Total_Medals),
             sumWeighted = sum(Medal_Weight)) %>% 
-  kable()
+    kable(caption = "US Men's Medal Proportion Per Medal Metric", col.names = c("Status", "Sum Total Golds", "Sum Total Medals", "Sum Weighted Medals")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
 For the men's simulation when looking at the top 5 athletes by:
@@ -1510,49 +2010,30 @@ For the men's simulation when looking at the top 5 athletes by:
 
     -   USA makes up 23% of the weight of men's medals in the simulation.
 
-**Image 9)** Top ten most successful female gymnast using total gold medal count by apparatus
-
-```{r}
-tot_w_simul %>% 
-  dplyr::select(unique_id, Golds, Country, Apparatus, USA) %>% 
-  group_by(Apparatus) %>% 
-  slice_max(order_by = Golds, n = 10) %>% 
-  kable()
-```
-
-**Image 10)**
+**Image 9)**
 
 ```{r echo=FALSE}
 #selects top 5 decorated gold medal athletes by apparatus
 top10_women <- tot_w_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Golds, n = 5)
-ggplot(data = top10_women,aes(x = Country, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 200) + labs(title = "10) Women: Country of Top 5 Athletes by Number of Gold Medals", subtitle = "by Apparatus", x = "Country ", y = "Number of Gold Medals")
+ggplot(data = top10_women,aes(x = Country, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 200) + labs(title = "9) Women: Country of Top 5 Athletes by Number of Gold Medals", subtitle = "by Apparatus", x = "Country ", y = "Number of Gold Medals")
 ```
 
-**Image 11)** Top ten most successful male gymnast using total gold medal count by apparatus
 
-```{r}
-tot_m_simul %>% 
-  dplyr::select(unique_id, Golds, Country, Apparatus, USA) %>% 
-  group_by(Apparatus) %>% 
-  slice_max(order_by = Golds, n = 10) %>% 
-  kable()
-```
-
-**Image 12)**
+**Image 10)**
 
 ```{r top5-decorated, warning = FALSE}
 #selects top 5 decorated gold medal athletes by apparatus
 top10_men <- tot_m_simul %>% 
   group_by(Apparatus) %>% 
   slice_max(order_by = Golds, n = 5)
-ggplot(data = top10_men,aes(x = Country, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 100) + labs(title = "12) Men: Country of Top 5 Athletes by Number of Gold Medals", subtitle = "by Apparatus", x = "Country", y = "Number of Gold Medals")
+ggplot(data = top10_men,aes(x = Country, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 100) + labs(title = "10) Men: Country of Top 5 Athletes by Number of Gold Medals", subtitle = "by Apparatus", x = "Country", y = "Number of Gold Medals")
 ```
 
 ***Note:*** The excessive number of countries display that there is not much overlap in the top 5 most gold medal decorated athletes on the men's team and therefore the lack of well-rounded gymnasts.
 
-**Image 13)**
+**Image 11)**
 
 Average of total gold medal count ranking by apparatus of all US male gymnasts in ascending order (to find best all around gymnast for men's team)
 
@@ -1586,69 +2067,61 @@ menGoldRank %>%
   group_by(unique_id) %>% 
   summarise(avgRank = mean(Gold_Count_Rank)) %>% 
   arrange(avgRank) %>% 
-  kable()
+  head(6) |>
+  mutate(unique_id = case_when(unique_id == "CarYUL_PHI" ~ "Carlos Yulo: PHI",
+                               unique_id == "ArtDOL_ISR" ~ "Artem Dolgopyat: ISR",
+                               unique_id == "RyoDOI_JPN" ~ "Ryosuke Doi: JPN",
+                               unique_id == "BohZHA_CHN" ~ "Boheng Zhang: CHN",
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
+                               unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
+                               unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
+                               unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "MaxWHI_GBR" ~ "Max Whitlock: GBR",
+                               unique_id == "ChiLEE_TPE" ~ "Chih Lee: TPE",
+                               unique_id == "RhyMCC_IRL" ~ "Rhys McClenaghan: IRL",
+                               unique_id == "NarKUR_KAZ" ~ "Nariman Kurbanov: KAZ",
+                               unique_id == "AhmABU_JOR" ~ "Ahmad Abu Al Soud: JOR",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "GagKHA_ARM" ~ "Gagik Khachikyan: ARM",
+                               unique_id == "ConSHI_CHN" ~ "Cong Shi: CHN",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "MilKAR_KAZ" ~ "Milad Karimi: KAZ",
+                               unique_id == "WeiSUN_CHN" ~ "Wei Sun: CHN",
+                               unique_id == "ShoKAW_JPN" ~ "Shohei Kawakami: JPN",
+                               unique_id == "WeiSU__CHN" ~ "Weide Su: CHN",
+                               unique_id == "IliGEO_CYP" ~ "Ilias Georgiou: CYP",
+                               unique_id == "ChaLIN_CHN" ~ "Chaopan Lin: CHN",
+                               unique_id == "YanLIU_CHN" ~ "Yang Liu: CHN",
+                               unique_id == "XinLAN_CHN" ~ "Xingyu Lan: CHN",
+                               unique_id == "JinZOU_CHN" ~ "Jingyuan Zou: CHN",
+                               unique_id == "ElePET_GRE" ~ "Eleftherious Petrounias: GRE",
+                               unique_id == "AdeASI_TUR" ~ "Adem Asil: TUR",
+                               unique_id == "HaoYOU_CHN" ~ "Hao You: CHN",
+                               unique_id == "SalMAR_ITA" ~ "Salvatore Maresca: ITA",
+                               unique_id == "IbrCOL_TUR" ~ "Ibrahim Colak: TUR",
+                               unique_id == "NikSIM_AZE" ~ "Nikita Simonov: AZE",
+                               unique_id == "LukDAU_GER" ~ "Lukas Dauser: GER",
+                               unique_id == "IllKOV_UKR" ~ "Illia Kovtun: UKR",
+                               unique_id == "JoeFRA_GBR" ~ "Joe Fraser: GBR",
+                               unique_id == "KaiSUG_JPN" ~ "Kaito Sugimoto: JPN",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "VinHÖC_AUT" ~ "Vinzenz Höck: AUT",
+                               unique_id == "KakTAN_JPN" ~ "Kakeru Tanigawa: JPN",
+                               unique_id == "ArtMAR_BRA" ~ "Arthur Mariano: BRA",
+                               unique_id == "LorDE _NED" ~ "Loran De Munck: NED",
+                               unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE")) |>
+  kable(caption = "Average Overall Rank of USA Athletes By Number of Gold Medals (Top 6)", col.names = c("Athlete & Country", "Average Rank")) |>
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
-```{r}
-#MCMC diagnostic check
-# get_mcmc_samples <- function(simulation_results) {
-#   mcmc_data <- as.mcmc(simulation_results$Total_Medals)
-#   return(mcmc_data)
-# }
-# 
-# mcmc_results <- simulate_full_competition(combined, "FX", "w", mu_0, sig_0, k_0, v_0, 100)
-# mcmc_samples <- get_mcmc_samples(mcmc_results)
-# 
-# coda::traceplot(mcmc_samples, main = "Trace Plot of Total Medals")
-# 
-# # Effective sample size
-# effectiveSize(mcmc_samples)
-# #A common rule of thumb is that an effective sample size should be at least 1% or 5% of the total number of samples, depending on the context.
-# 
-# # Autocorrelation plot
-# autocorr.plot(mcmc_samples)
-# 
-# mcmc_samples <- get_mcmc_samples(mcmc_results)
-# 
-# # Histogram of MCMC samples
-# hist(mcmc_samples, main = "Histogram of Total Medals", xlab = "Total Medals")
 
-```
-
-```{r}
-# # Diagnositcs for Women
-# 
-# # Summary stats for total w medals
-# mcmcTrace <- mcmc(tot_w_simul$Total_Medals)
-# summary(mcmcTrace)
-# 
-# # Acceptance rate for total w medals
-# acceptanceRate <- 1 - rejectionRate(mcmcTrace)
-# acceptanceRate
-# 
-# # Effective size for total w medals
-# effectiveSize(mcmcTrace)
-# 
-# # Mixing total w medals
-# plot(mcmcTrace)
-# 
-# autocorr.plot(mcmcTrace)
-# 
-# # Diagnostics For Men
-# 
-# # Summary stats for total w medals
-# mcmcTrace1 <- mcmc(tot_m_simul$Total_Medals)
-# summary(mcmcTrace1)
-# 
-# # Acceptance rate for total w medals
-# acceptanceRate <- 1 - rejectionRate(mcmcTrace1)
-# acceptanceRate
-# 
-# # Effective size for total w medals
-# effectiveSize(mcmcTrace1)
-# 
-# # Mixing total w medals
-# plot(mcmcTrace1)
-# 
-# autocorr.plot(mcmcTrace1)
-```
