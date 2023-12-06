@@ -360,6 +360,26 @@ analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0) {
   
   return(c(theta_sample, sig_sample))
 }
+
+old_analyze_athlete <- function(athlete_results, m_0, sig_0, k_0, v_0, smc = 1000) {
+  n = length(athlete_results)
+  ybar = mean(athlete_results)
+  
+  if (is.na(var(athlete_results))) {
+    var = 0
+  } else {
+    var = var(athlete_results) 
+  }
+  
+  k_n = k_0 + n
+  v_n = v_0 + n
+  m_n = (k_0*m_0 + n*ybar)/k_n
+  sig_n = (v_0*sig_0 + (n-1)*var + k_0*n*(ybar - m_0)**2/k_n)/v_n
+  sig_sample = mean(rinvgamma(smc, v_n/2, sig_n*v_n/2))
+  theta_sample = mean(rnorm(smc, m_n, sqrt(sig_sample/k_n)))
+  
+  return(c(theta_sample, sig_sample))
+}
 ```
 
 ```{r creating-medals}
@@ -1341,12 +1361,12 @@ plot_prior_fits = function (combined, app, g) {
   stat_function(fun = dnorm, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", linewidth = 1) +
   labs(title = paste(paste(app), "Total Score Dist. x Normal Prior"),  
        subtitle = "Black = actual, Red = fitted",
-       x = "Difficulty Score",
+       x = "Score",
        y = "Density") +
    theme_minimal() +
   theme(legend.position = "none",
-        plot.title = element_text(size = 6),
-        plot.subtitle = element_text(size = 5),
+        plot.title = element_text(size = 7),
+        plot.subtitle = element_text(size = 6),
         axis.text = element_text(size = 7),
         axis.title = element_text(size = 7))
 }
@@ -1368,52 +1388,84 @@ plot_grid(plot_prior_fits(combined, "FX", "w"),
           plot_prior_fits(combined, "VT", "w"))
 ```
 
-```{r}
-#It is clear that the normal distribution is not perfect and that the true densities are slanted, but it serves as a good approximation for the purposes of this case study. Specifically, our methodology uses an inverse gamma prior on the variance of the normal distribution, which is conjugate to the normal distribution. Below we have inverse gamma distributions plotted for each apparatus over the distributions of individual variances.
+It is clear that the normal distribution is not perfect and that the true densities are slanted, but it serves as a good approximation for the purposes of this case study. Specifically, our methodology uses an inverse gamma prior on the variance of the normal distribution, which is conjugate to the normal distribution. Below we have inverse gamma distributions plotted for each apparatus over the distributions of individual variances.
 
+```{r}
 plot_invgamma = function(combined, app, g) {
     combined = combined %>%
-    filter(Gender == g) %>%
-    mutate(variances = var(Score))
-  
-    normal_fit = fitdist(combined$Score[combined$Apparatus == app], "norm")
+      filter(Apparatus == app, Gender == g) %>%
+      group_by(unique_id) %>%
+      mutate(variances = sd(Score))
+    
+    invgamma_fit = fitdist(combined$variances, "invgamma")
     
     combined %>%
       filter(Apparatus == app) %>%
-    ggplot(aes(x = Score)) +
+    ggplot(aes(x = variances)) +
     geom_density() +
-    stat_function(fun = d, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", linewidth = 1) +
-    labs(title = paste(paste(app), "Total Score Dist. x Fitted Normal Prior"),  
-         x = "Difficulty Score",
+    stat_function(fun = dinvgamma, args = list(shape = invgamma_fit$estimate[[1]], scale = invgamma_fit$estimate[[2]]), color = "red", linewidth = 1) +
+    labs(title = paste(paste(app), "Score Var x Invgamma Prior"),  
+         x = "Variance",
          y = "Density") +
-     theme_minimal() +
+     theme_minimal() + 
     theme(legend.position = "none",
-          plot.title = element_text(size = 8),
-          plot.subtitle = element_text(size = 7),
+          plot.title = element_text(size = 7),  
+          plot.subtitle = element_text(size = 6),
           axis.text = element_text(size = 7),
           axis.title = element_text(size = 7))
 }
+
+plot_grid(plot_invgamma(combined, "FX", "m"),
+          plot_invgamma(combined, "HB", "m"),
+          plot_invgamma(combined, "PB", "m"),
+          plot_invgamma(combined, "PH", "m"),
+          plot_invgamma(combined, "SR", "m"),
+          plot_invgamma(combined, "VT", "m"))
 ```
 
-```{r}
-# Lastly we want to compare the actual scores simulated by the posterior predictive distribution to the actual scores observed in the data. We do this by plotting the actual scores against the simulated scores for each apparatus.
+And for the female events:
 
+```{r}
+plot_grid(plot_invgamma(combined, "FX", "w"),
+          plot_invgamma(combined, "BB", "w"),
+          plot_invgamma(combined, "UB", "w"),
+          plot_invgamma(combined, "VT", "w"))
+```
+
+Some of these distributions are rather poor, but again, they serve as a good approximation for the purposes of this case study. Lastly we want to compare the actual scores simulated by the posterior predictive distribution to the actual scores observed in the data. We do this by plotting the actual scores against the simulated scores for each apparatus.
+
+
+```{r}
+set.seed(14)
 plot_final_preds = function(data_23, app, g) {
+  HB_sd = data_23 %>%
+    filter(Apparatus == app, Gender == g) %>%
+    group_by(unique_id) %>%
+    summarise(sd = sd(Score)) %>%
+    mutate(sd = ifelse(is.na(sd), 0, sd))
+  
+  HB_mu = data_23 %>%
+    filter(Apparatus == app, Gender == g) %>%
+    group_by(unique_id) %>%
+    summarise(mu = mean(Score))
+    
+  normal_mu_fit = fitdist(HB_mu$mu, "norm")
+  invgamma_sd_fit = fitdist(HB_sd$sd[HB_sd$sd > 0], "invgamma")
+  
+  m_0 =  normal_mu_fit$estimate[[1]]
+  sig_0 = normal_mu_fit$estimate[[2]]
+  k_0 = invgamma_sd_fit$estimate[[1]] 
+  v_0 = invgamma_sd_fit$estimate[[2]]
+  
+  
   simul_data = data_23 %>%
   filter(Apparatus == app, Gender == g) %>%
   group_by(unique_id) %>%
-    summarise(mean_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[1],
-              sd_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[2],
+    summarise(mean_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[1],
+              sd_estimate = analyze_athlete(Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0)[2],
               observations = n()) %>%
     rowwise() %>%
-    mutate(simulated_D_Score = rnorm(1, mean_estimate, sd_estimate))
-  
-  simul_data %>%
-    ggplot(aes(x = simulated_D_Score)) +
-      geom_density(color = "red") +
-      labs(title = "simulated d scores",  
-           x = "Difficulty Score",
-           y = "Density")
+    mutate(simulated_Score = rnorm(1, mean_estimate, sd_estimate))
 
   data_23 %>%
     filter(Apparatus == app, Gender == g) %>% 
@@ -1421,17 +1473,39 @@ plot_final_preds = function(data_23, app, g) {
     summarise(mean_score = mean(Score),
               observations = n()) %>%
     filter(observations > 1) %>%
-    inner_join(simul_data, by = c("FirstName", "LastName")) %>%
+    inner_join(simul_data, by = c("unique_id")) %>%
     ggplot() +
-      geom_density(aes(x = mean_d_score), color = "blue") +
-      geom_density(aes(x = simulated_D_Score), color = "red") +
-      labs(title = paste(app, "Scores x Simulated Scores"),
+      geom_density(aes(x = mean_score), color = "blue") +
+      geom_density(aes(x = simulated_Score), color = "red") +
+      labs(title = paste(app, "Simulated Scores"),
            subtitle = "Blue = actual, Red = simulated",
-           x = "Difficulty Score",
-           y = "Density") 
+           x = "Score",
+           y = "Density") +
+     theme_minimal() + 
+    theme(legend.position = "none",
+          plot.title = element_text(size = 8),  
+          plot.subtitle = element_text(size = 7),
+          axis.text = element_text(size = 7),
+          axis.title = element_text(size = 7))
 }
+plot_grid(plot_final_preds(combined, "FX", "m"),
+          plot_final_preds(combined, "HB", "m"),
+          plot_final_preds(combined, "PB", "m"),
+          plot_final_preds(combined, "PH", "m"),
+          plot_final_preds(combined, "SR", "m"),
+          plot_final_preds(combined, "VT", "m"))
 ```
 
+And for the female events:
+
+```{r}
+plot_grid(plot_final_preds(combined, "FX", "w"),
+          plot_final_preds(combined, "BB", "w"),
+          plot_final_preds(combined, "UB", "w"),
+          plot_final_preds(combined, "VT", "w"))
+```
+
+Some of the apparatuses have very similar distributions to the simulations whilst others show some variation. Notably, BB simulated scores are very similar to the actual scores. Overall, the simulations present a good approximation of the actual scores.
 
 ```{r scoremeans-var, message = FALSE}
 # ** Include plot of distribution of score means and variances for a chosen apparatus **
