@@ -316,7 +316,7 @@ To simulate a score for an athlete we sample $\theta^{(s)} \sim p(\theta | x_i)$
 
 We began by creating prior distributions for each apparatus' total score. See Exploratory Data Visualizations for the apparatus-gender level distribution. Various distributions were considered, but the normal distribution was chosen for ease of use and effective fit with low standard errors and p-values < 0.01. We depended on conjugacy to derive the parameters of the normal distribution. Since both the mean and variance of the normal distribution are unknown, we used a normal-inverse gamma prior.
 
-To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means and an inverse-gamma distribution to athletes' variances. We used the maximum likelihood method in the `fitdist()` function (Muller, 2023). The maximum likelihood estimates  were then used as the prior parameters for the normal-inverse gamma distribution. This process was done independently for all apparatuses and genders. Following the establishment of the prior distributions, we updated these distributions based on individuals' competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters for mean and variance and then using these to simulate individual gymnastic scores.
+To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means and an inverse-gamma distribution to athletes' variances. We used the maximum likelihood method in the `fitdist()` function (Muller, 2023). The maximum likelihood estimates  were then used as the prior parameters for the normal-inverse gamma distribution. This process was done independently for all apparatuses and genders. Following the establishment of the prior distributions, we updated these distributions based on individuals' competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters for mean and variance and then using these to simulate individual gymnastic scores. See posterior predictive checks section in appendix for quality of fit.
 
 #### Simulation of Gymnastics Events
 
@@ -1325,18 +1325,22 @@ ggplot(number_athletes, aes(x = athletes_participated)) +
 
 ### Posterior Predictive Checks
 
-Additionally, we look at the distribution of mean scores and the distribution of variance scores for men's high bar apparatus as an example of how we will fit normal-inverse gamma priors for the means and variances. We can see that the distribution of mean scores follows an approximately normal distribution and the distribution of variance scores follow an approximately inverse-gamma distribution.
+Additionally, we look to visualize the effectiveness of the choice of a normal distribution by plotting MLE fitted normals over each apparatus.
 
-```{r highbar-fit, message = FALSE}
-## NOTE TO SELF, MAYBE COME BACK HERE AND FIX THIS IF ITS BROKEN
-normal_fit = fitdist(combined$Score[combined$Apparatus == "HB"], "norm")
-
-combined %>%
-  filter(Apparatus == "HB") %>%
+```{r}
+plot_prior_fits = function (combined, app, g) {
+  combined = combined %>%
+    filter(Gender == g)
+  
+  normal_fit = fitdist(combined$Score[combined$Apparatus == app], "norm")
+  
+  combined %>%
+    filter(Apparatus == app) %>%
   ggplot(aes(x = Score)) +
   geom_density() +
   stat_function(fun = dnorm, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", linewidth = 1) +
-  labs(title = paste("High Bar Score Distribution Compared to Fitted Normal Distribution"),  
+  labs(title = paste(paste(app), "Total Score Dist. x Fitted Normal Prior"),  
+       subtitle = "Black = actual, Red = fitted",
        x = "Difficulty Score",
        y = "Density") +
    theme_minimal() +
@@ -1345,7 +1349,89 @@ combined %>%
         plot.subtitle = element_text(size = 7),
         axis.text = element_text(size = 7),
         axis.title = element_text(size = 7))
+}
+
+plot_grid(plot_prior_fits(combined, "FX", "m"),
+          plot_prior_fits(combined, "HB", "m"),
+          plot_prior_fits(combined, "PB", "m"),
+          plot_prior_fits(combined, "PH", "m"),
+          plot_prior_fits(combined, "SR", "m"),
+          plot_prior_fits(combined, "VT", "m"))
 ```
+
+And for the female events:
+
+```{r}
+plot_grid(plot_prior_fits(combined, "FX", "w"),
+          plot_prior_fits(combined, "BB", "w"),
+          plot_prior_fits(combined, "UB", "w"),
+          plot_prior_fits(combined, "VT", "w"))
+```
+
+```{r}
+#It is clear that the normal distribution is not perfect and that the true densities are slanted, but it serves as a good approximation for the purposes of this case study. Specifically, our methodology uses an inverse gamma prior on the variance of the normal distribution, which is conjugate to the normal distribution. Below we have inverse gamma distributions plotted for each apparatus over the distributions of individual variances.
+
+plot_invgamma = function(combined, app, g) {
+    combined = combined %>%
+    filter(Gender == g) %>%
+    mutate(variances = var(Score))
+  
+    normal_fit = fitdist(combined$Score[combined$Apparatus == app], "norm")
+    
+    combined %>%
+      filter(Apparatus == app) %>%
+    ggplot(aes(x = Score)) +
+    geom_density() +
+    stat_function(fun = d, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", linewidth = 1) +
+    labs(title = paste(paste(app), "Total Score Dist. x Fitted Normal Prior"),  
+         x = "Difficulty Score",
+         y = "Density") +
+     theme_minimal() +
+    theme(legend.position = "none",
+          plot.title = element_text(size = 8),
+          plot.subtitle = element_text(size = 7),
+          axis.text = element_text(size = 7),
+          axis.title = element_text(size = 7))
+}
+```
+
+```{r}
+# Lastly we want to compare the actual scores simulated by the posterior predictive distribution to the actual scores observed in the data. We do this by plotting the actual scores against the simulated scores for each apparatus.
+
+plot_final_preds = function(data_23, app, g) {
+  simul_data = data_23 %>%
+  filter(Apparatus == app, Gender == g) %>%
+  group_by(unique_id) %>%
+    summarise(mean_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[1],
+              sd_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[2],
+              observations = n()) %>%
+    rowwise() %>%
+    mutate(simulated_D_Score = rnorm(1, mean_estimate, sd_estimate))
+  
+  simul_data %>%
+    ggplot(aes(x = simulated_D_Score)) +
+      geom_density(color = "red") +
+      labs(title = "simulated d scores",  
+           x = "Difficulty Score",
+           y = "Density")
+
+  data_23 %>%
+    filter(Apparatus == app, Gender == g) %>% 
+    group_by(unique_id) %>%
+    summarise(mean_score = mean(Score),
+              observations = n()) %>%
+    filter(observations > 1) %>%
+    inner_join(simul_data, by = c("FirstName", "LastName")) %>%
+    ggplot() +
+      geom_density(aes(x = mean_d_score), color = "blue") +
+      geom_density(aes(x = simulated_D_Score), color = "red") +
+      labs(title = paste(app, "Scores x Simulated Scores"),
+           subtitle = "Blue = actual, Red = simulated",
+           x = "Difficulty Score",
+           y = "Density") 
+}
+```
+
 
 ```{r scoremeans-var, message = FALSE}
 # ** Include plot of distribution of score means and variances for a chosen apparatus **
