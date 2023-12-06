@@ -8,7 +8,7 @@ output:
     latex_args: ["-shell-escape"]
 geometry: "top=12mm, bottom=12mm, left=12mm, right=12mm"
 format: pdf
-fontsize: 10.5pt
+fontsize: 10pt
 editor: visual
 ---
 
@@ -316,7 +316,11 @@ To simulate a score for an athlete we sample $\theta^{(s)} \sim p(\theta | x_i)$
 
 We began by creating prior distributions for each apparatus' total score. See Exploratory Data Visualizations for the apparatus-gender level distribution. Various distributions were considered, but the normal distribution was chosen for ease of use and effective fit with low standard errors and p-values \< 0.01. We depended on conjugacy to derive the parameters of the normal distribution. Since both the mean and variance of the normal distribution are unknown, we used a normal-inverse gamma prior.
 
+<<<<<<< HEAD
 To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means and an inverse-gamma distribution to athletes' variances. We used the maximum likelihood method in the `fitdist()` function (Muller, 2023). The maximum likelihood estimates were then used as the prior parameters for the normal-inverse gamma distribution. This process was done independently for all apparatuses and genders. Following the establishment of the prior distributions, we updated these distributions based on individuals' competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters for mean and variance and then using these to simulate individual gymnastic scores.
+=======
+To estimate prior parameters, we fit a normal distribution to the distribution of athletes' means and an inverse-gamma distribution to athletes' variances. We used the maximum likelihood method in the `fitdist()` function (Muller, 2023). The maximum likelihood estimates  were then used as the prior parameters for the normal-inverse gamma distribution. This process was done independently for all apparatuses and genders. Following the establishment of the prior distributions, we updated these distributions based on individuals' competition results. We rely on existing literature for the formulas for the posterior parameters (Hoff, 2009). We then employ a Monte Carlo method to sample new data, simulating the posterior parameters for mean and variance and then using these to simulate individual gymnastic scores. See posterior predictive checks section in appendix for quality of fit.
+>>>>>>> 91b3ff82939b8b2e03178f7668e0085e969f01fd
 
 #### Simulation of Gymnastics Events
 
@@ -623,7 +627,7 @@ VT_m_table = VT_m_simul |>
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -732,7 +736,7 @@ PB_m_simul |>
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -896,7 +900,7 @@ In our results, we saw that Simone Biles was a strong individual apparatus (part
 
 Our Team USA men's selection includes: Asher Hong, Curran Phillips, Donnell Whittenburg, Colt Walker, and Brody Malone.
 
-In order to find the expected best all-around male athletes from the simulation, we gave rankings of total count of gold medals for each apparatus, took the average of those rankings for each athlete and picked the top five athletes with the highest average ranking (Appendix: Image 13). This method also matches our simulation results, which shows these five athletes (except for Asher Hong as a vault specialist, yet Asher can also rank high in all-around male athletes) as all-around gymnasts who can place in the top 10 of simulated total medals in at least two apparatuses, and cover all the apparatuses except for pommel horse.
+In order to find the expected best all-around male athletes from the simulation, we gave rankings of total count of gold medals for each apparatus, took the average of those rankings for each athlete and decided to pick the top five athletes with the highest average ranking (Appendix: Image 13), but we will choose Curran Phillips as spot #5 instead of Paul Juda given Curran Phillips places well in vault and parallel bars, representing an all-arounder with additional specialties. This method also matches our simulation results, which shows these five athletes (except for Asher Hong as a vault specialist, yet Asher can also rank high in all-around male athletes) as all-around gymnasts who can place in the top 10 of simulated total medals in at least two apparatuses, and cover all the apparatuses except for pommel horse.
 
 ### Methodology and Data Evaluation
 
@@ -996,7 +1000,7 @@ FX_m_simul |>
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1053,7 +1057,7 @@ HB_m_simul |>
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1110,7 +1114,7 @@ PH_m_simul |>
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1167,7 +1171,7 @@ SR_m_simul |>
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1324,27 +1328,113 @@ ggplot(number_athletes, aes(x = athletes_participated)) +
 
 ### Posterior Predictive Checks
 
-Additionally, we look at the distribution of mean scores and the distribution of variance scores for men's high bar apparatus as an example of how we will fit normal-inverse gamma priors for the means and variances. We can see that the distribution of mean scores follows an approximately normal distribution and the distribution of variance scores follow an approximately inverse-gamma distribution.
+Additionally, we look to visualize the effectiveness of the choice of a normal distribution by plotting MLE fitted normals over each apparatus.
 
-```{r highbar-fit, message = FALSE}
-## NOTE TO SELF, MAYBE COME BACK HERE AND FIX THIS IF ITS BROKEN
-normal_fit = fitdist(combined$Score[combined$Apparatus == "HB"], "norm")
-
-combined %>%
-  filter(Apparatus == "HB") %>%
+```{r}
+plot_prior_fits = function (combined, app, g) {
+  combined = combined %>%
+    filter(Gender == g)
+  
+  normal_fit = fitdist(combined$Score[combined$Apparatus == app], "norm")
+  
+  combined %>%
+    filter(Apparatus == app) %>%
   ggplot(aes(x = Score)) +
   geom_density() +
   stat_function(fun = dnorm, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", linewidth = 1) +
-  labs(title = paste("High Bar Score Distribution Compared to Fitted Normal Distribution"),  
+  labs(title = paste(paste(app), "Total Score Dist. x Normal Prior"),  
+       subtitle = "Black = actual, Red = fitted",
        x = "Difficulty Score",
        y = "Density") +
    theme_minimal() +
   theme(legend.position = "none",
-        plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
+        plot.title = element_text(size = 6),
+        plot.subtitle = element_text(size = 5),
         axis.text = element_text(size = 7),
         axis.title = element_text(size = 7))
+}
+
+plot_grid(plot_prior_fits(combined, "FX", "m"),
+          plot_prior_fits(combined, "HB", "m"),
+          plot_prior_fits(combined, "PB", "m"),
+          plot_prior_fits(combined, "PH", "m"),
+          plot_prior_fits(combined, "SR", "m"),
+          plot_prior_fits(combined, "VT", "m"))
 ```
+
+And for the female events:
+
+```{r}
+plot_grid(plot_prior_fits(combined, "FX", "w"),
+          plot_prior_fits(combined, "BB", "w"),
+          plot_prior_fits(combined, "UB", "w"),
+          plot_prior_fits(combined, "VT", "w"))
+```
+
+```{r}
+#It is clear that the normal distribution is not perfect and that the true densities are slanted, but it serves as a good approximation for the purposes of this case study. Specifically, our methodology uses an inverse gamma prior on the variance of the normal distribution, which is conjugate to the normal distribution. Below we have inverse gamma distributions plotted for each apparatus over the distributions of individual variances.
+
+plot_invgamma = function(combined, app, g) {
+    combined = combined %>%
+    filter(Gender == g) %>%
+    mutate(variances = var(Score))
+  
+    normal_fit = fitdist(combined$Score[combined$Apparatus == app], "norm")
+    
+    combined %>%
+      filter(Apparatus == app) %>%
+    ggplot(aes(x = Score)) +
+    geom_density() +
+    stat_function(fun = d, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", linewidth = 1) +
+    labs(title = paste(paste(app), "Total Score Dist. x Fitted Normal Prior"),  
+         x = "Difficulty Score",
+         y = "Density") +
+     theme_minimal() +
+    theme(legend.position = "none",
+          plot.title = element_text(size = 8),
+          plot.subtitle = element_text(size = 7),
+          axis.text = element_text(size = 7),
+          axis.title = element_text(size = 7))
+}
+```
+
+```{r}
+# Lastly we want to compare the actual scores simulated by the posterior predictive distribution to the actual scores observed in the data. We do this by plotting the actual scores against the simulated scores for each apparatus.
+
+plot_final_preds = function(data_23, app, g) {
+  simul_data = data_23 %>%
+  filter(Apparatus == app, Gender == g) %>%
+  group_by(unique_id) %>%
+    summarise(mean_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[1],
+              sd_estimate = analyze_athlete(D_Score, m_0 = m_0, sig_0 = sig_0, k_0 = k_0, v_0 = v_0, smc = 1000)[2],
+              observations = n()) %>%
+    rowwise() %>%
+    mutate(simulated_D_Score = rnorm(1, mean_estimate, sd_estimate))
+  
+  simul_data %>%
+    ggplot(aes(x = simulated_D_Score)) +
+      geom_density(color = "red") +
+      labs(title = "simulated d scores",  
+           x = "Difficulty Score",
+           y = "Density")
+
+  data_23 %>%
+    filter(Apparatus == app, Gender == g) %>% 
+    group_by(unique_id) %>%
+    summarise(mean_score = mean(Score),
+              observations = n()) %>%
+    filter(observations > 1) %>%
+    inner_join(simul_data, by = c("FirstName", "LastName")) %>%
+    ggplot() +
+      geom_density(aes(x = mean_d_score), color = "blue") +
+      geom_density(aes(x = simulated_D_Score), color = "red") +
+      labs(title = paste(app, "Scores x Simulated Scores"),
+           subtitle = "Blue = actual, Red = simulated",
+           x = "Difficulty Score",
+           y = "Density") 
+}
+```
+
 
 ```{r scoremeans-var, message = FALSE}
 # ** Include plot of distribution of score means and variances for a chosen apparatus **
@@ -1461,7 +1551,7 @@ tot_w_simul %>%
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1549,7 +1639,7 @@ tot_w_simul %>%
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1637,7 +1727,7 @@ tot_w_simul %>%
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1761,7 +1851,7 @@ tot_m_simul %>%
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1849,7 +1939,7 @@ tot_m_simul %>%
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -1937,7 +2027,7 @@ tot_m_simul %>%
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -2077,7 +2167,7 @@ tot_m_simul %>%
                                unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
                                unique_id == "DaiHAS_JPN" ~ "Daiki Hashimoto: JPN",
                                unique_id == "KazMIN_JPN" ~ "Kazuki Minami: JPM",
-                               unique_id == "YulMOL_USA" ~ "Yul Moldauer",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
                                unique_id == "NicBAR_ITA" ~ "Nicola Bartolini: ITA",
                                unique_id == "HarHEP_GBR" ~ "Harry Hepworth: GBR",
                                unique_id == "JakJAR_GBR" ~ "Jake Jarman: GBR",
@@ -2148,7 +2238,7 @@ ggplot(data = top10_men,aes(x = Country, y =Golds, color = USA, shape = Apparatu
 
 **Image 13)**
 
-Average of total gold medal count ranking by apparatus of all US male gymnasts in ascending order (to find best all around gymnast for men's team)
+Average of total gold medal count ranking by apparatus of all US male gymnasts in ascending order -- lower average rank meaning better results, that is, placing higher in rank. We output this average rank in order to find best all around gymnast for men's team.
 
 ```{r}
 #ADDS RANK TO EACH MALE ATHLETE FOR EACH APPARATUS BY NUMBER OF GOLD MEDALS
@@ -2180,6 +2270,7 @@ menGoldRank_top6 <- menGoldRank %>%
   group_by(unique_id) %>% 
   summarise(avgRank = mean(Gold_Count_Rank)) %>% 
   arrange(avgRank) %>% 
+<<<<<<< HEAD
   slice_head(n = 6)
 
 menGoldRank_top6 %>% 
@@ -2238,6 +2329,25 @@ menGoldRank_top6 %>%
                                #unique_id == "Yu-SHI_TPE" ~ "Yu-Jan Shiao: TPE"
                                ))|>
   kable(caption = "Average Overall Rank of USA Athletes By Number of Gold Medals (Top 6)", col.names = c("Athlete & Country", "Average Rank")) |>
+=======
+  head(10) |>
+  mutate(unique_id = case_when(
+                               unique_id == "PauJUD_USA" ~ "Paul Juda: USA",
+                               unique_id == "YulMOL_USA" ~ "Yul Moldauer: USA",
+                               unique_id == "AshHON_USA" ~ "Asher Hong: USA",
+                               unique_id == "DalHAL_USA" ~ "Dallas Hale: USA",
+                               unique_id == "KhoYOU_USA" ~ "Khoi Young: USA",
+                               unique_id == "CurPHI_USA" ~ "Curran Phillips: USA",
+                               unique_id == "DonWHI_USA" ~ "Donnell Whittenburg: USA",
+                               unique_id == "TayBUR_USA" ~ "Taylor Burkhart: USA",
+                               unique_id == "ColWAL_USA" ~ "Colt Walker: USA",
+                               unique_id == "SteNED_USA" ~ "Stephen Nedoroscik: USA",
+                               unique_id == "BroMAL_USA" ~ "Brody Malone: USA",
+                               unique_id == "BlaSUN_USA" ~ "Blake Sun: USA",
+                               unique_id == "ShaWIS_USA" ~ "Shane Wiskus: USA",
+                               unique_id == "FreRIC_USA" ~ "Frederick Richard: USA")) |>
+  kable(caption = "Top 10 Average Ranks of USA Male Athletes By Number of Gold Medals", col.names = c("Athlete & Country", "Average Rank")) |>
+>>>>>>> 91b3ff82939b8b2e03178f7668e0085e969f01fd
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 
