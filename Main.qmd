@@ -8,7 +8,7 @@ output:
     latex_args: ["-shell-escape"]
 geometry: "top=12mm, bottom=12mm, left=12mm, right=12mm"
 format: pdf
-fontsize: 10.5pt
+fontsize: 10pt
 editor: visual
 ---
 
@@ -1339,14 +1339,14 @@ plot_prior_fits = function (combined, app, g) {
   ggplot(aes(x = Score)) +
   geom_density() +
   stat_function(fun = dnorm, args = list(normal_fit$estimate[[1]], normal_fit$estimate[[2]]), color = "red", linewidth = 1) +
-  labs(title = paste(paste(app), "Total Score Dist. x Fitted Normal Prior"),  
+  labs(title = paste(paste(app), "Total Score Dist. x Normal Prior"),  
        subtitle = "Black = actual, Red = fitted",
        x = "Difficulty Score",
        y = "Density") +
    theme_minimal() +
   theme(legend.position = "none",
-        plot.title = element_text(size = 8),
-        plot.subtitle = element_text(size = 7),
+        plot.title = element_text(size = 6),
+        plot.subtitle = element_text(size = 5),
         axis.text = element_text(size = 7),
         axis.title = element_text(size = 7))
 }
