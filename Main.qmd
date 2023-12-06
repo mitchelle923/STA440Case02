@@ -2296,6 +2296,8 @@ tot_m_simul %>%
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 ```
 
+\newpage
+
 **Image 12)**
 
 ```{r top5-decorated, warning = FALSE}
@@ -2304,7 +2306,7 @@ top10_men <- tot_m_simul %>%
   group_by(Apparatus) %>% 
   slice_max(order_by = Golds, n = 5)
 ggplot(data = top10_men,aes(x = Country, y =Golds, color = USA, shape = Apparatus)) + geom_point() + facet_wrap(~Apparatus) +theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ylim(0, 100) + labs(title = "12) Men: Country of Top 5 Athletes by Number of Gold Medals", subtitle = "by Apparatus", x = "Country", y = "Number of Gold Medals") +
-  theme(axis.text.x = element_text(size = 6.5, angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(size = 5, angle = 45, hjust = 1))
 ```
 
 ***Note:*** The excessive number of countries display that there is not much overlap in the top 5 most gold medal decorated athletes on the men's team and therefore the lack of well-rounded gymnasts.
